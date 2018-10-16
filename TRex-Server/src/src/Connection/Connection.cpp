@@ -17,6 +17,7 @@
  */
 
 #include "Connection.hpp"
+#include "Common/Funs.h"
 
 using concept::connection::Connection;
 using namespace concept::packet;
@@ -67,16 +68,13 @@ void Connection::start()
 
 void Connection::handleRead(const boost::system::error_code& error, std::size_t bytes_transferred) {
 	if (!error) {
-        std::cout << "PID " << ::getpid() << " is starting Connection::handleRead at " << clock() << std::endl;
-        clock_t stop;
-        clock_t start = clock();
+        traceEvent(2, syscall(SYS_gettid));
 		if (usePing) {
 			pingReceiveTimer.cancel();
 		}
 		requestHandler.handleRequest<BUFFER_LENGTH>(buffer, bytes_transferred);
 		asyncReadSome();
-        stop = clock();
-        std::cout << "Time to execute Connection::handleRead: " << stop-start << ", stop time at " << stop << std::endl;
+        traceEvent(9, syscall(SYS_gettid));
 	} else {
 		if(error==boost::asio::error::eof) LOG(warning) << "Connection closed while receiving from " << printRemoteEndpoint();
 		else LOG(warning) << "Connection error '" << error.message() << (error==boost::asio::error::eof) << "' while receiving from " << printRemoteEndpoint();

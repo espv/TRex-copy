@@ -41,6 +41,8 @@ typedef struct PartialEventStruct {
   PubPkt* indexes[MAX_RULE_FIELDS];
 } PartialEvent;
 
+void traceEvent(int trace_id, int pid);
+
 bool checkNegationConstraints(PubPkt* event, RulePkt* rule, int negNum);
 bool checkAggregateConstraints(PubPkt* event, RulePkt* rule, int aggNum);
 bool checkConstraints(PubPkt* event, RulePkt* rule, int state);

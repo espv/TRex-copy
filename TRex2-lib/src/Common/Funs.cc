@@ -19,6 +19,7 @@
 //
 
 #include "Funs.h"
+#include <sys/time.h>
 
 using namespace std;
 
@@ -26,6 +27,14 @@ using namespace std;
 // AC_CHECK_LIB macro
 extern "C" {
 void libTRex2_is_present(void){};
+}
+
+pthread_mutex_t* traceMutex = new pthread_mutex_t;
+void traceEvent(int traceId, int pid)
+{
+  pthread_mutex_lock(traceMutex);
+  cout << traceId << "-" << pid << "-" << clock() << std::endl;
+  pthread_mutex_unlock(traceMutex);
 }
 
 bool checkConstraints(PubPkt* event, RulePkt* rule, int state) {

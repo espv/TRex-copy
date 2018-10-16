@@ -17,11 +17,20 @@
  */
 
 #include "RequestHandler.hpp"
+#include <sys/syscall.h>
 
 using concept::connection::RequestHandler;
 using namespace concept::packet;
 using namespace concept::util;
 using namespace std;
+
+pthread_mutex_t* traceMutex = new pthread_mutex_t;
+void traceEvent(int traceId, int pid)
+{
+    pthread_mutex_lock(traceMutex);
+    cout << traceId << "-" << pid << "-" << clock() << std::endl;
+    pthread_mutex_unlock(traceMutex);
+}
 
 #ifdef HAVE_GTREX
 	RequestHandler::RequestHandler(TRexEngine &tRexEngine, GPUEngine &gtRexEngine, ConnectionProxy& connection, SubscriptionTable &subTable, bool useGPUPar):
@@ -57,9 +66,11 @@ RequestHandler::~RequestHandler(){
 }
 
 void RequestHandler::handleRequest(std::vector<PktPtr> & pkts){
+    traceEvent(1, syscall(SYS_gettid));
 	for (std::vector<PktPtr>::iterator it= pkts.begin(); it != pkts.end(); it++){
 		boost::apply_visitor(PktHandleVisitor(*this, useGPU), *it);
 	}
+    traceEvent(11, syscall(SYS_gettid));
 }
 
 void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
@@ -77,6 +88,7 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 }
 
 void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
+    traceEvent(2, syscall(SYS_gettid));
 	LOG(info) << "Publication from " << parent.connection.remoteToString() << ":" << endl
 			<< "  " << toString(pkt);
 	parent.subTable.processPublication(pkt);
@@ -87,6 +99,7 @@ void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
 	  parent.gtRexEngine.processPubPkt(pkt);
 	}
 #endif
+    traceEvent(10, syscall(SYS_gettid));
 }
 
 void RequestHandler::PktHandleVisitor::operator()(SubPkt * pkt) const{
