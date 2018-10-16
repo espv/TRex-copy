@@ -1,2 +1,2 @@
 cd "$(dirname "$0")"
-CFLAGS="" CXXFLAGS="" CPPFLAGS="-O3" ./configure
+CFLAGS="-std=c++11 -g3 -O0" CXXFLAGS="-std=c++11 -g2 -O0" CPPFLAGS="-std=c++11 -g3 -O0" ./configure
