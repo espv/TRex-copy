@@ -27,21 +27,17 @@ CompositeEventTemplate::CompositeEventTemplate(int parEventType) {
 }
 
 CompositeEventTemplate::~CompositeEventTemplate() {
-  for (map<int, CompositeEventTemplateAttr*>::iterator it = attributes.begin();
-       it != attributes.end(); ++it) {
-    delete it->second;
-  }
+  for (auto it : attributes)
+    delete it.second;
 }
 
 void CompositeEventTemplate::addAttribute(char* name, OpTree* value) {
-  CompositeEventTemplateAttr* attribute =
-      new CompositeEventTemplateAttr(name, value);
+  auto attribute = new CompositeEventTemplateAttr(name, value);
   attributes.insert(make_pair(attributes.size(), attribute));
 }
 
 void CompositeEventTemplate::addStaticAttribute(Attribute pattr) {
-  CompositeEventTemplateStaticAttr* attribute =
-      new CompositeEventTemplateStaticAttr(pattr);
+  auto attribute = new CompositeEventTemplateStaticAttr(pattr);
   staticAttributes.insert(make_pair(staticAttributes.size(), attribute));
 }
 
@@ -71,15 +67,12 @@ OpTree* CompositeEventTemplate::getAttributeTree(int index) {
 
 CompositeEventTemplate* CompositeEventTemplate::dup() {
   CompositeEventTemplate* dup = new CompositeEventTemplate(eventType);
-  for (map<int, CompositeEventTemplateAttr*>::iterator it = attributes.begin();
-       it != attributes.end(); ++it) {
-    CompositeEventTemplateAttr* attrDup = it->second->dup();
+  for (auto it : attributes) {
+    CompositeEventTemplateAttr* attrDup = it.second->dup();
     dup->addAttribute(attrDup);
   }
-  for (map<int, CompositeEventTemplateStaticAttr*>::iterator it =
-           staticAttributes.begin();
-       it != staticAttributes.end(); ++it) {
-    CompositeEventTemplateStaticAttr* attrDup = it->second->dup();
+  for (auto it : staticAttributes) {
+    CompositeEventTemplateStaticAttr* attrDup = it.second->dup();
     dup->addStaticAttribute(attrDup);
   }
   return dup;

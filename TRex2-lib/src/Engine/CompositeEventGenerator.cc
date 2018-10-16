@@ -323,8 +323,7 @@ inline float CompositeEventGenerator::computeAggregate(
   ValType type;
   bool checkParams = false;
   bool firstValue = true;
-  map<int, set<CPUParameter*>>::iterator paramIt =
-      aggregateParameters.find(index);
+  auto paramIt = aggregateParameters.find(index);
   if (paramIt != aggregateParameters.end())
     checkParams = true;
   for (int i = index1; i <= index2; i++) {
@@ -373,10 +372,9 @@ inline float CompositeEventGenerator::computeAggregate(
 bool CompositeEventGenerator::checkParameters(PubPkt* pkt,
                                               PartialEvent* partialEvent,
                                               set<CPUParameter*>& parameters) {
-  for (set<CPUParameter*>::iterator it = parameters.begin();
-       it != parameters.end(); ++it) {
+  for (auto it : parameters) {
     // cout << "Agg par" << endl;
-    if (!checkComplexParameter(pkt, partialEvent, *it, -1, AGG))
+    if (!checkComplexParameter(pkt, partialEvent, it, -1, AGG))
       return false;
   }
   return true;

@@ -51,29 +51,24 @@ void* processor(void* parShared) {
     set<PubPkt*> generatedPkts;
     for (int i = lowerBound; i < upperBound; i++) {
       traceEvent(7, syscall(SYS_gettid), false);
-      map<int, set<int>>::iterator negsIt = mh->matchingNegations.find(i);
+      auto negsIt = mh->matchingNegations.find(i);
       if (negsIt != mh->matchingNegations.end()) {
-        for (set<int>::iterator it = negsIt->second.begin();
-             it != negsIt->second.end(); ++it) {
-          int index = *it;
+        for (auto index : negsIt->second) {
           s->stacksRule->find(i)->second->addToNegationStack(s->pkt, index);
         }
       }
-      map<int, set<int>>::iterator aggsIt = mh->matchingAggregates.find(i);
+      auto aggsIt = mh->matchingAggregates.find(i);
       if (aggsIt != mh->matchingAggregates.end()) {
-        for (set<int>::iterator it = aggsIt->second.begin();
-             it != aggsIt->second.end(); ++it) {
-          int index = *it;
+        for (auto index : aggsIt->second) {
           s->stacksRule->find(i)->second->addToAggregateStack(s->pkt, index);
         }
       }
-      map<int, set<int>>::iterator statesIt = mh->matchingStates.find(i);
+
+      auto statesIt = mh->matchingStates.find(i);
       if (statesIt != mh->matchingStates.end()) {
         // Last state (if found) is processed last
         bool lastState = false;
-        for (set<int>::iterator it = statesIt->second.begin();
-             it != statesIt->second.end(); ++it) {
-          int index = *it;
+        for (auto index : statesIt->second) {
           if (index != 0) {
             s->stacksRule->find(i)->second->addToStack(s->pkt, index);
           } else {
@@ -122,9 +117,8 @@ TRexEngine::~TRexEngine() {
   delete shared[0].stillProcessing;
   delete[] shared;
   delete[] threads;
-  for (StacksRules::iterator it = stacksRules->begin();
-       it != stacksRules->end(); it++) {
-    StacksRule* stackRule = it->second;
+  for (auto it : *stacksRules) {
+    StacksRule* stackRule = it.second;
     delete stackRule;
   }
   delete stacksRules;
@@ -166,9 +160,8 @@ void TRexEngine::setRecursionNeeded(RulePkt* pkt) {
     inputEvents.insert(pkt->getPredicate(i).eventType);
   outputEvents.insert(pkt->getCompositeEventTemplate()->getEventType());
 
-  for (std::set<int>::iterator it = inputEvents.begin();
-       it != inputEvents.end(); ++it) {
-    if (outputEvents.find(*it) != outputEvents.end()) {
+  for (auto it : inputEvents) {
+    if (outputEvents.find(it) != outputEvents.end()) {
       recursionNeeded = true;
       return;
     }
@@ -231,9 +224,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
 
   // Collects results
   for (int i = 0; i < numProc; i++) {
-    for (set<PubPkt*>::iterator resIt = shared[i].result.begin();
-         resIt != shared[i].result.end(); ++resIt) {
-      PubPkt* resPkt = *resIt;
+    for (auto resPkt : shared[i].result) {
       result.insert(resPkt);
     }
     shared[i].result.clear();
@@ -253,15 +244,12 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
 
   traceEvent(9, syscall(SYS_gettid), false);
   // Notifies results to listeners
-  for (set<ResultListener*>::iterator it = resultListeners.begin();
-       it != resultListeners.end(); ++it) {
-    ResultListener* listener = *it;
+  for (auto listener : resultListeners) {
     listener->handleResult(result, duration);
   }
   traceEvent(10, syscall(SYS_gettid), false);
 
-  for (set<PubPkt*>::iterator it = result.begin(); it != result.end(); ++it) {
-    PubPkt* pkt = *it;
+  for (auto pkt : result) {
     if (recursionNeeded && recursionDepth < MAX_RECURSION_DEPTH)
       processPubPkt(pkt->copy(), true);
     if (pkt->decRefCount()) {

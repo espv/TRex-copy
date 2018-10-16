@@ -31,36 +31,29 @@ SimpleRoutingTable::SimpleRoutingTable() {
 SimpleRoutingTable::~SimpleRoutingTable() {
   pthread_mutex_destroy(mutex);
   delete mutex;
-  for (map<int, map<int, list<SubPkt*>>>::iterator it = subscriptions.begin();
-       it != subscriptions.end(); ++it) {
-    for (map<int, list<SubPkt*>>::iterator it2 = it->second.begin();
-         it2 != it->second.end(); ++it2) {
-      for (list<SubPkt*>::iterator it3 = it2->second.begin();
-           it3 != it2->second.end(); ++it3) {
-        SubPkt* pkt = *it3;
+  for (auto it : subscriptions)
+    for (auto it2 : it.second)
+      for (auto pkt : it2.second)
         delete pkt;
-      }
-    }
-  }
 }
 
 void SimpleRoutingTable::installSubscription(int clientId,
                                              SubPkt* subscription) {
   pthread_mutex_lock(mutex);
   int type = subscription->getEventType();
-  map<int, map<int, list<SubPkt*>>>::iterator it = subscriptions.find(type);
+  auto it = subscriptions.find(type);
   if (it == subscriptions.end()) {
     list<SubPkt*> newList;
     newList.push_back(subscription);
     subscriptions[type].insert(make_pair(clientId, newList));
   } else {
-    map<int, list<SubPkt*>>::iterator it2 = it->second.find(clientId);
-    if (it2 == it->second.end()) {
+    auto it2 = it.second.find(clientId);
+    if (it2 == it.second.end()) {
       list<SubPkt*> newSet;
       newSet.push_back(subscription);
-      it->second.insert(make_pair(clientId, newSet));
+      it.second.insert(make_pair(clientId, newSet));
     } else {
-      it2->second.push_back(subscription);
+      it2.second.push_back(subscription);
     }
   }
   pthread_mutex_unlock(mutex);
@@ -70,21 +63,20 @@ void SimpleRoutingTable::deleteSubscription(int clientId,
                                             SubPkt* subscription) {
   pthread_mutex_lock(mutex);
   int type = subscription->getEventType();
-  map<int, map<int, list<SubPkt*>>>::iterator it = subscriptions.find(type);
+  auto it = subscriptions.find(type);
   if (it == subscriptions.end()) {
     pthread_mutex_unlock(mutex);
     return;
   }
-  map<int, list<SubPkt*>>::iterator it2 = it->second.find(clientId);
-  if (it2 == it->second.end()) {
+  auto it2 = it.second.find(clientId);
+  if (it2 == it.second.end()) {
     pthread_mutex_unlock(mutex);
     return;
   }
-  for (list<SubPkt*>::iterator it3 = it2->second.begin();
-       it3 != it2->second.end();) {
+  for (auto it3 = it2.second.begin(); it3 != it2.second.end()) {
     SubPkt* stored = *it3;
     if (sameSubscription(stored, subscription))
-      it3 = it2->second.erase(it3);
+      it3 = it2.second.erase(it3);
     else
       ++it3;
   }
@@ -93,16 +85,12 @@ void SimpleRoutingTable::deleteSubscription(int clientId,
 
 void SimpleRoutingTable::removeClient(int clientId) {
   pthread_mutex_lock(mutex);
-  for (map<int, map<int, list<SubPkt*>>>::iterator it = subscriptions.begin();
-       it != subscriptions.end(); ++it) {
-    if (it->second.find(clientId) == it->second.end())
+  for (auto it : subscriptions) {
+    if (it.second.find(clientId) == it.second.end())
       continue;
-    for (list<SubPkt*>::iterator it2 = it->second[clientId].begin();
-         it2 != it->second[clientId].end(); ++it2) {
-      SubPkt* pkt = *it2;
+    for (auto pkt : it.second[clientId])
       delete pkt;
-    }
-    it->second.erase(clientId);
+    it.second.erase(clientId);
   }
   pthread_mutex_unlock(mutex);
 }
@@ -110,18 +98,14 @@ void SimpleRoutingTable::removeClient(int clientId) {
 void SimpleRoutingTable::getMatchingClients(PubPkt* pubPkt, set<int>& clients) {
   pthread_mutex_lock(mutex);
   int eventType = pubPkt->getEventType();
-  map<int, map<int, list<SubPkt*>>>::iterator it =
-      subscriptions.find(eventType);
+  auto it = subscriptions.find(eventType);
   if (it == subscriptions.end()) {
     pthread_mutex_unlock(mutex);
     return;
   }
-  for (map<int, list<SubPkt*>>::iterator it2 = it->second.begin();
-       it2 != it->second.end(); ++it2) {
-    int client = it2->first;
-    for (list<SubPkt*>::iterator it3 = it2->second.begin();
-         it3 != it2->second.end(); ++it3) {
-      SubPkt* subPkt = *it3;
+  for (auto it2 : it.second) {
+    int client = it2.first;
+    for (auto subPkt : it2.second) {
       if (matches(pubPkt, subPkt)) {
         clients.insert(client);
         break;

@@ -307,25 +307,19 @@ bool checkNegationConstraints(PubPkt* event, RulePkt* rule, int negNum) {
 
 void getMatchingColumns(PubPkt* e, map<int, set<int>>& topics,
                         list<int>& results) {
-  map<int, set<int>>::iterator it = topics.find(e->getEventType());
+  auto it = topics.find(e->getEventType());
   if (it == topics.end())
     return;
-  for (set<int>::iterator statesIt = it->second.begin();
-       statesIt != it->second.end(); ++statesIt) {
-    int state = *statesIt;
+  for (auto state : it->second)
     results.push_back(state);
-  }
 }
 
 void getMatchingColumns(int e, map<int, set<int>>& topics, list<int>& results) {
-  map<int, set<int>>::iterator it = topics.find(e);
+  auto it = topics.find(e);
   if (it == topics.end())
     return;
-  for (set<int>::iterator statesIt = it->second.begin();
-       statesIt != it->second.end(); ++statesIt) {
-    int state = *statesIt;
+  for (auto state : it->second)
     results.push_back(state);
-  }
 }
 
 EventInfo createEventInfo(PubPkt* event) {

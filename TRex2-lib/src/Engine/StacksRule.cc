@@ -26,8 +26,7 @@ StacksRule::StacksRule(RulePkt* pkt) {
   // Initializes the rule identifier
   ruleId = pkt->getRuleId();
   rulePkt = pkt;
-  eventGenerator =
-      new CompositeEventGenerator(pkt->getCompositeEventTemplate());
+  eventGenerator = new CompositeEventGenerator(pkt->getCompositeEventTemplate());
   if (pkt->getCompositeEventTemplate()->getAttributesNum() +
           pkt->getCompositeEventTemplate()->getStaticAttributesNum() ==
       0) {
@@ -86,86 +85,51 @@ StacksRule::StacksRule(RulePkt* pkt) {
                         pkt->getComplexParameter(i).vtype);
   }
   // Initialize the set of consuming indexes
-  set<int> cons = pkt->getConsuming();
-  for (set<int>::iterator it = cons.begin(); it != cons.end(); ++it) {
-    int consumedIndex = *it;
+  for (auto consumedIndex : pkt->getConsuming())
     consumingIndexes.insert(consumedIndex);
-  }
 }
 
 StacksRule::~StacksRule() {
   // Deletes stored messages used
-  for (map<int, vector<PubPkt*>>::iterator it = receivedPkts.begin();
-       it != receivedPkts.end(); ++it) {
-    vector<PubPkt*> temp = it->second;
-    for (vector<PubPkt*>::iterator it2 = temp.begin(); it2 != temp.end();
-         ++it2) {
-      PubPkt* pkt = *it2;
+  for (auto it : receivedPkts) {
+    vector<PubPkt*> temp = it.second;
+    for (auto pkt : temp)
       if (pkt->decRefCount())
         delete pkt;
-    }
   }
-  for (map<int, vector<PubPkt*>>::iterator it = receivedAggs.begin();
-       it != receivedAggs.end(); ++it) {
-    vector<PubPkt*> temp = it->second;
-    for (vector<PubPkt*>::iterator it2 = temp.begin(); it2 != temp.end();
-         ++it2) {
-      PubPkt* pkt = *it2;
+  for (auto it : receivedAggs) {
+    vector<PubPkt*> temp = it.second;
+    for (auto pkt : temp)
       if (pkt->decRefCount())
         delete pkt;
-    }
   }
-  for (map<int, vector<PubPkt*>>::iterator it = receivedNegs.begin();
-       it != receivedNegs.end(); ++it) {
-    vector<PubPkt*> temp = it->second;
-    for (vector<PubPkt*>::iterator it2 = temp.begin(); it2 != temp.end();
-         ++it2) {
-      PubPkt* pkt = *it2;
+  for (auto it : receivedNegs) {
+    vector<PubPkt*> temp = it.second;
+    for (auto pkt : temp)
       if (pkt->decRefCount())
         delete pkt;
-    }
   }
 
   // frees heap memory
-  for (map<int, Stack*>::iterator it = stacks.begin(); it != stacks.end();
-       ++it) {
-    delete it->second;
-  }
-  for (set<Parameter*>::iterator it = endStackParameters.begin();
-       it != endStackParameters.end(); ++it) {
-    Parameter* par = *it;
+  for (auto it : stacks)
+    delete it.second;
+  for (auto par : endStackParameters)
     delete par;
+  for (auto it : branchStackComplexParameters) {
+    set<CPUParameter*> temp = it.second;
+    for (auto par : temp)
+      delete par;
   }
 
-  for (map<int, set<CPUParameter*>>::iterator it =
-           branchStackComplexParameters.begin();
-       it != branchStackComplexParameters.end(); ++it) {
-    set<CPUParameter*> temp = it->second;
-    for (set<CPUParameter*>::iterator it2 = temp.begin(); it2 != temp.end();
-         ++it2) {
-      CPUParameter* par = *it2;
+  for (auto it : aggregateComplexParameters) {
+    set<CPUParameter*> temp = it.second;
+    for (auto par : temp)
       delete par;
-    }
   }
-
-  for (map<int, set<CPUParameter*>>::iterator it =
-           aggregateComplexParameters.begin();
-       it != aggregateComplexParameters.end(); ++it) {
-    set<CPUParameter*> temp = it->second;
-    for (set<CPUParameter*>::iterator it2 = temp.begin(); it2 != temp.end();
-         ++it2) {
-      CPUParameter* par = *it2;
-      delete par;
-    }
-  }
-  for (map<int, Aggregate*>::iterator it = aggregates.begin();
-       it != aggregates.end(); ++it) {
-    delete it->second;
-  }
-  for (map<int, Negation*>::iterator it = negations.begin();
-       it != negations.end(); ++it) {
-    delete it->second;
-  }
+  for (auto it : aggregates)
+    delete it.second;
+  for (auto it : negations)
+    delete it.second;
   delete eventGenerator;
 }
 
@@ -216,8 +180,7 @@ void StacksRule::parametricAddToStack(PubPkt* pkt, int& parStacksSize,
     pkt->incRefCount();
   } else {
     parStacksSize++;
-    vector<PubPkt*>::iterator vecIt = parReceived.begin();
-    parReceived.insert(vecIt + i, pkt);
+    parReceived.insert(parReceived.begin() + i, pkt);
     pkt->incRefCount();
   }
 }
@@ -313,8 +276,7 @@ void StacksRule::getWinEvents(list<PartialEvent*>* results, int index,
       getLastValidElement(receivedPkts[index], stacksSize[index], tsUp, index1);
   if (index2 < 0)
     index2 = index1;
-  map<int, set<CPUParameter*>>::iterator itComplex =
-      branchStackComplexParameters.find(index);
+  auto itComplex = branchStackComplexParameters.find(index);
   if (itComplex != branchStackComplexParameters.end())
     useComplexParameters = true;
 
@@ -342,9 +304,7 @@ void StacksRule::getWinEvents(list<PartialEvent*>* results, int index,
       bool invalidatedByNegations = false;
       set<int>* negation = stacks[index]->getLinkedNegations();
       if (!negation->empty()) {
-        for (set<int>::iterator it = negation->begin(); it != negation->end();
-             ++it) {
-          int neg = *it;
+        for (auto neg : *negation) {
           if (checkNegation(neg, newPartialEvent)) {
             invalidatedByNegations = true;
             break;
@@ -404,8 +364,7 @@ bool StacksRule::checkNegation(int negIndex, PartialEvent* partialResult) {
   if (index2 < 0)
     index2 = index1;
 
-  map<int, set<CPUParameter*>>::iterator itComplex =
-      negationComplexParameters.find(negIndex);
+  auto itComplex = negationComplexParameters.find(negIndex);
   if (itComplex == negationComplexParameters.end())
     return true;
   // Iterates over all negations and over all parameters.
@@ -413,8 +372,7 @@ bool StacksRule::checkNegation(int negIndex, PartialEvent* partialResult) {
   // then return true, otherwise return false
   for (int count = 0; count <= index2 - index1; count++) {
     PubPkt* tmpPkt = receivedNegs[negIndex].at(index1 + count);
-    if (checkParameters(tmpPkt, partialResult, itComplex->second, negIndex,
-                        NEG))
+    if (checkParameters(tmpPkt, partialResult, itComplex->second, negIndex, NEG))
       return true;
   }
   return false;
@@ -429,9 +387,7 @@ list<PartialEvent*>* StacksRule::getPartialResults(PubPkt* pkt) {
   // Checks negations on the first state
   set<int>* negation = stacks[0]->getLinkedNegations();
   if (!negation->empty()) {
-    for (set<int>::iterator it = negation->begin(); it != negation->end();
-         ++it) {
-      int neg = *it;
+    for (auto neg : *negation) {
       if (checkNegation(neg, last)) {
         delete last;
         delete prevEvents;
@@ -443,9 +399,7 @@ list<PartialEvent*>* StacksRule::getPartialResults(PubPkt* pkt) {
   for (int state = 1; state < stacksNum; state++) {
     Stack* stack = stacks[state];
     // Iterates over all previously generated events
-    for (list<PartialEvent*>::iterator listIt = prevEvents->begin();
-         listIt != prevEvents->end(); ++listIt) {
-      PartialEvent* event = *listIt;
+    for (auto event : *prevEvents) {
       // Extract events for next iteration
       int refState = referenceState[state];
       TimeMs maxTimeStamp = event->indexes[refState]->getTimeStamp();
@@ -453,9 +407,7 @@ list<PartialEvent*>* StacksRule::getPartialResults(PubPkt* pkt) {
       getWinEvents(currentEvents, state, maxTimeStamp, kind, event);
     }
     // Swaps current and previous results and deletes previous ones
-    for (list<PartialEvent*>::iterator it = prevEvents->begin();
-         it != prevEvents->end(); ++it) {
-      PartialEvent* pe = *it;
+    for (auto pe : *prevEvents) {
       delete pe;
     }
     prevEvents->clear();
@@ -505,9 +457,7 @@ bool StacksRule::checkParameter(PubPkt* pkt, PartialEvent* partialEvent,
 bool StacksRule::checkParameters(PubPkt* pkt, PartialEvent* partialEvent,
                                  set<CPUParameter*>& complexParameters,
                                  int index, StateType sType) {
-  for (set<CPUParameter*>::iterator it = complexParameters.begin();
-       it != complexParameters.end(); ++it) {
-    CPUParameter* par = *it;
+  for (auto par : complexParameters) {
     if (!checkComplexParameter(pkt, partialEvent, par, index, sType))
       return false;
   }
@@ -516,11 +466,9 @@ bool StacksRule::checkParameters(PubPkt* pkt, PartialEvent* partialEvent,
 
 void StacksRule::removePartialEventsNotMatchingParameters(
     list<PartialEvent*>* partialEvents, set<Parameter*>& parameters) {
-  for (list<PartialEvent*>::iterator it = partialEvents->begin();
-       it != partialEvents->end();) {
+  for (auto it = partialEvents->begin(); it != partialEvents->end();) {
     bool valid = true;
-    for (set<Parameter*>::iterator it2 = parameters.begin();
-         it2 != parameters.end(); ++it2) {
+    for (auto it2 = parameters.begin(); it2 != parameters.end(); ++it2) {
       Parameter* par = *it2;
       int indexOfReferenceEvent = par->evIndex2;
       PartialEvent* partialEvent = *it;
@@ -539,9 +487,7 @@ void StacksRule::removePartialEventsNotMatchingParameters(
 
 void StacksRule::createComplexEvents(list<PartialEvent*>* partialEvents,
                                      set<PubPkt*>& results) {
-  for (list<PartialEvent*>::iterator it = partialEvents->begin();
-       it != partialEvents->end(); ++it) {
-    PartialEvent* pe = *it;
+  for (auto pe : *partialEvents) {
     PubPkt* genPkt = NULL;
     if (compositeEventId >= 0) {
       genPkt = new PubPkt(compositeEventId, NULL, 0);
@@ -562,17 +508,14 @@ void StacksRule::removeConsumedEvent(list<PartialEvent*>* partialEvents) {
     if (consumingIndexes.find(i) == consumingIndexes.end())
       continue;
     set<PubPkt*> pktsToRemove;
-    for (list<PartialEvent*>::iterator it = partialEvents->begin();
-         it != partialEvents->end(); ++it) {
-      PartialEvent* pe = *it;
+    for (auto pe : *partialEvents) {
       PubPkt* pkt = pe->indexes[i];
       if (pktsToRemove.find(pkt) == pktsToRemove.end()) {
         pktsToRemove.insert(pkt);
       }
     }
-    map<int, vector<PubPkt*>>::iterator mapIt = receivedPkts.find(i);
-    for (vector<PubPkt*>::iterator it = mapIt->second.begin();
-         it != mapIt->second.end();) {
+    auto mapIt = receivedPkts.find(i);
+    for (auto it = mapIt->second.begin(); it != mapIt->second.end();) {
       PubPkt* pkt = *it;
       if (pktsToRemove.find(pkt) != pktsToRemove.end()) {
         it = mapIt->second.erase(it);
@@ -587,9 +530,7 @@ void StacksRule::removeConsumedEvent(list<PartialEvent*>* partialEvents) {
 }
 
 void StacksRule::deletePartialEvents(list<PartialEvent*>* partialEvents) {
-  for (list<PartialEvent*>::iterator it = partialEvents->begin();
-       it != partialEvents->end(); ++it) {
-    PartialEvent* pe = *it;
+  for (auto pe : *partialEvents) {
     delete pe;
   }
   delete partialEvents;
@@ -643,7 +584,7 @@ void StacksRule::removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize,
   int newSize = deleteInvalidElements(parReceived, parStacksSize, minTS);
   if (newSize == parStacksSize)
     return;
-  vector<PubPkt*>::iterator it = parReceived.begin();
+  auto it = parReceived.begin();
   for (int count = 0; count < parStacksSize - newSize; count++) {
     PubPkt* pkt = *it;
     if (pkt->decRefCount())

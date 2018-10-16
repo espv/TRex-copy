@@ -25,11 +25,8 @@ using namespace std;
 BoolConstraintIndex::BoolConstraintIndex() {}
 
 BoolConstraintIndex::~BoolConstraintIndex() {
-  for (set<BoolTableConstraint*>::iterator it = usedConstraints.begin();
-       it != usedConstraints.end(); it++) {
-    BoolTableConstraint* itc = *it;
+  for (auto itc : usedConstraints)
     delete itc;
-  }
 }
 
 void BoolConstraintIndex::installConstraint(Constraint& constraints,
@@ -56,7 +53,7 @@ void BoolConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (indexes.find(name) == indexes.end())
       continue;
     // Equality constraints
-    map<bool, BoolTableConstraint*>::iterator it = indexes[name].eq.find(val);
+    auto it = indexes[name].eq.find(val);
     if (it != indexes[name].eq.end()) {
       BoolTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
@@ -71,9 +68,7 @@ void BoolConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
 }
 
 BoolTableConstraint* BoolConstraintIndex::getConstraint(Constraint& c) {
-  for (set<BoolTableConstraint*>::iterator it = usedConstraints.begin();
-       it != usedConstraints.end(); ++it) {
-    BoolTableConstraint* itc = *it;
+  for (auto itc : usedConstraints) {
     if (itc->op != c.op)
       continue;
     if (itc->val != c.boolVal)
@@ -86,7 +81,7 @@ BoolTableConstraint* BoolConstraintIndex::getConstraint(Constraint& c) {
 }
 
 BoolTableConstraint* BoolConstraintIndex::createConstraint(Constraint& c) {
-  BoolTableConstraint* itc = new BoolTableConstraint;
+  auto itc = new BoolTableConstraint;
   strcpy(itc->name, c.name);
   itc->op = c.op;
   itc->val = c.boolVal;
@@ -109,15 +104,14 @@ inline void BoolConstraintIndex::installConstraint(BoolTableConstraint* c) {
 inline void BoolConstraintIndex::processConstraint(
     BoolTableConstraint* c, MatchingHandler& mh,
     map<TablePred*, int>& predCount) {
-  for (set<TablePred*>::iterator it = c->connectedPredicates.begin();
-       it != c->connectedPredicates.end(); ++it) {
+  for (auto it : c->connectedPredicates) {
     // If satisfied for the first time, sets count to 1
-    if (predCount.find(*it) == predCount.end())
-      predCount.insert(make_pair(*it, 1));
+    if (predCount.find(it) == predCount.end())
+      predCount.insert(make_pair(it, 1));
     // Otherwise increases count by one
     else
-      ++predCount[*it];
-    if (predCount[*it] == (*it)->constraintsNum)
-      addToMatchingHandler(mh, (*it));
+      ++predCount[it];
+    if (predCount[it] == it->constraintsNum)
+      addToMatchingHandler(mh, it);
   }
 }

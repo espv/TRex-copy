@@ -25,11 +25,8 @@ using namespace std;
 FloatConstraintIndex::FloatConstraintIndex() {}
 
 FloatConstraintIndex::~FloatConstraintIndex() {
-  for (set<FloatTableConstraint*>::iterator it = usedConstraints.begin();
-       it != usedConstraints.end(); it++) {
-    FloatTableConstraint* itc = *it;
+  for (auto itc : usedConstraints)
     delete itc;
-  }
 }
 
 void FloatConstraintIndex::installConstraint(Constraint& constraints,
@@ -56,24 +53,20 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (indexes.find(name) == indexes.end())
       continue;
     // Equality constraints
-    map<float, FloatTableConstraint*>::iterator it = indexes[name].eq.find(val);
+    auto it = indexes[name].eq.find(val);
     if (it != indexes[name].eq.end()) {
       FloatTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
     // Less than constraints (iterating in descending order)
-    for (map<float, FloatTableConstraint*>::reverse_iterator rit =
-             indexes[name].lt.rbegin();
-         rit != indexes[name].lt.rend(); ++rit) {
+    for (auto rit = indexes[name].lt.rbegin(); rit != indexes[name].lt.rend(); ++rit) {
       if (rit->first <= val)
         break;
       FloatTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
     // Less than or equal to constraints (iterating in descending order)
-    for (map<float, FloatTableConstraint*>::reverse_iterator rit =
-             indexes[name].le.rbegin();
-         rit != indexes[name].le.rend(); ++rit) {
+    for (auto rit = indexes[name].le.rbegin(); rit != indexes[name].le.rend(); ++rit) {
       if (rit->first < val)
         break;
       FloatTableConstraint* itc = rit->second;
@@ -104,9 +97,7 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
 }
 
 FloatTableConstraint* FloatConstraintIndex::getConstraint(Constraint& c) {
-  for (set<FloatTableConstraint*>::iterator it = usedConstraints.begin();
-       it != usedConstraints.end(); ++it) {
-    FloatTableConstraint* itc = *it;
+  for (auto itc : usedConstraints) {
     if (itc->op != c.op)
       continue;
     if (itc->val != c.floatVal)
@@ -119,7 +110,7 @@ FloatTableConstraint* FloatConstraintIndex::getConstraint(Constraint& c) {
 }
 
 FloatTableConstraint* FloatConstraintIndex::createConstraint(Constraint& c) {
-  FloatTableConstraint* itc = new FloatTableConstraint;
+  auto itc = new FloatTableConstraint;
   strcpy(itc->name, c.name);
   itc->op = c.op;
   itc->val = c.floatVal;
@@ -147,18 +138,16 @@ inline void FloatConstraintIndex::installConstraint(FloatTableConstraint* c) {
     indexes[s].ne.insert(make_pair(c->val, c));
 }
 
-inline void FloatConstraintIndex::processConstraint(
-    FloatTableConstraint* c, MatchingHandler& mh,
-    map<TablePred*, int>& predCount) {
-  for (set<TablePred*>::iterator it = c->connectedPredicates.begin();
-       it != c->connectedPredicates.end(); ++it) {
+inline void FloatConstraintIndex::processConstraint(FloatTableConstraint* c,
+                                                    MatchingHandler& mh, map<TablePred*, int>& predCount) {
+  for (auto it : c->connectedPredicates) {
     // If satisfied for the first time, sets count to 1
-    if (predCount.find(*it) == predCount.end())
-      predCount.insert(make_pair(*it, 1));
+    if (predCount.find(it) == predCount.end())
+      predCount.insert(make_pair(it, 1));
     // Otherwise increases count by one
     else
-      ++predCount[*it];
-    if (predCount[*it] == (*it)->constraintsNum)
-      addToMatchingHandler(mh, (*it));
+      ++predCount[it];
+    if (predCount[it] == (it)->constraintsNum)
+      addToMatchingHandler(mh, (it));
   }
 }

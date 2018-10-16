@@ -25,11 +25,8 @@ using namespace std;
 IntConstraintIndex::IntConstraintIndex() {}
 
 IntConstraintIndex::~IntConstraintIndex() {
-  for (set<IntTableConstraint*>::iterator it = usedConstraints.begin();
-       it != usedConstraints.end(); it++) {
-    IntTableConstraint* itc = *it;
+  for (auto itc : usedConstraints)
     delete itc;
-  }
 }
 
 void IntConstraintIndex::installConstraint(Constraint& constraints,
@@ -56,24 +53,20 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (indexes.find(name) == indexes.end())
       continue;
     // Equality constraints
-    map<int, IntTableConstraint*>::iterator it = indexes[name].eq.find(val);
+    auto it = indexes[name].eq.find(val);
     if (it != indexes[name].eq.end()) {
       IntTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
     // Less than constraints (iterating in descending order)
-    for (map<int, IntTableConstraint*>::reverse_iterator rit =
-             indexes[name].lt.rbegin();
-         rit != indexes[name].lt.rend(); ++rit) {
+    for (auto rit = indexes[name].lt.rbegin(); rit != indexes[name].lt.rend(); ++rit) {
       if (rit->first <= val)
         break;
       IntTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
     // Less than or equal to constraints (iterating in descending order)
-    for (map<int, IntTableConstraint*>::reverse_iterator rit =
-             indexes[name].le.rbegin();
-         rit != indexes[name].le.rend(); ++rit) {
+    for (auto rit = indexes[name].le.rbegin(); rit != indexes[name].le.rend(); ++rit) {
       if (rit->first < val)
         break;
       IntTableConstraint* itc = rit->second;
@@ -104,9 +97,7 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
 }
 
 IntTableConstraint* IntConstraintIndex::getConstraint(Constraint& c) {
-  for (set<IntTableConstraint*>::iterator it = usedConstraints.begin();
-       it != usedConstraints.end(); ++it) {
-    IntTableConstraint* itc = *it;
+  for (auto itc : usedConstraints) {
     if (itc->op != c.op)
       continue;
     if (itc->val != c.intVal)
@@ -150,15 +141,14 @@ inline void IntConstraintIndex::installConstraint(IntTableConstraint* c) {
 inline void IntConstraintIndex::processConstraint(
     IntTableConstraint* c, MatchingHandler& mh,
     map<TablePred*, int>& predCount) {
-  for (set<TablePred*>::iterator it = c->connectedPredicates.begin();
-       it != c->connectedPredicates.end(); ++it) {
+  for (auto it : c->connectedPredicates) {
     // If satisfied for the first time, sets count to 1
-    if (predCount.find(*it) == predCount.end())
-      predCount.insert(make_pair(*it, 1));
+    if (predCount.find(it) == predCount.end())
+      predCount.insert(make_pair(it, 1));
     // Otherwise increases count by one
     else
-      ++predCount[*it];
-    if (predCount[*it] == (*it)->constraintsNum)
-      addToMatchingHandler(mh, (*it));
+      ++predCount[it];
+    if (predCount[it] == it->constraintsNum)
+      addToMatchingHandler(mh, it);
   }
 }

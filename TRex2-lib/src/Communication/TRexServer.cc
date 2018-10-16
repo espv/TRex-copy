@@ -83,9 +83,8 @@ TRexServer::~TRexServer() {
   delete outputMutex;
   pthread_cond_destroy(outputCond);
   delete outputCond;
-  for (map<int, pthread_t*>::iterator it = readingThreads.begin();
-       it != readingThreads.end(); ++it) {
-    pthread_t* t = it->second;
+  for (auto it : readingThreads) {
+    pthread_t* t = it.second;
     pthread_cancel(*t);
     delete t;
   }
@@ -236,15 +235,12 @@ void TRexServer::readFromOutputQueue() {
     PubPkt* pkt = out->getPkt();
     int size = marshaller.getSize(pkt);
     char* sendArray = marshaller.encode(pkt);
-    for (set<int>::iterator it = out->getClients()->begin();
-         it != out->getClients()->end(); ++it) {
-      int clientId = *it;
+    for (auto clientId : *out->getClients()) {
       int socketId = -1;
       pthread_mutex_lock(socketsMutex);
-      map<int, int>::iterator outputSocketsIt = outputSockets.find(clientId);
-      if (outputSocketsIt != outputSockets.end()) {
+      auto outputSocketsIt = outputSockets.find(clientId);
+      if (outputSocketsIt != outputSockets.end())
         socketId = outputSocketsIt->second;
-      }
       pthread_mutex_unlock(socketsMutex);
       if (socketId < 0)
         // No connection to the subscriber
@@ -261,8 +257,7 @@ void TRexServer::readFromOutputQueue() {
 }
 
 void TRexServer::handleResult(set<PubPkt*>& genPkts, double procTime) {
-  for (set<PubPkt*>::iterator it = genPkts.begin(); it != genPkts.end(); ++it) {
-    PubPkt* pkt = *it;
+  for (auto pkt : genPkts) {
     set<int>* subClients = new set<int>;
     routingTable->getMatchingClients(pkt, *subClients);
     if (recursiveTypes.find(pkt->getEventType()) != recursiveTypes.end()) {
@@ -310,13 +305,12 @@ void TRexServer::connectToSubscriber(int clientId, long address, int port) {
 
 void TRexServer::removeDisconnectedClient(int clientId, bool reading) {
   pthread_mutex_lock(socketsMutex);
-  map<int, int>::iterator inputSocketIt = inputSockets.find(clientId);
+  auto inputSocketIt = inputSockets.find(clientId);
   if (inputSocketIt != inputSockets.end()) {
     inputSockets.erase(inputSocketIt);
   }
   if (!reading) {
-    map<int, pthread_t*>::iterator readingThreadIt =
-        readingThreads.find(clientId);
+    auto readingThreadIt = readingThreads.find(clientId);
     if (readingThreadIt != readingThreads.end()) {
       pthread_t* t = readingThreadIt->second;
       readingThreads.erase(readingThreadIt);
@@ -324,10 +318,9 @@ void TRexServer::removeDisconnectedClient(int clientId, bool reading) {
       delete t;
     }
   }
-  map<int, int>::iterator outputSocketsIt = outputSockets.find(clientId);
-  if (outputSocketsIt != outputSockets.end()) {
+  auto outputSocketsIt = outputSockets.find(clientId);
+  if (outputSocketsIt != outputSockets.end())
     outputSockets.erase(outputSocketsIt);
-  }
   pthread_mutex_unlock(socketsMutex);
   if (reading)
     pthread_exit(NULL);

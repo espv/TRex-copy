@@ -25,11 +25,8 @@ using namespace std;
 IndexingTable::IndexingTable() {}
 
 IndexingTable::~IndexingTable() {
-  for (set<TablePred*>::iterator it = usedPreds.begin(); it != usedPreds.end();
-       it++) {
-    TablePred* tp = *it;
+  for (auto tp : usedPreds)
     delete tp;
-  }
 }
 
 void IndexingTable::installRulePkt(RulePkt* pkt) {

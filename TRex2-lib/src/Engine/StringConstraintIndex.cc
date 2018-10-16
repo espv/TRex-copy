@@ -25,11 +25,8 @@ using namespace std;
 StringConstraintIndex::StringConstraintIndex() {}
 
 StringConstraintIndex::~StringConstraintIndex() {
-  for (set<StringTableConstraint*>::iterator it = usedConstraints.begin();
-       it != usedConstraints.end(); it++) {
-    StringTableConstraint* itc = *it;
+  for (auto itc : usedConstraints)
     delete itc;
-  }
 }
 
 void StringConstraintIndex::installConstraint(Constraint& constraints,
@@ -56,8 +53,7 @@ void StringConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (indexes.find(name) == indexes.end())
       continue;
     // Equality constraints
-    map<string, StringTableConstraint*>::iterator it =
-        indexes[name].eq.find(val);
+    auto it = indexes[name].eq.find(val);
     if (it != indexes[name].eq.end()) {
       StringTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
@@ -74,9 +70,7 @@ void StringConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
 }
 
 StringTableConstraint* StringConstraintIndex::getConstraint(Constraint& c) {
-  for (set<StringTableConstraint*>::iterator it = usedConstraints.begin();
-       it != usedConstraints.end(); ++it) {
-    StringTableConstraint* itc = *it;
+  for (auto itc : usedConstraints) {
     if (itc->op != c.op)
       continue;
     if (itc->val == c.stringVal)
@@ -113,15 +107,14 @@ inline void StringConstraintIndex::installConstraint(StringTableConstraint* c) {
 inline void StringConstraintIndex::processConstraint(
     StringTableConstraint* c, MatchingHandler& mh,
     map<TablePred*, int>& predCount) {
-  for (set<TablePred*>::iterator it = c->connectedPredicates.begin();
-       it != c->connectedPredicates.end(); ++it) {
+  for (auto it : c->connectedPredicates) {
     // If satisfied for the first time, sets count to 1
-    if (predCount.find(*it) == predCount.end())
-      predCount.insert(make_pair(*it, 1));
+    if (predCount.find(it) == predCount.end())
+      predCount.insert(make_pair(it, 1));
     // Otherwise increases count by one
     else
-      ++predCount[*it];
-    if (predCount[*it] == (*it)->constraintsNum)
-      addToMatchingHandler(mh, (*it));
+      ++predCount[it];
+    if (predCount[it] == (it)->constraintsNum)
+      addToMatchingHandler(mh, (it));
   }
 }

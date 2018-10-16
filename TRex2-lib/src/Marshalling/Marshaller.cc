@@ -102,11 +102,8 @@ int Marshaller::getNumBytes(RulePkt* pkt) {
   set<int> consumingSet = pkt->getConsuming();
   int numConsuming = consumingSet.size();
   size += getNumBytes(numConsuming);
-  for (set<int>::iterator it = consumingSet.begin(); it != consumingSet.end();
-       ++it) {
-    int consuming = *it;
+  for (auto consuming : consumingSet)
     size += getNumBytes(consuming);
-  }
   return size;
 }
 
@@ -147,10 +144,8 @@ int Marshaller::encode(RulePkt* source, char* dest, int startIndex) {
   set<int> consuming = source->getConsuming();
   int consumingNum = consuming.size();
   startIndex = encode(consumingNum, dest, startIndex);
-  for (set<int>::iterator it = consuming.begin(); it != consuming.end(); ++it) {
-    int consuming = *it;
-    startIndex = encode(consuming, dest, startIndex);
-  }
+  for (auto consum : consuming)
+    startIndex = encode(consum, dest, startIndex);
   return startIndex;
 }
 
@@ -504,10 +499,8 @@ int Marshaller::getNumBytes(set<int>& source) {
 int Marshaller::encode(set<int>& source, char* dest, int startIndex) {
   int numElements = source.size();
   startIndex = encode(numElements, dest, startIndex);
-  for (set<int>::iterator it = source.begin(); it != source.end(); ++it) {
-    int element = *it;
+  for (auto element : source)
     startIndex = encode(element, dest, startIndex);
-  }
   return startIndex;
 }
 

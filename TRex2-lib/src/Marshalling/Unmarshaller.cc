@@ -97,10 +97,9 @@ RulePkt* Unmarshaller::decodeRulePkt(char* source, int& index) {
     consuming.insert(decodeInt(source, index));
   }
   RulePkt* pkt = new RulePkt(false);
-  for (map<int, Predicate>::iterator it = predicates.begin();
-       it != predicates.end(); ++it) {
-    int index = it->first;
-    Predicate pred = it->second;
+  for (auto it : predicates) {
+    int index = it.first;
+    Predicate pred = it.second;
 
     if (index == 0) {
       pkt->addRootPredicate(pred.eventType, pred.constraints,
@@ -111,9 +110,8 @@ RulePkt* Unmarshaller::decodeRulePkt(char* source, int& index) {
     }
     delete pred.constraints;
   }
-  for (map<int, Aggregate>::iterator it = aggregates.begin();
-       it != aggregates.end(); ++it) {
-    Aggregate agg = it->second;
+  for (auto it : aggregates) {
+    Aggregate agg = it.second;
     if (agg.lowerId < 0) {
       pkt->addTimeBasedAggregate(agg.eventType, agg.constraints,
                                  agg.constraintsNum, agg.upperId, agg.lowerTime,
@@ -125,9 +123,8 @@ RulePkt* Unmarshaller::decodeRulePkt(char* source, int& index) {
     }
     delete agg.constraints;
   }
-  for (map<int, Negation>::iterator it = negations.begin();
-       it != negations.end(); ++it) {
-    Negation neg = it->second;
+  for (auto it : negations) {
+    Negation neg = it.second;
     if (neg.lowerId < 0) {
       pkt->addTimeBasedNegation(neg.eventType, neg.constraints,
                                 neg.constraintsNum, neg.upperId, neg.lowerTime);
@@ -138,9 +135,8 @@ RulePkt* Unmarshaller::decodeRulePkt(char* source, int& index) {
     }
     delete neg.constraints;
   }
-  for (map<int, ComplexParameter>::iterator it = parameters.begin();
-       it != parameters.end(); ++it) {
-    ComplexParameter par = it->second;
+  for (auto it : parameters) {
+    ComplexParameter par = it.second;
     if (par.type == STATE) {
       pkt->addComplexParameter(par.operation, par.vtype, par.leftTree,
                                par.rightTree);
@@ -153,10 +149,8 @@ RulePkt* Unmarshaller::decodeRulePkt(char* source, int& index) {
     }
   }
   pkt->setCompositeEventTemplate(eventTemplate);
-  for (set<int>::iterator it = consuming.begin(); it != consuming.end(); ++it) {
-    int consum = *it;
+  for (auto consum : consuming)
     pkt->addConsuming(consum);
-  }
   return pkt;
 }
 
