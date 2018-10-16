@@ -66,7 +66,7 @@ OpTree* CompositeEventTemplate::getAttributeTree(int index) {
 }
 
 CompositeEventTemplate* CompositeEventTemplate::dup() {
-  CompositeEventTemplate* dup = new CompositeEventTemplate(eventType);
+  auto dup = new CompositeEventTemplate(eventType);
   for (auto it : attributes) {
     CompositeEventTemplateAttr* attrDup = it.second->dup();
     dup->addAttribute(attrDup);
@@ -82,8 +82,7 @@ void CompositeEventTemplate::addAttribute(CompositeEventTemplateAttr* parAttr) {
   attributes.insert(make_pair(attributes.size(), parAttr));
 }
 
-void CompositeEventTemplate::addStaticAttribute(
-    CompositeEventTemplateStaticAttr* parAttr) {
+void CompositeEventTemplate::addStaticAttribute(CompositeEventTemplateStaticAttr* parAttr) {
   staticAttributes.insert(make_pair(staticAttributes.size(), parAttr));
 }
 
