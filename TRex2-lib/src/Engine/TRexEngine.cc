@@ -23,10 +23,12 @@
 
 using namespace std;
 
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+
 void* processor(void* parShared) {
   Shared* s = (Shared*)parShared;
-  int lowerBound = s->lowerBound;
-  int upperBound = s->upperBound;
   bool first = true;
   while (true) {
     if (first) {
@@ -34,6 +36,10 @@ void* processor(void* parShared) {
       first = false;
     }
     pthread_cond_wait(s->processCond, s->processMutex);
+    // At this point, s->processMutex is locked by this thread, and s->lowerBound and s->upperBound will not be changed by TRexEngine::processRulePkt
+    int lowerBound = s->lowerBound;
+    int upperBound = s->upperBound;
+    std::cout << "PID " << syscall(SYS_gettid) << " => processor(): " << "" << std::endl;
     // End processing
     if (s->finish) {
       pthread_mutex_unlock(s->processMutex);
@@ -124,11 +130,11 @@ TRexEngine::~TRexEngine() {
 
 void TRexEngine::finalize() {
   // Creates shared memory and initializes threads
-  int* stillProcessing = new int;
-  (*stillProcessing) = numProc;
   int size = stacksRules->size() / numProc + 1;
-  pthread_mutex_t* resultMutex = new pthread_mutex_t;
-  pthread_cond_t* resultCond = new pthread_cond_t;
+  int* stillProcessing = new int;
+  pthread_mutex_t *resultMutex = new pthread_mutex_t;
+  pthread_cond_t *resultCond = new pthread_cond_t;
+  (*stillProcessing) = numProc;
   pthread_mutex_init(resultMutex, NULL);
   pthread_cond_init(resultCond, NULL);
 
@@ -136,15 +142,15 @@ void TRexEngine::finalize() {
     shared[i].lowerBound = size * i;
     shared[i].upperBound = size * (i + 1);
     shared[i].finish = false;
+    shared[i].stacksRule = stacksRules;
+    shared[i].stillProcessing = stillProcessing;
     shared[i].processMutex = new pthread_mutex_t;
     shared[i].processCond = new pthread_cond_t;
     shared[i].resultMutex = resultMutex;
     shared[i].resultCond = resultCond;
-    shared[i].stacksRule = stacksRules;
-    shared[i].stillProcessing = stillProcessing;
     pthread_mutex_init(shared[i].processMutex, NULL);
     pthread_cond_init(shared[i].processCond, NULL);
-    pthread_create(&threads[i], NULL, processor, (void*)&shared[i]);
+    pthread_create(&threads[i], NULL, processor, (void *) &shared[i]);
   }
   usleep(1000);
 }
@@ -171,11 +177,22 @@ void TRexEngine::processRulePkt(RulePkt* pkt) {
   setRecursionNeeded(pkt);
   StacksRule* stacksRule = new StacksRule(pkt);
   stacksRules->insert(make_pair(stacksRule->getRuleId(), stacksRule));
+  int size = stacksRules->size() / numProc + 1;
+  for (int i = 0; i < numProc; i++) {
+    pthread_mutex_lock(shared[i].processMutex);
+    // The processor function will only access shared[i].lowerBound and shared[i].upperBound after locking shared[i].processMutex
+    shared[i].lowerBound = size * i;
+    shared[i].upperBound = size * (i + 1);
+    pthread_mutex_unlock(shared[i].processMutex);
+  }
   indexingTable.installRulePkt(pkt);
   delete pkt;
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
+  std::cout << "PID " << syscall(SYS_gettid) << " is running TRexEngine::processPubPkt" << std::endl;
+  clock_t stop1, stop2, stop3, stop4, stop5, stop6, stop7;
+  clock_t start = clock();
   if (recursion == false)
     recursionDepth = 0;
   else
@@ -189,6 +206,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   indexingTable.processMessage(pkt, *mh);
   set<PubPkt*> result;
 
+  stop1 = clock();
   // Installs information in shared memory
   for (int i = 0; i < numProc; i++) {
     pthread_mutex_lock(shared[i].processMutex);
@@ -201,6 +219,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
     pthread_cond_signal(shared[i].processCond);
     pthread_mutex_unlock(shared[i].processMutex);
   }
+  //stop2 = clock();
 
   // Waits until all processes finish
   pthread_mutex_lock(shared[0].resultMutex);
@@ -209,6 +228,8 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
     pthread_cond_wait(shared[0].resultCond, shared[0].resultMutex);
   pthread_mutex_unlock(shared[0].resultMutex);
   *(shared[0].stillProcessing) = numProc;
+
+  stop3 = clock();
 
   // Collects results
   for (int i = 0; i < numProc; i++) {
@@ -223,6 +244,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
       delete shared[i].pkt;
 #endif
   }
+  //stop4 = clock();
   // Deletes used packet
   if (pkt->decRefCount())
     delete pkt;
@@ -232,12 +254,17 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   double duration = (tValEnd.tv_sec - tValStart.tv_sec) * 1000000 +
                     tValEnd.tv_usec - tValStart.tv_usec;
 
+
+  //stop5 = clock();
+
   // Notifies results to listeners
   for (set<ResultListener*>::iterator it = resultListeners.begin();
        it != resultListeners.end(); ++it) {
     ResultListener* listener = *it;
     listener->handleResult(result, duration);
   }
+
+  //stop6 = clock();
 
   for (set<PubPkt*>::iterator it = result.begin(); it != result.end(); ++it) {
     PubPkt* pkt = *it;
@@ -247,6 +274,11 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
       delete pkt;
     }
   }
+
+  std::cout << stop3-start << std::endl;
+  stop7 = clock();
+  std::cout /*<< "It took " */<< stop7-start << ", " << stop7 /*<< " to process published packet"*/ << std::endl;
+  std::cout << duration << std::endl;
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt) {

@@ -183,6 +183,7 @@ void StacksRule::addToNegationStack(PubPkt* pkt, int index) {
 
 void StacksRule::startComputation(PubPkt* pkt, set<PubPkt*>& results) {
   // Adds the terminator to the last stack
+  std::cout << "StacksRule.cc >> StacksRule::startComputation" << std::endl;
   pkt->incRefCount();
   receivedPkts[0].push_back(pkt);
   stacksSize[0] = 1;
@@ -203,40 +204,6 @@ void StacksRule::startComputation(PubPkt* pkt, set<PubPkt*>& results) {
   if (pkt->decRefCount())
     delete pkt;
   stacksSize[0] = 0;
-}
-
-void StacksRule::processPkt(PubPkt* pkt, MatchingHandler* mh,
-                            set<PubPkt*>& results, int index) {
-  map<int, set<int>>::iterator aggIt = mh->matchingAggregates.find(index);
-  if (aggIt != mh->matchingAggregates.end()) {
-    for (set<int>::iterator it = aggIt->second.begin();
-         it != aggIt->second.end(); ++it) {
-      int aggIndex = *it;
-      addToAggregateStack(pkt, aggIndex);
-    }
-  }
-  map<int, set<int>>::iterator negIt = mh->matchingNegations.find(index);
-  if (negIt != mh->matchingNegations.end()) {
-    for (set<int>::iterator it = negIt->second.begin();
-         it != negIt->second.end(); ++it) {
-      int negIndex = *it;
-      addToNegationStack(pkt, negIndex);
-    }
-  }
-  map<int, set<int>>::iterator stateIt = mh->matchingStates.find(index);
-  if (stateIt != mh->matchingStates.end()) {
-    bool lastStack = false;
-    for (set<int>::iterator it = stateIt->second.begin();
-         it != stateIt->second.end(); ++it) {
-      int stateIndex = *it;
-      if (stateIndex != 0) {
-        addToStack(pkt, stateIndex);
-      } else
-        lastStack = true;
-    }
-    if (lastStack)
-      startComputation(pkt, results);
-  }
 }
 
 void StacksRule::parametricAddToStack(PubPkt* pkt, int& parStacksSize,

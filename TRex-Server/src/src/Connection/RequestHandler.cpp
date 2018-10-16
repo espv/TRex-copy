@@ -68,6 +68,7 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 	// Let TRex process (and *delete*) the packet
 	if (!useGPU) {
 	  parent.tRexEngine.processRulePkt(pkt);
+      //parent.tRexEngine.finalize();  // Espen: is this necessary? It results in numProc threads to be spawned for every published rule.
 	}
 #ifdef HAVE_GTREX
 	if (useGPU) {
