@@ -37,7 +37,7 @@ void traceEvent(int traceId, int pid, bool reset)
   auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
   if (reset)
     previous_time = current_time;
-  cout << traceId << "-" << pid << "-" << current_time-previous_time << std::endl;
+  cout << traceId << "-" << pid << "-" << current_time/*-previous_time*/ << std::endl;
   previous_time = current_time;
   pthread_mutex_unlock(traceMutex);
 }

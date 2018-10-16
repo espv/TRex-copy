@@ -192,7 +192,6 @@ void TRexEngine::processRulePkt(RulePkt* pkt) {
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
-  traceEvent(5, syscall(SYS_gettid), false);
   if (recursion == false)
     recursionDepth = 0;
   else
@@ -207,6 +206,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   set<PubPkt*> result;
 
   // Installs information in shared memory
+  traceEvent(5, syscall(SYS_gettid), false);
   for (int i = 0; i < numProc; i++) {
     pthread_mutex_lock(shared[i].processMutex);
     shared[i].mh = mh;
@@ -226,6 +226,8 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
     pthread_cond_wait(shared[0].resultCond, shared[0].resultMutex);
   pthread_mutex_unlock(shared[0].resultMutex);
   *(shared[0].stillProcessing) = numProc;
+
+  traceEvent(8, syscall(SYS_gettid), false);
 
   // Collects results
   for (int i = 0; i < numProc; i++) {
@@ -249,12 +251,14 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   double duration = (tValEnd.tv_sec - tValStart.tv_sec) * 1000000 +
                     tValEnd.tv_usec - tValStart.tv_usec;
 
+  traceEvent(9, syscall(SYS_gettid), false);
   // Notifies results to listeners
   for (set<ResultListener*>::iterator it = resultListeners.begin();
        it != resultListeners.end(); ++it) {
     ResultListener* listener = *it;
     listener->handleResult(result, duration);
   }
+  traceEvent(10, syscall(SYS_gettid), false);
 
   for (set<PubPkt*>::iterator it = result.begin(); it != result.end(); ++it) {
     PubPkt* pkt = *it;
@@ -264,8 +268,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
       delete pkt;
     }
   }
-
-  traceEvent(8, syscall(SYS_gettid), false);
+  traceEvent(11, syscall(SYS_gettid), false);
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt) {

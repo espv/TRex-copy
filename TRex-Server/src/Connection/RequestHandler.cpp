@@ -63,7 +63,7 @@ void RequestHandler::handleRequest(std::vector<PktPtr> & pkts){
 	for (std::vector<PktPtr>::iterator it= pkts.begin(); it != pkts.end(); it++){
 		boost::apply_visitor(PktHandleVisitor(*this, useGPU), *it);
 	}
-    traceEvent(11, syscall(SYS_gettid), false);
+    traceEvent(16, syscall(SYS_gettid), false);
 }
 
 void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
@@ -81,7 +81,7 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 }
 
 void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
-    traceEvent(2, syscall(SYS_gettid), false);
+    //traceEvent(2, syscall(SYS_gettid), false);
 	LOG(info) << "Publication from " << parent.connection.remoteToString() << ":" << endl
 			<< "  " << toString(pkt);
 	parent.subTable.processPublication(pkt);
@@ -92,7 +92,7 @@ void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
 	  parent.gtRexEngine.processPubPkt(pkt);
 	}
 #endif
-    traceEvent(10, syscall(SYS_gettid), false);
+    //traceEvent(10, syscall(SYS_gettid), false);
 }
 
 void RequestHandler::PktHandleVisitor::operator()(SubPkt * pkt) const{
