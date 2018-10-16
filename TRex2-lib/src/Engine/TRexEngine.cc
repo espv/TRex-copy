@@ -40,7 +40,7 @@ void* processor(void* parShared) {
     // At this point, s->processMutex is locked by this thread, and s->lowerBound and s->upperBound will not be changed by TRexEngine::processRulePkt
     int lowerBound = s->lowerBound;
     int upperBound = s->upperBound;
-    traceEvent(6, syscall(SYS_gettid));
+    traceEvent(6, syscall(SYS_gettid), false);
     // End processing
     if (s->finish) {
       pthread_mutex_unlock(s->processMutex);
@@ -50,7 +50,7 @@ void* processor(void* parShared) {
     MatchingHandler* mh = s->mh;
     set<PubPkt*> generatedPkts;
     for (int i = lowerBound; i < upperBound; i++) {
-      traceEvent(7, syscall(SYS_gettid));
+      traceEvent(7, syscall(SYS_gettid), false);
       map<int, set<int>>::iterator negsIt = mh->matchingNegations.find(i);
       if (negsIt != mh->matchingNegations.end()) {
         for (set<int>::iterator it = negsIt->second.begin();
@@ -192,7 +192,7 @@ void TRexEngine::processRulePkt(RulePkt* pkt) {
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
-  traceEvent(5, syscall(SYS_gettid));
+  traceEvent(5, syscall(SYS_gettid), false);
   if (recursion == false)
     recursionDepth = 0;
   else
@@ -265,7 +265,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
     }
   }
 
-  traceEvent(8, syscall(SYS_gettid));
+  traceEvent(8, syscall(SYS_gettid), false);
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt) {

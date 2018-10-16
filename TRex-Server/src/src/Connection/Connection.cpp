@@ -68,13 +68,13 @@ void Connection::start()
 
 void Connection::handleRead(const boost::system::error_code& error, std::size_t bytes_transferred) {
 	if (!error) {
-        traceEvent(2, syscall(SYS_gettid));
+        traceEvent(2, syscall(SYS_gettid), false);
 		if (usePing) {
 			pingReceiveTimer.cancel();
 		}
 		requestHandler.handleRequest<BUFFER_LENGTH>(buffer, bytes_transferred);
 		asyncReadSome();
-        traceEvent(9, syscall(SYS_gettid));
+        traceEvent(9, syscall(SYS_gettid), false);
 	} else {
 		if(error==boost::asio::error::eof) LOG(warning) << "Connection closed while receiving from " << printRemoteEndpoint();
 		else LOG(warning) << "Connection error '" << error.message() << (error==boost::asio::error::eof) << "' while receiving from " << printRemoteEndpoint();
