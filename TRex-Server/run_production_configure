@@ -1,1 +1,2 @@
+cd "$(dirname "$0")"
 CFLAGS="" CXXFLAGS="" CPPFLAGS="-O3" ./configure
