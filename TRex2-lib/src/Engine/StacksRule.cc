@@ -26,11 +26,10 @@ StacksRule::StacksRule(RulePkt* pkt) {
   // Initializes the rule identifier
   ruleId = pkt->getRuleId();
   rulePkt = pkt;
-  eventGenerator = new CompositeEventGenerator(pkt->getCompositeEventTemplate());
-  if (pkt->getCompositeEventTemplate()->getAttributesNum() +
-          pkt->getCompositeEventTemplate()->getStaticAttributesNum() ==
-      0) {
-    compositeEventId = pkt->getCompositeEventTemplate()->getEventType();
+  auto cet = pkt->getCompositeEventTemplate();
+  eventGenerator = new CompositeEventGenerator(cet);
+  if (cet->getAttributesNum() + cet->getStaticAttributesNum() == 0) {
+    compositeEventId = cet->getEventType();
   } else {
     compositeEventId = -1;
   }
@@ -272,8 +271,7 @@ void StacksRule::getWinEvents(list<PartialEvent*>* results, int index,
     return;
   if (receivedPkts[index][index1]->getTimeStamp() >= tsUp)
     return;
-  int index2 =
-      getLastValidElement(receivedPkts[index], stacksSize[index], tsUp, index1);
+  int index2 = getLastValidElement(receivedPkts[index], stacksSize[index], tsUp, index1);
   if (index2 < 0)
     index2 = index1;
   auto itComplex = branchStackComplexParameters.find(index);
@@ -350,8 +348,7 @@ bool StacksRule::checkNegation(int negIndex, PartialEvent* partialResult) {
   }
   int index1 =
       getFirstValidElement(receivedNegs[negIndex], negsSize[negIndex], minTS);
-  // TODO: Aggiungere la seguente riga per avere uguaglianza semantica
-  // con TRex nel test Rain.
+  // TODO: Aggiungere la seguente riga per avere uguaglianza semantica con TRex nel test Rain.
   // if (receivedNegs[negIndex][0]->getTimeStamp()<=maxTS &&
   // receivedNegs[negIndex][0]->getTimeStamp()>=minTS) return true;
   if (index1 < 0)
@@ -359,8 +356,7 @@ bool StacksRule::checkNegation(int negIndex, PartialEvent* partialResult) {
   // maxTS and minTS negation events are not valid; Jan 2015
   if (receivedNegs[negIndex][index1]->getTimeStamp() >= maxTS)
     return false;
-  int index2 = getLastValidElement(receivedNegs[negIndex], negsSize[negIndex],
-                                   maxTS, index1);
+  int index2 = getLastValidElement(receivedNegs[negIndex], negsSize[negIndex], maxTS, index1);
   if (index2 < 0)
     index2 = index1;
 
@@ -435,14 +431,11 @@ bool StacksRule::checkParameter(PubPkt* pkt, PartialEvent* partialEvent,
     return false;
   switch (type1) {
     case INT:
-      return receivedPkt->getIntAttributeVal(index2) ==
-             pkt->getIntAttributeVal(index1);
+      return receivedPkt->getIntAttributeVal(index2) == pkt->getIntAttributeVal(index1);
     case FLOAT:
-      return receivedPkt->getFloatAttributeVal(index2) ==
-             pkt->getFloatAttributeVal(index1);
+      return receivedPkt->getFloatAttributeVal(index2) == pkt->getFloatAttributeVal(index1);
     case BOOL:
-      return receivedPkt->getBoolAttributeVal(index2) ==
-             pkt->getBoolAttributeVal(index1);
+      return receivedPkt->getBoolAttributeVal(index2) == pkt->getBoolAttributeVal(index1);
     case STRING:
       char result1[STRING_VAL_LEN];
       char result2[STRING_VAL_LEN];
@@ -457,10 +450,9 @@ bool StacksRule::checkParameter(PubPkt* pkt, PartialEvent* partialEvent,
 bool StacksRule::checkParameters(PubPkt* pkt, PartialEvent* partialEvent,
                                  set<CPUParameter*>& complexParameters,
                                  int index, StateType sType) {
-  for (auto par : complexParameters) {
+  for (auto par : complexParameters)
     if (!checkComplexParameter(pkt, partialEvent, par, index, sType))
       return false;
-  }
   return true;
 }
 
@@ -541,8 +533,7 @@ void StacksRule::clearStacks() {
     int refersToStack = stacks[stack]->getRefersTo();
     if (stacksSize[refersToStack] == 0)
       continue;
-    TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() -
-                   stacks[stack]->getWindow();
+    TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() - stacks[stack]->getWindow();
     removeOldPacketsFromStack(minTS, stacksSize[stack], receivedPkts[stack]);
   }
   for (int negIndex = 0; negIndex < negsNum; negIndex++) {
@@ -558,8 +549,7 @@ void StacksRule::clearStacks() {
       win = stacks[secondIndex]->getWindow();
     }
     TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() - win;
-    removeOldPacketsFromStack(minTS, negsSize[negIndex],
-                              receivedNegs[negIndex]);
+    removeOldPacketsFromStack(minTS, negsSize[negIndex], receivedNegs[negIndex]);
   }
   for (int aggIndex = 0; aggIndex < aggrsNum; aggIndex++) {
     Aggregate* agg = aggregates[aggIndex];
@@ -572,13 +562,11 @@ void StacksRule::clearStacks() {
       win = stacks[secondIndex]->getWindow();
     }
     TimeMs minTS = receivedPkts[refersToStack][0]->getTimeStamp() - win;
-    removeOldPacketsFromStack(minTS, aggsSize[aggIndex],
-                              receivedAggs[aggIndex]);
+    removeOldPacketsFromStack(minTS, aggsSize[aggIndex], receivedAggs[aggIndex]);
   }
 }
 
-void StacksRule::removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize,
-                                           vector<PubPkt*>& parReceived) {
+void StacksRule::removeOldPacketsFromStack(TimeMs& minTS, int& parStacksSize, vector<PubPkt*>& parReceived) {
   if (parStacksSize == 0)
     return;
   int newSize = deleteInvalidElements(parReceived, parStacksSize, minTS);

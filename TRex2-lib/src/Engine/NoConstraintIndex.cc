@@ -30,9 +30,7 @@ void NoConstraintIndex::installPredicate(TablePred* predicate) {
   predicates.insert(predicate);
 }
 
-void NoConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
-                                       map<TablePred*, int>& predCount) {
-  for (auto pred : predicates) {
+void NoConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh, map<TablePred*, int>& predCount) {
+  for (auto pred : predicates)
     addToMatchingHandler(mh, pred);
-  }
 }

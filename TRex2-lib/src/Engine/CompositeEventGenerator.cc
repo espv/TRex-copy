@@ -64,25 +64,22 @@ PubPkt* CompositeEventGenerator::generateCompositeEvent(
   for (int i = 0; i < staticAttributesNum; i++) {
     ceTemplate->getStaticAttribute(attributes[i + attributesNum], i);
   }
-  PubPkt* result =
-      new PubPkt(eventType, attributes, attributesNum + staticAttributesNum);
+  PubPkt* result = new PubPkt(eventType, attributes, attributesNum + staticAttributesNum);
   result->setTime(partialEvent->indexes[0]->getTimeStamp());
   return result;
 }
 
 inline int CompositeEventGenerator::computeIntValue(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
+  PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
+  int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
+  map<int, vector<PubPkt*>>& receivedAggs,
+  map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
   OpTreeType type = opTree->getType();
   if (type == LEAF) {
     OpValueReference* reference = opTree->getValueReference();
-    RulePktValueReference* pktReference =
-        dynamic_cast<RulePktValueReference*>(reference);
+    RulePktValueReference* pktReference = dynamic_cast<RulePktValueReference*>(reference);
     if (pktReference == NULL) {
-      StaticValueReference* sReference =
-          dynamic_cast<StaticValueReference*>(reference);
+      StaticValueReference* sReference = dynamic_cast<StaticValueReference*>(reference);
       if (sReference->getType() == INT)
         return sReference->getIntValue();
       else if (sReference->getType() == FLOAT)
@@ -96,16 +93,15 @@ inline int CompositeEventGenerator::computeIntValue(
       PubPkt* pkt = partialEvent->indexes[index];
       int attrIndex;
       ValType type;
-      if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex,
-                                        type) == false)
+      if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type) == false)
         return 0;
       if (type == INT)
         return pkt->getIntAttributeVal(attrIndex);
       else if (type == FLOAT)
         return pkt->getFloatAttributeVal(attrIndex);
     } else {
-      return computeAggregate(index, partialEvent, aggregates, aggsSize,
-                              receivedPkts, receivedAggs, aggregateParameters);
+      return computeAggregate(index, partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
+                              aggregateParameters);
     }
   } else {
     // Integer can only be obtained from integer:
@@ -132,19 +128,17 @@ inline int CompositeEventGenerator::computeIntValue(
 }
 
 inline float CompositeEventGenerator::computeFloatValue(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
+  PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
+  int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
+  map<int, vector<PubPkt*>>& receivedAggs,
+  map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
   OpTreeType type = opTree->getType();
   if (type == LEAF) {
     OpValueReference* reference = opTree->getValueReference();
-    RulePktValueReference* pktReference =
-        dynamic_cast<RulePktValueReference*>(reference);
+    RulePktValueReference* pktReference = dynamic_cast<RulePktValueReference*>(reference);
     if (pktReference == NULL) {
       // this is a static value
-      StaticValueReference* sReference =
-          dynamic_cast<StaticValueReference*>(reference);
+      StaticValueReference* sReference = dynamic_cast<StaticValueReference*>(reference);
       if (sReference->getType() == INT)
         return sReference->getIntValue();
       else if (sReference->getType() == FLOAT)
@@ -158,8 +152,7 @@ inline float CompositeEventGenerator::computeFloatValue(
       PubPkt* pkt = partialEvent->indexes[index];
       int attrIndex;
       ValType type;
-      if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex,
-                                        type) == false)
+      if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type) == false)
         return 0;
       if (type == INT)
         return pkt->getIntAttributeVal(attrIndex);
@@ -204,19 +197,17 @@ inline float CompositeEventGenerator::computeFloatValue(
 }
 
 inline bool CompositeEventGenerator::computeBoolValue(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
+  PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
+  int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
+  map<int, vector<PubPkt*>>& receivedAggs,
+  map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree) {
   OpTreeType type = opTree->getType();
   if (type == LEAF) {
     OpValueReference* reference = opTree->getValueReference();
-    RulePktValueReference* pktReference =
-        dynamic_cast<RulePktValueReference*>(reference);
+    RulePktValueReference* pktReference = dynamic_cast<RulePktValueReference*>(reference);
     if (pktReference == NULL) {
       // this is a static value
-      StaticValueReference* sReference =
-          dynamic_cast<StaticValueReference*>(reference);
+      StaticValueReference* sReference = dynamic_cast<StaticValueReference*>(reference);
       if (sReference->getType() == INT)
         return sReference->getIntValue();
       else if (sReference->getType() == FLOAT)
@@ -230,8 +221,7 @@ inline bool CompositeEventGenerator::computeBoolValue(
       PubPkt* pkt = partialEvent->indexes[index];
       int attrIndex;
       ValType type;
-      if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex,
-                                        type) == false)
+      if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type) == false)
         return false;
       return pkt->getBoolAttributeVal(attrIndex);
     } else {
@@ -257,19 +247,17 @@ inline bool CompositeEventGenerator::computeBoolValue(
 }
 
 inline void CompositeEventGenerator::computeStringValue(
-    PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree,
-    char* result) {
+  PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
+  int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
+  map<int, vector<PubPkt*>>& receivedAggs,
+  map<int, set<CPUParameter*>>& aggregateParameters, OpTree* opTree,
+  char* result) {
   // No operator is defined for strings: type can only be LEAF
   OpValueReference* reference = opTree->getValueReference();
-  RulePktValueReference* pktReference =
-      dynamic_cast<RulePktValueReference*>(reference);
+  RulePktValueReference* pktReference = dynamic_cast<RulePktValueReference*>(reference);
   if (pktReference == NULL) {
     // this is a static value
-    StaticValueReference* sReference =
-        dynamic_cast<StaticValueReference*>(reference);
+    StaticValueReference* sReference = dynamic_cast<StaticValueReference*>(reference);
     return sReference->getStringValue(result);
   }
   int index = pktReference->getIndex();
@@ -279,8 +267,7 @@ inline void CompositeEventGenerator::computeStringValue(
     int attrIndex;
     ValType type;
     strcpy(result, "");
-    if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex,
-                                      type) == false)
+    if (pkt->getAttributeIndexAndType(pktReference->getName(), attrIndex, type) == false)
       return;
     pkt->getStringAttributeVal(attrIndex, result);
   } else {
@@ -289,10 +276,10 @@ inline void CompositeEventGenerator::computeStringValue(
 }
 
 inline float CompositeEventGenerator::computeAggregate(
-    int index, PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
-    int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
-    map<int, vector<PubPkt*>>& receivedAggs,
-    map<int, set<CPUParameter*>>& aggregateParameters) {
+  int index, PartialEvent* partialEvent, map<int, Aggregate*>& aggregates,
+  int aggsSize[MAX_RULE_FIELDS], map<int, vector<PubPkt*>>& receivedPkts,
+  map<int, vector<PubPkt*>>& receivedAggs,
+  map<int, set<CPUParameter*>>& aggregateParameters) {
   Aggregate* agg = aggregates[index];
   TimeMs maxTS = partialEvent->indexes[agg->upperId]->getTimeStamp();
   TimeMs minTS = 0;
@@ -337,8 +324,7 @@ inline float CompositeEventGenerator::computeAggregate(
     float val = 0;
     if (pkt->getAttributeIndexAndType(name, attIndex, type) && type == INT) {
       val = pkt->getIntAttributeVal(attIndex);
-    } else if (pkt->getAttributeIndexAndType(name, attIndex, type) &&
-               type == FLOAT) {
+    } else if (pkt->getAttributeIndexAndType(name, attIndex, type) && type == FLOAT) {
       val = pkt->getFloatAttributeVal(attIndex);
     }
     count++;
@@ -369,9 +355,7 @@ inline float CompositeEventGenerator::computeAggregate(
   return 0;
 }
 
-bool CompositeEventGenerator::checkParameters(PubPkt* pkt,
-                                              PartialEvent* partialEvent,
-                                              set<CPUParameter*>& parameters) {
+bool CompositeEventGenerator::checkParameters(PubPkt* pkt, PartialEvent* partialEvent, set<CPUParameter*>& parameters) {
   for (auto it : parameters) {
     // cout << "Agg par" << endl;
     if (!checkComplexParameter(pkt, partialEvent, it, -1, AGG))

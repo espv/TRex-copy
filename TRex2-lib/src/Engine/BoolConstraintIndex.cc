@@ -29,8 +29,7 @@ BoolConstraintIndex::~BoolConstraintIndex() {
     delete itc;
 }
 
-void BoolConstraintIndex::installConstraint(Constraint& constraints,
-                                            TablePred* predicate) {
+void BoolConstraintIndex::installConstraint(Constraint& constraints, TablePred* predicate) {
   // Looks if the same constraint is already installed in the table
   BoolTableConstraint* itc = getConstraint(constraints);
   if (itc == NULL) {
@@ -102,8 +101,8 @@ inline void BoolConstraintIndex::installConstraint(BoolTableConstraint* c) {
 }
 
 inline void BoolConstraintIndex::processConstraint(
-    BoolTableConstraint* c, MatchingHandler& mh,
-    map<TablePred*, int>& predCount) {
+  BoolTableConstraint* c, MatchingHandler& mh,
+  map<TablePred*, int>& predCount) {
   for (auto it : c->connectedPredicates) {
     // If satisfied for the first time, sets count to 1
     if (predCount.find(it) == predCount.end())
