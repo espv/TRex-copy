@@ -27,6 +27,11 @@ using concept::util::Logging;
 using namespace std;
 
 
+void my_handler(int s){
+	exit(1);
+}
+
+
 void runServer(bool useGPU){
 	// Create server with default port and #threads = #CPUs
 	SOEPServer server(SOEPServer::DEFAULT_PORT, 1 /*boost::thread::hardware_concurrency()*/, false, useGPU);
@@ -54,6 +59,14 @@ void testEngine(){
 }
 
 int main(int argc, char* argv[]){
+	struct sigaction sigIntHandler;
+
+	sigIntHandler.sa_handler = my_handler;
+	sigemptyset(&sigIntHandler.sa_mask);
+	sigIntHandler.sa_flags = 0;
+
+	sigaction(SIGINT, &sigIntHandler, NULL);
+
 	Logging::init();
 #ifdef HAVE_GTREX
 	if (argc==2 && strcmp(argv[1], "-gpu")==0) {
