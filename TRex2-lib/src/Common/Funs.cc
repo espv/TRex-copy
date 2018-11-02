@@ -33,6 +33,7 @@ pthread_mutex_t* traceMutex = new pthread_mutex_t;
 double previous_time;
 void traceEvent(int traceId, int pid, bool reset)
 {
+#ifdef DEBUG
   pthread_mutex_lock(traceMutex);
   auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
   if (reset)
@@ -40,6 +41,7 @@ void traceEvent(int traceId, int pid, bool reset)
   cout << traceId << "-" << pid << "-" << current_time/*-previous_time*/ << std::endl;
   previous_time = current_time;
   pthread_mutex_unlock(traceMutex);
+#endif
 }
 
 bool checkConstraints(PubPkt* event, RulePkt* rule, int state) {
