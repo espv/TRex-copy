@@ -34,7 +34,7 @@ void my_handler(int s){
 
 void runServer(bool useGPU){
 	// Create server with default port and #threads = #CPUs
-	SOEPServer server(SOEPServer::DEFAULT_PORT, 1 /*boost::thread::hardware_concurrency()*/, false, useGPU);
+	SOEPServer server(SOEPServer::DEFAULT_PORT, boost::thread::hardware_concurrency(), false, useGPU);
 
 	server.run();
 }
