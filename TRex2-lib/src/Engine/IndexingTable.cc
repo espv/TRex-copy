@@ -68,9 +68,7 @@ void IndexingTable::installRulePkt(RulePkt* pkt) {
   }
 }
 
-void IndexingTable::installTablePredicate(int eventType,
-                                          Constraint* constraints,
-                                          int numConstraints, TablePred* tp) {
+void IndexingTable::installTablePredicate(int eventType, Constraint* constraints, int numConstraints, TablePred* tp) {
   usedPreds.insert(tp);
   if (numConstraints == 0) {
     installNoConstraint(eventType, tp);

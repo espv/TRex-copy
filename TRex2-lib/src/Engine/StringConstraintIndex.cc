@@ -83,7 +83,7 @@ StringTableConstraint* StringConstraintIndex::getConstraint(Constraint& c) {
 }
 
 StringTableConstraint* StringConstraintIndex::createConstraint(Constraint& c) {
-  StringTableConstraint* itc = new StringTableConstraint;
+  auto itc = new StringTableConstraint;
   strcpy(itc->name, c.name);
   itc->op = c.op;
   itc->val = c.stringVal;
@@ -105,8 +105,8 @@ inline void StringConstraintIndex::installConstraint(StringTableConstraint* c) {
 }
 
 inline void StringConstraintIndex::processConstraint(
-    StringTableConstraint* c, MatchingHandler& mh,
-    map<TablePred*, int>& predCount) {
+  StringTableConstraint* c, MatchingHandler& mh,
+  map<TablePred*, int>& predCount) {
   for (auto it : c->connectedPredicates) {
     // If satisfied for the first time, sets count to 1
     if (predCount.find(it) == predCount.end())

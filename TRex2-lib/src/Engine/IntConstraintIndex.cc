@@ -110,7 +110,7 @@ IntTableConstraint* IntConstraintIndex::getConstraint(Constraint& c) {
 }
 
 IntTableConstraint* IntConstraintIndex::createConstraint(Constraint& c) {
-  IntTableConstraint* itc = new IntTableConstraint;
+  auto itc = new IntTableConstraint;
   strcpy(itc->name, c.name);
   itc->op = c.op;
   itc->val = c.intVal;

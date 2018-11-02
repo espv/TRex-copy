@@ -29,8 +29,7 @@ FloatConstraintIndex::~FloatConstraintIndex() {
     delete itc;
 }
 
-void FloatConstraintIndex::installConstraint(Constraint& constraints,
-                                             TablePred* predicate) {
+void FloatConstraintIndex::installConstraint(Constraint& constraints, TablePred* predicate) {
   // Looks if the same constraint is already installed in the table
   FloatTableConstraint* itc = getConstraint(constraints);
   if (itc == NULL) {
@@ -124,18 +123,12 @@ inline void FloatConstraintIndex::installConstraint(FloatTableConstraint* c) {
     FloatOperatorsTable emptyTable;
     indexes.insert(make_pair(s, emptyTable));
   }
-  if (c->op == EQ)
-    indexes[s].eq.insert(make_pair(c->val, c));
-  else if (c->op == LT)
-    indexes[s].lt.insert(make_pair(c->val, c));
-  else if (c->op == GT)
-    indexes[s].gt.insert(make_pair(c->val, c));
-  else if (c->op == LE)
-    indexes[s].le.insert(make_pair(c->val, c));
-  else if (c->op == GE)
-    indexes[s].ge.insert(make_pair(c->val, c));
-  else
-    indexes[s].ne.insert(make_pair(c->val, c));
+  if (c->op == EQ)      indexes[s].eq.insert(make_pair(c->val, c));
+  else if (c->op == LT) indexes[s].lt.insert(make_pair(c->val, c));
+  else if (c->op == GT) indexes[s].gt.insert(make_pair(c->val, c));
+  else if (c->op == LE) indexes[s].le.insert(make_pair(c->val, c));
+  else if (c->op == GE) indexes[s].ge.insert(make_pair(c->val, c));
+  else                  indexes[s].ne.insert(make_pair(c->val, c));
 }
 
 inline void FloatConstraintIndex::processConstraint(FloatTableConstraint* c,

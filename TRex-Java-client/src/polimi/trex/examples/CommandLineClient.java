@@ -111,7 +111,15 @@ public class CommandLineClient implements PacketListener {
 		client.subscribe(subTypes);
 	    }
 	    if (sendRule) client.sendRule();
-	    if(pubType!=-1) client.publish(pubType, keys, values);
+	    if(pubType!=-1) {
+	    	int cnt = 0;
+	    	while (true) {
+	    		if (cnt % 10000 == 0)
+	    			System.out.println("Number of events sent: " + cnt);
+				client.publish(pubType, keys, values);
+				++cnt;
+			}
+		}
 	} catch(IOException e) { e.printStackTrace(); }
     }
 
