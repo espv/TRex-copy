@@ -18,12 +18,13 @@
 
 #include "RequestHandler.hpp"
 #include <sys/syscall.h>
-#include "Common/Funs.h"
 
 using concept::connection::RequestHandler;
 using namespace concept::packet;
 using namespace concept::util;
 using namespace std;
+
+extern void traceEvent(int traceId, int pid, bool reset);
 
 #ifdef HAVE_GTREX
 	RequestHandler::RequestHandler(TRexEngine &tRexEngine, GPUEngine &gtRexEngine, ConnectionProxy& connection, SubscriptionTable &subTable, bool useGPUPar):
@@ -80,19 +81,25 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 #endif
 }
 
+long long cnt = 0;
 void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
-    //traceEvent(2, syscall(SYS_gettid), false);
-	LOG(info) << "Publication from " << parent.connection.remoteToString() << ":" << endl
-			<< "  " << toString(pkt);
-	parent.subTable.processPublication(pkt);
-	// Let TRex process (and *delete*) the packet
-	if (!useGPU) parent.tRexEngine.processPubPkt(pkt);
+    //while (true) {
+    if (++cnt % 10000 == 0)
+        std::cout << cnt << std::endl;
+    //LOG(info) << "Publication from " << parent.connection.remoteToString() << ":" << endl
+    //          << "  " << toString(pkt);
+    //continue;
+    PubPkt *newPkt = pkt->copy();
+    parent.subTable.processPublication(pkt);
+    // Let TRex process (and *delete*) the packet
+    if (!useGPU) parent.tRexEngine.processPubPkt(pkt);
+    pkt = newPkt;
 #ifdef HAVE_GTREX
-	if (useGPU) {
-	  parent.gtRexEngine.processPubPkt(pkt);
-	}
+    if (useGPU) {
+          parent.gtRexEngine.processPubPkt(pkt);
+        }
 #endif
-    //traceEvent(10, syscall(SYS_gettid), false);
+    //}
 }
 
 void RequestHandler::PktHandleVisitor::operator()(SubPkt * pkt) const{

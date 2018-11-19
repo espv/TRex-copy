@@ -58,7 +58,12 @@ void testEngine(){
 	 */
 }
 
+extern bool doTrace;
 int main(int argc, char* argv[]){
+	if (argc > 1 && !strcmp(argv[1], "-trace"))  // If first argument is -trace
+        doTrace = true;
+	else
+	    doTrace = false;
 	struct sigaction sigIntHandler;
 
 	sigIntHandler.sa_handler = my_handler;
