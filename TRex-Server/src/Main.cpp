@@ -20,6 +20,7 @@
 #include "server.hpp"
 #include "test.hpp"
 #include "util.hpp"
+#include "trace-framework.hpp"
 
 using concept::server::SOEPServer;
 using namespace concept::test;

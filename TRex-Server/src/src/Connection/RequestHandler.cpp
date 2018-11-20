@@ -17,6 +17,7 @@
  */
 
 #include "RequestHandler.hpp"
+#include "../../trace-framework.hpp"
 
 using concept::connection::RequestHandler;
 using namespace concept::packet;
