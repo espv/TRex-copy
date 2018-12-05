@@ -245,9 +245,10 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   traceEvent(9, syscall(SYS_gettid), false);
   // Notifies results to listeners
   for (auto listener : resultListeners) {
+    traceEvent(10, syscall(SYS_gettid), false);
     listener->handleResult(result, duration);
   }
-  traceEvent(10, syscall(SYS_gettid), false);
+  traceEvent(11, syscall(SYS_gettid), false);
 
   for (auto pkt : result) {
     if (recursionNeeded && recursionDepth < MAX_RECURSION_DEPTH)
@@ -256,7 +257,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
       delete pkt;
     }
   }
-  traceEvent(11, syscall(SYS_gettid), false);
+  traceEvent(12, syscall(SYS_gettid), false);
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt) {
