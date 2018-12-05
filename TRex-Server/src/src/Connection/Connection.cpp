@@ -17,7 +17,7 @@
  */
 
 #include "Connection.hpp"
-#include "Common/Funs.h"
+#include "../../trace-framework.hpp"
 
 using concept::connection::Connection;
 using namespace concept::packet;
