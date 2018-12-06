@@ -19,6 +19,7 @@
 //
 
 #include "IndexingTable.h"
+#include "../Common/trace-framework-definition.h"
 
 using namespace std;
 
@@ -126,6 +127,7 @@ void IndexingTable::processMessage(PubPkt* pkt, MatchingHandler& mh) {
   // predCount stores intermediate results, it will be useful when more types
   // will be available
   map<TablePred*, int> predCount;
+  traceEvent(50, false);
   if (noIndex.find(eventType) != noIndex.end())
     noIndex[eventType].processMessage(pkt, mh, predCount);
   if (intIndex.find(eventType) != intIndex.end())
@@ -136,4 +138,5 @@ void IndexingTable::processMessage(PubPkt* pkt, MatchingHandler& mh) {
     boolIndex[eventType].processMessage(pkt, mh, predCount);
   if (stringIndex.find(eventType) != stringIndex.end())
     stringIndex[eventType].processMessage(pkt, mh, predCount);
+  traceEvent(51, false);
 }
