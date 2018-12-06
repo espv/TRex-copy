@@ -2,9 +2,56 @@
 import sys
 from collections import Counter
 
+#from openpyxl import Workbook
+#
+#wb = Workbook()
+#
+#ws = wb.create_sheet("Mysheet") # insert at the end (default)
+#
+#ws.title = "New Title"
+#
+#ws.sheet_properties.tabColor = "1072BA"
+#
+#wb.save('output/'+sys.argv[1]+'.xlsx')
+
+from datetime import date
+from enum import Enum
+from openpyxl_templates import TemplatedWorkbook
+from openpyxl_templates.table_sheet import TableSheet
+from openpyxl_templates.table_sheet.columns import CharColumn, ChoiceColumn, DateColumn
+class Fruits(Enum):
+    apple = 1
+    banana = 2
+    orange = 3
+
+class PersonSheet(TableSheet):
+    first_name = CharColumn()
+    last_name = CharColumn()
+    date_of_birth = DateColumn()
+    favorite_fruit = ChoiceColumn(choices=(
+        (Fruits.apple, "Apple"),
+        (Fruits.banana, "Banana"),
+        (Fruits.orange, "Orange"),
+    ))
+class PersonsWorkbook(TemplatedWorkbook):
+    persons = PersonSheet()
+
+
+wb = PersonsWorkbook()
+wb.persons.write(
+    title="List of fruit lovers",
+    objects=(
+        ("John", "Doe", date(year=1992, month=7, day=17), Fruits.banana),
+        ("Jane", "Doe", date(year=1986, month=3, day=2), Fruits.apple),
+    )
+)
+wb.save("my_excel.xlsx")
+
+
 argv = sys.argv
 if len(argv) < 2:
-    print "USAGE: python unique_sequences.py <file> <delimiter from> <delimiter to> <[include delimiter to]>"
+    print("USAGE: python unique_sequences.py <file> <delimiter from> <delimiter to> <[include delimiter to]>")
+    exit(0)
 
 max_diff = 99999999
 if "--max-diff" in argv:
@@ -19,8 +66,8 @@ del1 = del2 = None
 if len(argv) >= 4:
     del1 = argv[2]
     del2 = argv[3]
-    print "del1:", del1
-    print "del2:", del2
+    print("del1:", del1)
+    print("del2:", del2)
 
 first_time = None
 number_forwarded = 0
@@ -29,12 +76,12 @@ number_received = 0
 include_del2 = False
 if len(argv) >= 5 and argv[4] == "inc":
     include_del2 = True
-    print "Including delimiter 2"
+    print("Including delimiter 2")
 else:
-    print "Not including delimiter 2"
+    print("Not including delimiter 2")
 
 if len(argv) >= 2:
-    print "File:", argv[1]
+    print("File:", argv[1])
 
 number_between_dels = 9999999999
 #if len(argv) >= 6:
@@ -99,15 +146,15 @@ for i, l in enumerate(traces):
         cur_sequence = []
 
 for sequence in unique_sequences:
-    print "Occurrences:", sequence[0], "sequence:", ", ".join(sequence[1])
-    print "Occurrences with line numbers:", sequence[2], "\n"
+    print("Occurrences:", sequence[0], "sequence:", ", ".join(sequence[1]))
+    print("Occurrences with line numbers:", sequence[2], "\n")
     l = sorted([r[1] for r in sequence[2]])
-    print "All unique times and number of occurrences:", Counter(l).most_common()
-    print "Max:", max(l), ", min:", min(l)
-    print "Avg:", sum(l)/float(len(l)), ", median:", l[len(l)/2], "\n"
+    print("All unique times and number of occurrences:", Counter(l).most_common())
+    print("Max:", max(l), ", min:", min(l))
+    print("Avg:", sum(l)/float(len(l)), ", median:", l[len(l)/2], "\n")
 
 if time is None or first_time is None or number_forwarded == 0:
     sys.exit(0)
-print "Number forwarded:", number_forwarded, "first_time:", first_time, "- last_time:", time
-print "Forwarded on avg every", (time-first_time)/number_forwarded
-print "Number received:", number_received, "- on avg every", (time-first_time)/number_received, "\n"
+print("Number forwarded:", number_forwarded, "first_time:", first_time, "- last_time:", time)
+print("Forwarded on avg every", (time-first_time)/number_forwarded)
+print("Number received:", number_received, "- on avg every", (time-first_time)/number_received, "\n")
