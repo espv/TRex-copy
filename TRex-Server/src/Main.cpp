@@ -21,6 +21,8 @@
 #include "test.hpp"
 #include "util.hpp"
 #include "trace-framework.hpp"
+#include <iostream>
+#include <fstream>
 
 using concept::server::SOEPServer;
 using namespace concept::test;
@@ -29,6 +31,14 @@ using namespace std;
 
 
 void my_handler(int s){
+    ofstream myfile;
+    myfile.open ("example.txt");
+    for (int i = 0; i < tracedEvents; ++i)
+    {
+        TraceEvent *event = &events[i];
+        myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
+    }
+    myfile.close();
 	exit(1);
 }
 
