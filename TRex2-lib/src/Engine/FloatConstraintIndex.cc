@@ -19,6 +19,7 @@
 //
 
 #include "FloatConstraintIndex.h"
+#include "../Common/trace-framework-definition.h"
 
 using namespace std;
 
@@ -47,6 +48,8 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
   for (int i = 0; i < pkt->getAttributesNum(); i++) {
     if (pkt->getAttribute(i).type != FLOAT)
       continue;
+
+    traceEvent(40, false);
     string name = pkt->getAttribute(i).name;
     float val = pkt->getFloatAttributeVal(i);
     if (indexes.find(name) == indexes.end())
@@ -61,6 +64,8 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (auto rit = indexes[name].lt.rbegin(); rit != indexes[name].lt.rend(); ++rit) {
       if (rit->first <= val)
         break;
+
+      traceEvent(41, false);
       FloatTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
@@ -68,6 +73,8 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (auto rit = indexes[name].le.rbegin(); rit != indexes[name].le.rend(); ++rit) {
       if (rit->first < val)
         break;
+
+      traceEvent(42, false);
       FloatTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
@@ -75,6 +82,8 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (it = indexes[name].gt.begin(); it != indexes[name].gt.end(); ++it) {
       if (it->first >= val)
         break;
+
+      traceEvent(43, false);
       FloatTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -82,6 +91,8 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (it = indexes[name].ge.begin(); it != indexes[name].ge.end(); ++it) {
       if (it->first > val)
         break;
+
+      traceEvent(44, false);
       FloatTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -89,6 +100,8 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (it = indexes[name].ne.begin(); it != indexes[name].ne.end(); ++it) {
       if (it->first == val)
         continue;
+
+      traceEvent(44, false);
       FloatTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -134,6 +147,7 @@ inline void FloatConstraintIndex::installConstraint(FloatTableConstraint* c) {
 inline void FloatConstraintIndex::processConstraint(FloatTableConstraint* c,
                                                     MatchingHandler& mh, map<TablePred*, int>& predCount) {
   for (auto it : c->connectedPredicates) {
+    traceEvent(45, false);
     // If satisfied for the first time, sets count to 1
     if (predCount.find(it) == predCount.end())
       predCount.insert(make_pair(it, 1));

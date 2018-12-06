@@ -19,6 +19,7 @@
 //
 
 #include "StringConstraintIndex.h"
+#include "../Common/trace-framework-definition.h"
 
 using namespace std;
 
@@ -48,6 +49,8 @@ void StringConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
   for (int i = 0; i < pkt->getAttributesNum(); i++) {
     if (pkt->getAttribute(i).type != STRING)
       continue;
+
+    traceEvent(20, false);
     string name = pkt->getAttribute(i).name;
     string val = pkt->getAttribute(i).stringVal;
     if (indexes.find(name) == indexes.end())
@@ -65,6 +68,7 @@ void StringConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
         continue;
       StringTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
+      traceEvent(21, false);
     }
   }
 }

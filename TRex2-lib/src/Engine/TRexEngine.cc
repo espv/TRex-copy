@@ -19,14 +19,11 @@
 //
 
 #include "TRexEngine.h"
-#include "Common/Funs.h"
 #include <sys/time.h>
+#include "../Common/trace-framework-definition.h"
 
 using namespace std;
 
-#include <unistd.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
 
 void* processor(void* parShared) {
   Shared* s = (Shared*)parShared;
@@ -40,7 +37,7 @@ void* processor(void* parShared) {
     // At this point, s->processMutex is locked by this thread, and s->lowerBound and s->upperBound will not be changed by TRexEngine::processRulePkt
     int lowerBound = s->lowerBound;
     int upperBound = s->upperBound;
-    traceEvent(6, syscall(SYS_gettid), false);
+    traceEvent(6, false);
     // End processing
     if (s->finish) {
       pthread_mutex_unlock(s->processMutex);
@@ -50,7 +47,7 @@ void* processor(void* parShared) {
     MatchingHandler* mh = s->mh;
     set<PubPkt*> generatedPkts;
     for (int i = lowerBound; i < upperBound; i++) {
-      traceEvent(7, syscall(SYS_gettid), false);
+      traceEvent(7, false);
       auto negsIt = mh->matchingNegations.find(i);
       if (negsIt != mh->matchingNegations.end()) {
         for (auto index : negsIt->second) {
@@ -199,7 +196,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   set<PubPkt*> result;
 
   // Installs information in shared memory
-  traceEvent(5, syscall(SYS_gettid), false);
+  traceEvent(5, false);
   for (int i = 0; i < numProc; i++) {
     pthread_mutex_lock(shared[i].processMutex);
     shared[i].mh = mh;
@@ -220,7 +217,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   pthread_mutex_unlock(shared[0].resultMutex);
   *(shared[0].stillProcessing) = numProc;
 
-  traceEvent(8, syscall(SYS_gettid), false);
+  traceEvent(8, false);
 
   // Collects results
   for (int i = 0; i < numProc; i++) {
@@ -242,13 +239,13 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   double duration = (tValEnd.tv_sec - tValStart.tv_sec) * 1000000 +
                     tValEnd.tv_usec - tValStart.tv_usec;
 
-  traceEvent(9, syscall(SYS_gettid), false);
+  traceEvent(9, false);
   // Notifies results to listeners
   for (auto listener : resultListeners) {
-    traceEvent(10, syscall(SYS_gettid), false);
+    traceEvent(10, false);
     listener->handleResult(result, duration);
   }
-  traceEvent(11, syscall(SYS_gettid), false);
+  traceEvent(11, false);
 
   for (auto pkt : result) {
     if (recursionNeeded && recursionDepth < MAX_RECURSION_DEPTH)
@@ -257,7 +254,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
       delete pkt;
     }
   }
-  traceEvent(12, syscall(SYS_gettid), false);
+  traceEvent(12, false);
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt) {

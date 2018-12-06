@@ -19,6 +19,7 @@
 //
 
 #include "IntConstraintIndex.h"
+#include "../Common/trace-framework-definition.h"
 
 using namespace std;
 
@@ -48,6 +49,8 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
   for (int i = 0; i < pkt->getAttributesNum(); i++) {
     if (pkt->getAttribute(i).type != INT)
       continue;
+
+    traceEvent(30, false);
     string name = pkt->getAttribute(i).name;
     int val = pkt->getIntAttributeVal(i);
     if (indexes.find(name) == indexes.end())
@@ -62,6 +65,8 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (auto rit = indexes[name].lt.rbegin(); rit != indexes[name].lt.rend(); ++rit) {
       if (rit->first <= val)
         break;
+
+      traceEvent(31, false);
       IntTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
@@ -69,6 +74,8 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (auto rit = indexes[name].le.rbegin(); rit != indexes[name].le.rend(); ++rit) {
       if (rit->first < val)
         break;
+
+      traceEvent(32, false);
       IntTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
@@ -76,6 +83,8 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (it = indexes[name].gt.begin(); it != indexes[name].gt.end(); ++it) {
       if (it->first >= val)
         break;
+
+      traceEvent(33, false);
       IntTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -83,6 +92,8 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (it = indexes[name].ge.begin(); it != indexes[name].ge.end(); ++it) {
       if (it->first > val)
         break;
+
+      traceEvent(34, false);
       IntTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -90,6 +101,8 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     for (it = indexes[name].ne.begin(); it != indexes[name].ne.end(); ++it) {
       if (it->first == val)
         continue;
+
+      traceEvent(35, false);
       IntTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -142,6 +155,7 @@ inline void IntConstraintIndex::processConstraint(
     IntTableConstraint* c, MatchingHandler& mh,
     map<TablePred*, int>& predCount) {
   for (auto it : c->connectedPredicates) {
+    traceEvent(36, false);
     // If satisfied for the first time, sets count to 1
     if (predCount.find(it) == predCount.end())
       predCount.insert(make_pair(it, 1));

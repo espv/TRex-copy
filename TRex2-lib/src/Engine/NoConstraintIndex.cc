@@ -19,6 +19,7 @@
 //
 
 #include "NoConstraintIndex.h"
+#include "../Common/trace-framework-definition.h"
 
 using namespace std;
 
@@ -31,6 +32,8 @@ void NoConstraintIndex::installPredicate(TablePred* predicate) {
 }
 
 void NoConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh, map<TablePred*, int>& predCount) {
-  for (auto pred : predicates)
+  for (auto pred : predicates) {
+    traceEvent(30, false);
     addToMatchingHandler(mh, pred);
+  }
 }

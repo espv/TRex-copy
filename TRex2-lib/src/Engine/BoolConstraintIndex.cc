@@ -19,6 +19,7 @@
 //
 
 #include "BoolConstraintIndex.h"
+#include "../Common/trace-framework-definition.h"
 
 using namespace std;
 
@@ -47,10 +48,14 @@ void BoolConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
   for (int i = 0; i < pkt->getAttributesNum(); i++) {
     if (pkt->getAttribute(i).type != BOOL)
       continue;
+
+    traceEvent(50, false);
     string name = pkt->getAttribute(i).name;
     bool val = pkt->getBoolAttributeVal(i);
     if (indexes.find(name) == indexes.end())
       continue;
+
+    traceEvent(41, false);
     // Equality constraints
     auto it = indexes[name].eq.find(val);
     if (it != indexes[name].eq.end()) {
@@ -104,6 +109,7 @@ inline void BoolConstraintIndex::processConstraint(
   BoolTableConstraint* c, MatchingHandler& mh,
   map<TablePred*, int>& predCount) {
   for (auto it : c->connectedPredicates) {
+    traceEvent(42, false);
     // If satisfied for the first time, sets count to 1
     if (predCount.find(it) == predCount.end())
       predCount.insert(make_pair(it, 1));

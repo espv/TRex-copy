@@ -18,13 +18,12 @@
 
 #include "RequestHandler.hpp"
 #include <sys/syscall.h>
+#include "../../../TRex2-lib/src/Common/trace-framework-definition.h"
 
 using concept::connection::RequestHandler;
 using namespace concept::packet;
 using namespace concept::util;
 using namespace std;
-
-extern void traceEvent(int traceId, int pid, bool reset);
 
 #ifdef HAVE_GTREX
 	RequestHandler::RequestHandler(TRexEngine &tRexEngine, GPUEngine &gtRexEngine, ConnectionProxy& connection, SubscriptionTable &subTable, bool useGPUPar):
@@ -60,11 +59,11 @@ RequestHandler::~RequestHandler(){
 }
 
 void RequestHandler::handleRequest(std::vector<PktPtr> & pkts){
-    traceEvent(1, syscall(SYS_gettid), true);
+    traceEvent(1, true);
 	for (std::vector<PktPtr>::iterator it= pkts.begin(); it != pkts.end(); it++){
 		boost::apply_visitor(PktHandleVisitor(*this, useGPU), *it);
 	}
-    traceEvent(16, syscall(SYS_gettid), false);
+    traceEvent(16, false);
 }
 
 void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{

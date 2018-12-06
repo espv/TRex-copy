@@ -8,7 +8,11 @@
 #include <chrono>
 #include <sched.h>
 
-void traceEvent(int traceId, int pid, bool reset);
+#include <unistd.h>
+#include <sys/syscall.h>
+#include <sys/types.h>
+
+using namespace std;
 
 bool doTrace = false;
 pthread_mutex_t* traceMutex = new pthread_mutex_t;
@@ -27,10 +31,11 @@ TraceEvent events[1000000];
 int tracedEvents = 0;
 
 bool writeTracesToFile = true;
-void traceEvent(int traceId, int pid, bool reset)
+void traceEvent(int traceId, bool reset)
 {
     if (!doTrace)
         return;
+    int pid = syscall(SYS_gettid);
     pthread_mutex_lock(traceMutex);
     auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
     if (writeTracesToFile) {
