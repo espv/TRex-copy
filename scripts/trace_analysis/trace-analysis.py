@@ -1,5 +1,6 @@
 
 import sys
+import re
 from collections import Counter
 
 #from openpyxl import Workbook
@@ -24,34 +25,52 @@ class Fruits(Enum):
     banana = 2
     orange = 3
 
-class PersonSheet(TableSheet):
-    first_name = CharColumn()
-    last_name = CharColumn()
-    date_of_birth = DateColumn()
-    favorite_fruit = ChoiceColumn(choices=(
-        (Fruits.apple, "Apple"),
-        (Fruits.banana, "Banana"),
-        (Fruits.orange, "Orange"),
-    ))
-class PersonsWorkbook(TemplatedWorkbook):
-    persons = PersonSheet()
+class TraceSheet(TableSheet):
+    traceId = CharColumn()
+    cpuId = CharColumn()
+    threadId = CharColumn()
+    timestamp = CharColumn()
+class TraceWorkBook(TemplatedWorkbook):
+    trace_entries = TraceSheet()
 
 
-wb = PersonsWorkbook()
-wb.persons.write(
-    title="List of fruit lovers",
-    objects=(
-        ("John", "Doe", date(year=1992, month=7, day=17), Fruits.banana),
-        ("Jane", "Doe", date(year=1986, month=3, day=2), Fruits.apple),
-    )
-)
-wb.save("my_excel.xlsx")
+class TraceEntry():
+    def __init__(self, traceId, cpuId, threadId, timestamp):
+        self.traceId = traceId
+        self.cpuId = cpuId
+        self.threadId = threadId
+        self.timestamp = timestamp
 
+class Trace():
+    def __init__(self, fn):
+        self.rows = []
+        self.trace = open(fn, "r")
+    
+    def collect_data(self):
+        for l in self.trace:
+            split_l = re.split('\t|\n', l)
+            self.rows.append(TraceEntry(split_l[0], split_l[1], split_l[2], split_l[3]))
+    
+    def as_xlsx(self):
+        wb = TraceWorkBook()
+        wb_objects = ((te.traceId, te.cpuId, te.threadId, te.timestamp) for te in self.rows)
+        wb.trace_entries.write(
+            title="Trace",
+            objects=wb_objects
+        )
+
+        wb.save("processed_trace.xlsx")
 
 argv = sys.argv
+
+trace = Trace(argv[1])
+trace.collect_data()
+trace.as_xlsx()
+
 if len(argv) < 2:
     print("USAGE: python unique_sequences.py <file> <delimiter from> <delimiter to> <[include delimiter to]>")
     exit(0)
+
 
 max_diff = 99999999
 if "--max-diff" in argv:
