@@ -100,21 +100,26 @@ class Trace():
 
         #y = grouped_by_traceId[:, 4]
         fig, ax = plt.subplots()
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(fourty, 40) for fourty in y]), label='40th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(thirty, 30) for thirty in y]), label='30th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(twenty, 20) for twenty in y]), label='20th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(seventy, 70) for seventy in y]), label='70th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(eighty, 80) for eighty in y]), label='80th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(sixty, 60) for sixty in y]), label='60th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ten, 10) for ten in y]), label='10th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(one, 1) for one in y]), label='1th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ninety, 90) for ninety in y]), label='90th percentile')
-        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(fourty, 40) for fourty in y]), label='40th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(thirty, 30) for thirty in y]), label='30th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(twenty, 20) for twenty in y]), label='20th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(seventy, 70) for seventy in y]), label='70th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(eighty, 80) for eighty in y]), label='80th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(sixty, 60) for sixty in y]), label='60th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ten, 10) for ten in y]), label='10th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(one, 1) for one in y]), label='1th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ninety, 90) for ninety in y]), label='90th percentile')
+        #ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
 
-        legend = ax.legend(loc='upper center', shadow=True, fontsize='x-large')
-
-        plt.show()
+        #ax.hist(y[5])
+        import seaborn as sns
+        for group in y:
+            try:
+                sns.distplot(group)
+                plt.show()
+            except np.linalg.linalg.LinAlgError:
+                pass
 
     def regular_as_xlsx(self):
         self.wb.regular_trace_entries.write(
