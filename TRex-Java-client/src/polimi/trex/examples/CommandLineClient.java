@@ -58,7 +58,7 @@ public class CommandLineClient implements PacketListener {
 			}
 	
 	private TransportManager tManager = new TransportManager(true);
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, InterruptedException {
    	String serverHost = null;
 	int serverPort = -1;
 	List<Integer> subTypes = null;
@@ -116,6 +116,7 @@ public class CommandLineClient implements PacketListener {
 	    	while (true) {
 	    		if (cnt % 10000 == 0)
 	    			System.out.println("Number of events sent: " + cnt);
+				Thread.sleep(1);
 				client.publish(pubType, keys, values);
 				++cnt;
 			}

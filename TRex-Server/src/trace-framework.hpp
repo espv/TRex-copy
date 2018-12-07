@@ -45,13 +45,13 @@ void traceEvent(int traceId, bool reset)
         events[tracedEvents].timestamp = current_time;
         ++tracedEvents;
     } else {
-        //if (first_time == 0)
-        //    first_time = current_time;
+        if (first_time == 0)
+            first_time = current_time;
         // Resetting doesn't work currently since multiple cores and threads might call this same function
         // The exception is when tracing in low event rates
         if (reset)
             previous_time = current_time;
-        cout << traceId << "-" << sched_getcpu() << "-" << pid << "-" << current_time - previous_time << std::endl;
+        cout << traceId << "-" << sched_getcpu() << "-" << pid << "-" << current_time - first_time << std::endl;
         previous_time = current_time;
     }
     pthread_mutex_unlock(traceMutex);
