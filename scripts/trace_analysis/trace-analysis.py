@@ -3,6 +3,7 @@ import sys
 import re
 from collections import Counter
 
+FIRST_TRACEID = 1
 #from openpyxl import Workbook
 #
 #wb = Workbook()
@@ -15,11 +16,15 @@ from collections import Counter
 #
 #wb.save('output/'+sys.argv[1]+'.xlsx')
 
-from datetime import date
 from enum import Enum
 from openpyxl_templates import TemplatedWorkbook
 from openpyxl_templates.table_sheet import TableSheet
-from openpyxl_templates.table_sheet.columns import CharColumn, ChoiceColumn, DateColumn
+from openpyxl_templates.table_sheet.columns import CharColumn, ChoiceColumn, DateColumn, IntColumn
+import numpy as np
+import numpy_indexed as npi
+from matplotlib import pyplot as plt
+np.set_printoptions(edgeitems=30, linewidth=100000,
+                    formatter=dict(float=lambda x: "%.3g" % x))
 class Fruits(Enum):
     apple = 1
     banana = 2
@@ -30,42 +35,112 @@ class TraceSheet(TableSheet):
     cpuId = CharColumn()
     threadId = CharColumn()
     timestamp = CharColumn()
+
+
+class TraceIdheet(TableSheet):
+    traceIdFrom = CharColumn()
+    traceIdTo = CharColumn()
+    cpuId = CharColumn()
+    threadId = CharColumn()
+    timestamp = IntColumn()
+
+
 class TraceWorkBook(TemplatedWorkbook):
-    trace_entries = TraceSheet()
+    regular_trace_entries = TraceSheet()
+    traceid_trace_entries = TraceIdheet()
 
 
 class TraceEntry():
-    def __init__(self, traceId, cpuId, threadId, timestamp):
+    def __init__(self, traceId, cpuId, threadId, timestamp, cur_prev_time_diff):
         self.traceId = traceId
         self.cpuId = cpuId
         self.threadId = threadId
         self.timestamp = timestamp
+        self.cur_prev_time_diff = cur_prev_time_diff
+
 
 class Trace():
-    def __init__(self, fn):
+    def __init__(self, fn, output_fn):
         self.rows = []
+        self.raw_rows = []
         self.trace = open(fn, "r")
+        self.wb = TraceWorkBook()
+        self.output_fn = output_fn
+        self.numpy_rows = None
     
     def collect_data(self):
+        previous_time = 0
         for l in self.trace:
             split_l = re.split('\t|\n', l)
-            self.rows.append(TraceEntry(split_l[0], split_l[1], split_l[2], split_l[3]))
-    
-    def as_xlsx(self):
-        wb = TraceWorkBook()
-        wb_objects = ((te.traceId, te.cpuId, te.threadId, te.timestamp) for te in self.rows)
-        wb.trace_entries.write(
+            traceId = int(split_l[0])
+            cpuId = int(split_l[1])
+            threadId = int(split_l[2])
+            t = int(split_l[3])
+            if traceId == FIRST_TRACEID:
+                previous_time = t
+            self.rows.append(TraceEntry(traceId, threadId, cpuId, t, t-previous_time))
+            previous_time = t
+
+        self.numpy_rows = np.array([[te.traceId, te.threadId, te.cpuId, te.timestamp, te.cur_prev_time_diff] for te in self.rows])
+        print(self.numpy_rows)
+        print("\n")
+        grouped_by_traceId = npi.group_by(self.numpy_rows[:, 0]).split(self.numpy_rows[:, :])
+        for r in grouped_by_traceId:
+            print(r, "\n")
+
+        plt.title("Matplotlib demo")
+        plt.xlabel("x axis caption")
+        plt.ylabel("y axis caption")
+        #y = [np.percentile(arr[4:], 50) for arr in grouped_by_traceId]
+        #plt.plot(np.arange(len(grouped_by_traceId)),y)
+        y = []
+        for group in grouped_by_traceId:
+            diffs = np.array([r[4] for r in group])
+            y.append(diffs)
+
+        #y = grouped_by_traceId[:, 4]
+        fig, ax = plt.subplots()
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(fourty, 40) for fourty in y]), label='40th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(thirty, 30) for thirty in y]), label='30th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(twenty, 20) for twenty in y]), label='20th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(seventy, 70) for seventy in y]), label='70th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(eighty, 80) for eighty in y]), label='80th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(sixty, 60) for sixty in y]), label='60th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ten, 10) for ten in y]), label='10th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(one, 1) for one in y]), label='1th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ninety, 90) for ninety in y]), label='90th percentile')
+        ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
+
+        legend = ax.legend(loc='upper center', shadow=True, fontsize='x-large')
+
+        plt.show()
+
+    def regular_as_xlsx(self):
+        self.wb.regular_trace_entries.write(
             title="Trace",
-            objects=wb_objects
+            objects=((te.traceId, te.cpuId, te.threadId, te.timestamp) for te in self.rows)
         )
 
-        wb.save("processed_trace.xlsx")
+        self.wb.save(self.output_fn)
+
+    def traceid_as_xlsx(self):
+        self.wb.traceid_trace_entries.write(
+            title="Trace ID analytics",
+            objects=()
+        )
+
+        self.wb.save(self.output_fn)
+
 
 argv = sys.argv
 
-trace = Trace(argv[1])
+trace = Trace(argv[1], "processed-trace.xlsx")
 trace.collect_data()
-trace.as_xlsx()
+trace.regular_as_xlsx()
+trace.traceid_as_xlsx()
+
+exit(0)
 
 if len(argv) < 2:
     print("USAGE: python unique_sequences.py <file> <delimiter from> <delimiter to> <[include delimiter to]>")
