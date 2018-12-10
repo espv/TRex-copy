@@ -2,10 +2,9 @@
 <module version="4">
   <component name="FacetManager">
     <facet type="Python" name="Python">
-      <configuration sdkName="Python 2.7 (trace-analysis)" />
+      <configuration sdkName="Python 3.5" />
     </facet>
   </component>
-  <component name="Go" enabled="true" />
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
@@ -13,9 +12,6 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Python 2.7 (trace-analysis) interpreter library" level="application" />
-  </component>
-  <component name="PyDocumentationSettings">
-    <option name="renderExternalDocumentation" value="true" />
+    <orderEntry type="library" name="Python 3.5 interpreter library" level="application" />
   </component>
 </module>

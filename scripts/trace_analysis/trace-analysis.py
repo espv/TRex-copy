@@ -1,6 +1,8 @@
 
 import sys
 import re
+import os
+import errno
 from collections import Counter
 
 FIRST_TRACEID = 1
@@ -60,10 +62,10 @@ class TraceEntry():
 
 
 class Trace():
-    def __init__(self, fn, output_fn):
+    def __init__(self, trace, output_fn):
         self.rows = []
         self.raw_rows = []
-        self.trace = open(fn, "r")
+        self.trace = trace
         self.wb = TraceWorkBook()
         self.output_fn = output_fn
         self.numpy_rows = None
@@ -98,25 +100,46 @@ class Trace():
             diffs = np.array([r[4] for r in group])
             y_hist.append(diffs)
 
+        trace_file_id = re.split('traces/|\.trace', self.trace.name)[1]
+        try:
+            os.mkdir('output/'+trace_file_id)
+        except OSError as exc:  # Python >2.5
+            if exc.errno == errno.EEXIST and os.path.isdir('output/'+trace_file_id):
+                pass
+            else:
+                raise
         y = [[g[i][4] for i in range(len(g))] for g in grouped_by_traceId]
         fig, ax = plt.subplots()
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(fifty, 50) for fifty in y]), label='50th percentile')
+        fig.savefig('output/'+trace_file_id+'/fifty-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(fourty, 40) for fourty in y]), label='40th percentile')
+        fig.savefig('output/'+trace_file_id+'/fourty-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(thirty, 30) for thirty in y]), label='30th percentile')
+        fig.savefig('output/'+trace_file_id+'/thirty-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(twenty, 20) for twenty in y]), label='20th percentile')
+        fig.savefig('output/'+trace_file_id+'/twenty-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(seventy, 70) for seventy in y]), label='70th percentile')
+        fig.savefig('output/'+trace_file_id+'/seventy-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(eighty, 80) for eighty in y]), label='80th percentile')
+        fig.savefig('output/'+trace_file_id+'/eighty-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(sixty, 60) for sixty in y]), label='60th percentile')
+        fig.savefig('output/'+trace_file_id+'/sixty-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ten, 10) for ten in y]), label='10th percentile')
+        fig.savefig('output/'+trace_file_id+'/ten-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(one, 1) for one in y]), label='1th percentile')
+        fig.savefig('output/'+trace_file_id+'/one-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ninety, 90) for ninety in y]), label='90th percentile')
+        fig.savefig('output/'+trace_file_id+'/ninety-percentile.png')
         ax.plot(np.arange(len(grouped_by_traceId)), np.asarray([np.percentile(ninetynine, 99) for ninetynine in y]), label='99h percentile')
+        fig.savefig('output/'+trace_file_id+'/ninetynine-percentile.png')
         plt.show()
         #ax.hist(y[5])
         import seaborn as sns
-        for group in y_hist:
+        for i, group in enumerate(y_hist):
             try:
-                sns.distplot(group)
+                sns_plot = sns.distplot(group)
+                fig = sns_plot.get_figure()
+                fig.savefig('output/'+trace_file_id+'/processing-stage-'+str(i)+'.png')
                 plt.show()
             except np.linalg.linalg.LinAlgError:
                 pass
@@ -138,14 +161,61 @@ class Trace():
         self.wb.save(self.output_fn)
 
 
+from pathlib import Path
+
+
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.togglebutton import ToggleButton
+from kivy.uix.button import Button
+
+trace_fn = None
+
+
+class TestApp(App):
+
+    def __init__(self):
+        super(TestApp, self).__init__()
+        self.bl = BoxLayout(orientation='vertical')
+
+    def select_trace_file(self, instance):
+        selected_tb = None
+        for c in self.bl.children:
+            if isinstance(c, ToggleButton) and c.state == 'down':
+                selected_tb = c
+                break
+        if selected_tb is not None:
+            trace_file = open('../../traces/'+selected_tb.text, 'r')
+            trace = Trace(trace_file, "processed-"+trace_file.name.split(".")[0]+".xlsx")
+            trace.collect_data()
+            trace.regular_as_xlsx()
+            trace.traceid_as_xlsx()
+
+        #exit(0)
+
+    def build(self):
+        pathlist = Path('../../traces').glob('**/*.trace')
+        for i, path in enumerate(pathlist):
+            # because path is object not string
+            fn = path.name
+            # print(path_in_str)
+            if i == 0:
+                self.bl.add_widget(ToggleButton(text=fn, group="trace file", state='down'))
+            else:
+                self.bl.add_widget(ToggleButton(text=fn, group="trace file"))
+
+        select_button = Button(text="Select")
+        select_button.bind(on_press=self.select_trace_file)
+        self.bl.add_widget(select_button)
+        return self.bl
+
+TestApp().run()
+
+import time
+while (True):
+    time.sleep(1)
+
 argv = sys.argv
-
-trace = Trace(argv[1], "processed-trace.xlsx")
-trace.collect_data()
-trace.regular_as_xlsx()
-trace.traceid_as_xlsx()
-
-exit(0)
 
 if len(argv) < 2:
     print("USAGE: python unique_sequences.py <file> <delimiter from> <delimiter to> <[include delimiter to]>")
