@@ -33,7 +33,7 @@ using namespace std;
 void my_handler(int s){
     ofstream myfile;
     std::ostringstream oss;
-    oss << "traces/trace-" << std::time(0) << ".txt";
+    oss << "traces/" << std::time(0) << ".trace";
     std::string fn = oss.str();
     myfile.open (fn);
     for (int i = 0; i < tracedEvents; ++i)
