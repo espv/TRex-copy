@@ -24,6 +24,12 @@
 #include <iostream>
 #include <fstream>
 
+// For creating a unique trace file name
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
+using namespace boost::uuids;
 using concept::server::SOEPServer;
 using namespace concept::test;
 using concept::util::Logging;
@@ -33,7 +39,9 @@ using namespace std;
 void my_handler(int s){
     ofstream myfile;
     std::ostringstream oss;
-    oss << "traces/" << std::time(0) << ".trace";
+	random_generator gen;
+	uuid id = gen();
+    oss << "../analysis/traces/" << std::time << "-" << id << ".trace";
     std::string fn = oss.str();
     myfile.open (fn);
     for (int i = 0; i < tracedEvents; ++i)
