@@ -11,6 +11,26 @@
 #include <unistd.h>
 #include <sys/syscall.h>
 #include <sys/types.h>
+#include <stdint.h>
+
+//  Windows
+#ifdef _WIN32
+
+#include <intrin.h>
+uint64_t rdtsc(){
+    return __rdtsc();
+}
+
+//  Linux/GCC
+#else
+
+uint64_t rdtsc(){
+    unsigned int lo,hi;
+    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+    return ((uint64_t)hi << 32) | lo;
+}
+
+#endif
 
 using namespace std;
 
@@ -25,24 +45,26 @@ public:
     int cpuId;
     int threadId;
     long long timestamp;
+    long long rdtsc;
 };
 
 TraceEvent events[1000000];
 int tracedEvents = 0;
 
-bool writeTracesToFile = true;
+bool writeTraceToFile = true;
 void traceEvent(int traceId, bool reset)
 {
-    if (!doTrace)
+    if (!doTrace || (traceId != 1 && traceId != 100))
         return;
     int pid = syscall(SYS_gettid);
     pthread_mutex_lock(traceMutex);
     auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-    if (writeTracesToFile) {
+    if (writeTraceToFile) {
         events[tracedEvents].locationId = traceId;
         events[tracedEvents].cpuId = sched_getcpu();
         events[tracedEvents].threadId = pid;
         events[tracedEvents].timestamp = current_time;
+        events[tracedEvents].rdtsc = rdtsc();
         ++tracedEvents;
     } else {
         if (first_time == 0)

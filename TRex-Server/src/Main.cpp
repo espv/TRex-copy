@@ -41,13 +41,13 @@ void my_handler(int s){
     std::ostringstream oss;
 	random_generator gen;
 	uuid id = gen();
-    oss << "../analysis/traces/" << std::time << "-" << id << ".trace";
+    oss << "../analysis/traces/" << std::time(0) << "-" << id << ".trace";
     std::string fn = oss.str();
     myfile.open (fn);
     for (int i = 0; i < tracedEvents; ++i)
     {
         TraceEvent *event = &events[i];
-        myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
+        myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\t" << event->rdtsc << "\n";
     }
     myfile.close();
 	exit(1);

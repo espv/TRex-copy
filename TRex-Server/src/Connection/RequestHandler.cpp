@@ -59,11 +59,9 @@ RequestHandler::~RequestHandler(){
 }
 
 void RequestHandler::handleRequest(std::vector<PktPtr> & pkts){
-    traceEvent(1, true);
 	for (std::vector<PktPtr>::iterator it= pkts.begin(); it != pkts.end(); it++){
 		boost::apply_visitor(PktHandleVisitor(*this, useGPU), *it);
 	}
-    traceEvent(16, false);
 }
 
 void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
@@ -83,16 +81,18 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 long long cnt = 0;
 void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
     //while (true) {
-    if (++cnt % 10000 == 0)
-        std::cout << cnt << std::endl;
+	traceEvent(1, true);
+    //if (++cnt % 10000 == 0)
+    //    std::cout << cnt << std::endl;
     //LOG(info) << "Publication from " << parent.connection.remoteToString() << ":" << endl
     //          << "  " << toString(pkt);
     //continue;
-    PubPkt *newPkt = pkt->copy();
+    //PubPkt *newPkt = pkt->copy();
     parent.subTable.processPublication(pkt);
     // Let TRex process (and *delete*) the packet
     if (!useGPU) parent.tRexEngine.processPubPkt(pkt);
-    pkt = newPkt;
+    //pkt = newPkt;
+	traceEvent(100, true);
 #ifdef HAVE_GTREX
     if (useGPU) {
           parent.gtRexEngine.processPubPkt(pkt);
