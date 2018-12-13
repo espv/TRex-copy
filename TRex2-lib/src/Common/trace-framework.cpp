@@ -1,9 +1,7 @@
 //
-// Created by espen on 20.11.18.
+// Created by espen on 13.12.18.
 //
 
-#ifndef TREXSERVER_TRACE_FRAMEWORK_H
-#define TREXSERVER_TRACE_FRAMEWORK_H
 
 #include <chrono>
 #include <sched.h>
@@ -12,6 +10,18 @@
 #include <sys/syscall.h>
 #include <sys/types.h>
 #include <stdint.h>
+#include "trace-framework.hpp"
+
+#include <iostream>
+#include <fstream>
+#include <sstream>
+
+// For creating a unique trace file name
+#include <boost/uuid/uuid.hpp>
+#include <boost/uuid/uuid_generators.hpp>
+#include <boost/uuid/uuid_io.hpp>
+
+using namespace boost::uuids;
 
 //  Windows
 #ifdef _WIN32
@@ -39,17 +49,9 @@ pthread_mutex_t* traceMutex = new pthread_mutex_t;
 double previous_time;
 long long first_time = 0;
 
-class TraceEvent {
-public:
-    int locationId;
-    int cpuId;
-    int threadId;
-    long long timestamp;
-    long long rdtsc;
-};
+int tracedEvents = 0;
 
 TraceEvent events[1000000];
-int tracedEvents = 0;
 
 bool writeTraceToFile = true;
 void traceEvent(int traceId, bool reset)
@@ -79,4 +81,19 @@ void traceEvent(int traceId, bool reset)
     pthread_mutex_unlock(traceMutex);
 };
 
-#endif //TREXSERVER_TRACE_FRAMEWORK_H
+void writeBufferToFile()
+{
+    ofstream myfile;
+    std::ostringstream oss;
+    random_generator gen;
+    uuid id = gen();
+    oss << "../analysis/traces/" << std::time(0) << "-" << id << ".trace";
+    std::string fn = oss.str();
+    myfile.open (fn);
+    for (int i = 0; i < tracedEvents; ++i)
+    {
+        TraceEvent *event = &events[i];
+        myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\t" << event->rdtsc << "\n";
+    }
+    myfile.close();
+}

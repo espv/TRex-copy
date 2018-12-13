@@ -20,16 +20,8 @@
 #include "server.hpp"
 #include "test.hpp"
 #include "util.hpp"
-#include "trace-framework.hpp"
-#include <iostream>
-#include <fstream>
+#include "../../TRex2-lib/src/Common/trace-framework.hpp"
 
-// For creating a unique trace file name
-#include <boost/uuid/uuid.hpp>
-#include <boost/uuid/uuid_generators.hpp>
-#include <boost/uuid/uuid_io.hpp>
-
-using namespace boost::uuids;
 using concept::server::SOEPServer;
 using namespace concept::test;
 using concept::util::Logging;
@@ -37,19 +29,7 @@ using namespace std;
 
 #define USE_SINGLE_CORE 1
 void my_handler(int s){
-    ofstream myfile;
-    std::ostringstream oss;
-	random_generator gen;
-	uuid id = gen();
-    oss << "../analysis/traces/" << std::time(0) << "-" << id << ".trace";
-    std::string fn = oss.str();
-    myfile.open (fn);
-    for (int i = 0; i < tracedEvents; ++i)
-    {
-        TraceEvent *event = &events[i];
-        myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\t" << event->rdtsc << "\n";
-    }
-    myfile.close();
+	writeBufferToFile();
 	exit(1);
 }
 

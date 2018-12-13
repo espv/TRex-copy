@@ -17,7 +17,7 @@
  */
 
 #include "RequestHandler.hpp"
-#include "../../trace-framework.hpp"
+#include "../../../../TRex2-lib/src/Common/trace-framework.hpp"
 
 using concept::connection::RequestHandler;
 using namespace concept::packet;

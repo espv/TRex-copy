@@ -19,8 +19,8 @@
 //
 
 #include "TRexEngine.h"
+#include "../Common/trace-framework.hpp"
 #include <sys/time.h>
-#include "../Common/trace-framework-definition.h"
 
 using namespace std;
 

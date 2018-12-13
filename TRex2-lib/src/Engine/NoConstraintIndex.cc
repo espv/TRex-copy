@@ -19,7 +19,7 @@
 //
 
 #include "NoConstraintIndex.h"
-#include "../Common/trace-framework-definition.h"
+#include "../Common/trace-framework.hpp"
 
 using namespace std;
 

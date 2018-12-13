@@ -17,7 +17,7 @@
  */
 
 #include "Connection.hpp"
-#include "../../trace-framework.hpp"
+#include "../../../../TRex2-lib/src/Common/trace-framework.hpp"
 
 using concept::connection::Connection;
 using namespace concept::packet;

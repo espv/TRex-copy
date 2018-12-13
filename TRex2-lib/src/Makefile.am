@@ -6,7 +6,7 @@
 Unmarshaller.${OBJEXT} : CXXFLAGS = -O0
 	
 lib_LTLIBRARIES = libTRex2.la
-libTRex2_la_SOURCES = Common/CompositeEventTemplate.cc Common/Funs.cc Common/OpTree.cc Common/TimeMs.cc Common/Timer.cc Common/Consts.h \
+libTRex2_la_SOURCES = Common/CompositeEventTemplate.cc Common/trace-framework.cpp Common/Funs.cc Common/OpTree.cc Common/TimeMs.cc Common/Timer.cc Common/Consts.h \
 	Engine/AbstractConstraintIndex.cc Engine/BoolConstraintIndex.cc Engine/CompositeEventGenerator.cc Engine/FloatConstraintIndex.cc Engine/IndexingTable.cc Engine/IntConstraintIndex.cc Engine/NoConstraintIndex.cc Engine/Stack.cc Engine/StacksRule.cc Engine/StringConstraintIndex.cc Engine/TRexEngine.cc \
 	Marshalling/Marshaller.cc Marshalling/Unmarshaller.cc \
 	Packets/AdvPkt.cc Packets/JoinPkt.cc Packets/PubPkt.cc Packets/RulePkt.cc Packets/RulePktValueReference.cc Packets/SubPkt.cc Packets/StaticValueReference.cc

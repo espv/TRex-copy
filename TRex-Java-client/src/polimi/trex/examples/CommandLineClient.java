@@ -116,7 +116,7 @@ public class CommandLineClient implements PacketListener {
 	    	while (true) {
 	    		if (cnt % 10000 == 0)
 	    			System.out.println("Number of events sent: " + cnt);
-				Thread.sleep(1);
+				Thread.sleep(50-);
 				client.publish(pubType, keys, values);
 				++cnt;
 			}
