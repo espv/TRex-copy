@@ -104,22 +104,23 @@ public class CommandLineClient implements PacketListener {
 	    printUsageAndExit();
 	}
 	try {
-	    client = new CommandLineClient(serverHost, serverPort);
-	    if(subTypes.size()>0) {
-		client.tManager.addPacketListener(client);
-		client.tManager.start();
-		client.subscribe(subTypes);
-	    }
-	    if (sendRule) client.sendRule();
-	    if(pubType!=-1) {
-	    	int cnt = 0;
-	    	while (true) {
-	    		if (cnt % 10000 == 0)
-	    			System.out.println("Number of events sent: " + cnt);
+		int cnt = 0;
+		while (true) {
+			client = new CommandLineClient(serverHost, serverPort);
+			if (subTypes.size() > 0) {
+				client.tManager.addPacketListener(client);
+				client.tManager.start();
+				client.subscribe(subTypes);
+			}
+			if (sendRule) client.sendRule();
+			if (pubType != -1) {
+				if (cnt % 10000 == 0)
+					System.out.println("Number of events sent: " + cnt);
 				Thread.sleep(50);
 				client.publish(pubType, keys, values);
 				++cnt;
 			}
+			client.tManager.stop();
 		}
 	} catch(IOException e) { e.printStackTrace(); }
     }
