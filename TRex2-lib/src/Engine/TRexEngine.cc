@@ -28,11 +28,14 @@ using namespace std;
 void* processor(void* parShared) {
   Shared* s = (Shared*)parShared;
   bool first = true;
+  traceEvent(57, false);
   while (true) {
     if (first) {
       pthread_mutex_lock(s->processMutex);
       first = false;
     }
+
+    traceEvent(58, false);
     pthread_cond_wait(s->processCond, s->processMutex);
     // At this point, s->processMutex is locked by this thread, and s->lowerBound and s->upperBound will not be changed by TRexEngine::processRulePkt
     int lowerBound = s->lowerBound;
@@ -83,6 +86,8 @@ void* processor(void* parShared) {
     if (*(s->stillProcessing) == 0)
       pthread_cond_signal(s->resultCond);
     pthread_mutex_unlock(s->resultMutex);
+
+    traceEvent(59, false);
   }
   pthread_exit(NULL);
 }
@@ -195,9 +200,10 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   indexingTable.processMessage(pkt, *mh);
   set<PubPkt*> result;
 
+  traceEvent(110, false);
   // Installs information in shared memory
-  traceEvent(5, false);
   for (int i = 0; i < numProc; i++) {
+    traceEvent(5, false);
     pthread_mutex_lock(shared[i].processMutex);
     shared[i].mh = mh;
 #if MP_MODE == MP_COPY
@@ -212,12 +218,13 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   // Waits until all processes finish
   pthread_mutex_lock(shared[0].resultMutex);
   // If not all thread have finished, wait until last one
+  traceEvent(8, false);
   if (*(shared[0].stillProcessing) != 0)
     pthread_cond_wait(shared[0].resultCond, shared[0].resultMutex);
   pthread_mutex_unlock(shared[0].resultMutex);
   *(shared[0].stillProcessing) = numProc;
-
-  traceEvent(8, false);
+  for (int i = 0; i < numProc; i++)  // Part of tracing only to connect trace event 8 with 111 for all processes
+    traceEvent(111, false);
 
   // Collects results
   for (int i = 0; i < numProc; i++) {

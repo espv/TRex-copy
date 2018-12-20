@@ -27,7 +27,7 @@ using namespace concept::test;
 using concept::util::Logging;
 using namespace std;
 
-#define USE_SINGLE_CORE 1
+#define USE_SINGLE_CORE
 void my_handler(int s){
 	writeBufferToFile();
 	exit(1);
@@ -36,7 +36,7 @@ void my_handler(int s){
 
 void runServer(bool useGPU){
 	// Create server with default port and #threads = #CPUs
-#if USE_SINGLE_CORE == 1
+#ifdef USE_SINGLE_CORE
 	SOEPServer server(SOEPServer::DEFAULT_PORT, 1, false, useGPU);
 # else
 	SOEPServer server(SOEPServer::DEFAULT_PORT, boost::thread::hardware_concurrency(), false, useGPU);
