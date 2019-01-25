@@ -23,25 +23,6 @@
 
 using namespace boost::uuids;
 
-//  Windows
-#ifdef _WIN32
-
-#include <intrin.h>
-uint64_t rdtsc(){
-    return __rdtsc();
-}
-
-//  Linux/GCC
-#else
-
-uint64_t rdtsc(){
-    unsigned int lo,hi;
-    __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-    return ((uint64_t)hi << 32) | lo;
-}
-
-#endif
-
 using namespace std;
 
 bool doTrace = false;
@@ -66,7 +47,6 @@ void traceEvent(int traceId, bool reset)
         events[tracedEvents].cpuId = sched_getcpu();
         events[tracedEvents].threadId = pid;
         events[tracedEvents].timestamp = current_time;
-        events[tracedEvents].rdtsc = rdtsc();
         ++tracedEvents;
     } else {
         if (first_time == 0)
@@ -93,7 +73,7 @@ void writeBufferToFile()
     for (int i = 0; i < tracedEvents; ++i)
     {
         TraceEvent *event = &events[i];
-        myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\t" << event->rdtsc << "\n";
+        myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
     }
     myfile.close();
 }
