@@ -105,6 +105,24 @@ public class CommandLineClient implements PacketListener {
 	}
 	try {
 		int cnt = 0;
+		int []allPubTypes = new int[2];
+		ArrayList<String> keys1 = new ArrayList<String>();
+		ArrayList<String> keys2 = new ArrayList<String>();
+		ArrayList<String> values1 = new ArrayList<String>();
+		ArrayList<String> values2 = new ArrayList<String>();
+        allPubTypes[0] = 11;
+        allPubTypes[1] = 10;
+		keys1.add("area");
+		keys1.add("percentage");
+		values1.add("office");
+		values1.add("20");
+		keys2.add("area");
+		keys2.add("value");
+		values2.add("office");
+		values2.add("100");
+		ArrayList<String>[] allkeys = new ArrayList[]{keys1, keys2};
+		ArrayList<String>[] allvalues = new ArrayList[]{values1, values2};
+		int curIndex = 1;
 		while (true) {
 			client = new CommandLineClient(serverHost, serverPort);
 			if (subTypes.size() > 0) {
@@ -117,9 +135,12 @@ public class CommandLineClient implements PacketListener {
 				if (cnt % 10000 == 0)
 					System.out.println("Number of events sent: " + cnt);
 				//Thread.sleep(50);
-				client.publish(pubType, keys, values);
+				client.publish(allPubTypes[curIndex], allkeys[curIndex], allvalues[curIndex]);
+				//curIndex = (curIndex + 1) % 2;
 				++cnt;
 			}
+			if (pubType == -1)
+				break;
 			client.tManager.stop();
 		}
 	} catch(IOException e) { e.printStackTrace(); }

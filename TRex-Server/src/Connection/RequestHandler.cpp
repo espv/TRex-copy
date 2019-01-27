@@ -19,6 +19,7 @@
 #include "RequestHandler.hpp"
 #include "../../../TRex2-lib/src/Common/trace-framework.hpp"
 #include <sys/syscall.h>
+#include <chrono>
 
 using concept::connection::RequestHandler;
 using namespace concept::packet;
@@ -79,11 +80,15 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 }
 
 long long cnt = 0;
+auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
 void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
     //while (true) {
-	traceEvent(1, true);
-    //if (++cnt % 10000 == 0)
-    //    std::cout << cnt << std::endl;
+    traceEvent(1, true);
+    if (++cnt % 2000 == 0) {
+        auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
+        std::cout << cnt << " - " << current_time-prev_time << std::endl;
+        prev_time = current_time;
+    }
     //LOG(info) << "Publication from " << parent.connection.remoteToString() << ":" << endl
     //          << "  " << toString(pkt);
     //continue;
@@ -92,7 +97,7 @@ void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
     // Let TRex process (and *delete*) the packet
     if (!useGPU) parent.tRexEngine.processPubPkt(pkt);
     //pkt = newPkt;
-	traceEvent(100, true);
+    traceEvent(100, true);
 #ifdef HAVE_GTREX
     if (useGPU) {
           parent.gtRexEngine.processPubPkt(pkt);

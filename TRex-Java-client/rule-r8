@@ -1,0 +1,5 @@
+Assign 10 => Temp, 12 => Fire
+Define  Fire(area: string, temp: float)
+From   Temp(value > 40)
+Where   area := Temp.area, temp := Temp.value
+Consuming Temp, Fire;

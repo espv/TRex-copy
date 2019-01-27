@@ -21,6 +21,7 @@
 #include "test.hpp"
 #include "util.hpp"
 #include "../../TRex2-lib/src/Common/trace-framework.hpp"
+#include "../../TRex2-lib/src/Packets/PubPkt.h"
 
 using concept::server::SOEPServer;
 using namespace concept::test;
@@ -70,6 +71,8 @@ int main(int argc, char* argv[]){
         doTrace = true;
 	else
 	    doTrace = false;
+
+    boost::log::core::get()->set_logging_enabled(false);
 	struct sigaction sigIntHandler;
 
 	sigIntHandler.sa_handler = my_handler;
