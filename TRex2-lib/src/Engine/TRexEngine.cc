@@ -218,7 +218,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   // Waits until all processes finish
   pthread_mutex_lock(shared[0].resultMutex);
   // If not all thread have finished, wait until last one
-  traceEvent(8, false);
+  //traceEvent(8, false);
   if (*(shared[0].stillProcessing) != 0)
     pthread_cond_wait(shared[0].resultCond, shared[0].resultMutex);
   pthread_mutex_unlock(shared[0].resultMutex);
