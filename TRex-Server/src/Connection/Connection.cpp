@@ -17,6 +17,7 @@
  */
 
 #include "Connection.hpp"
+#include "../../../TRex2-lib/src/Common/trace-framework.hpp"
 
 using concept::connection::Connection;
 using namespace concept::packet;
@@ -99,6 +100,7 @@ void Connection::handleWrite(const boost::system::error_code& error, CharVectorP
 			pingSendTimer.cancel();
 		}
 	}
+	traceEvent(155, true);  // Finished writing packet to TCP socket buffer
 }
 
 void Connection::handlePingReceive(const boost::system::error_code& error){

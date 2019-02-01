@@ -134,7 +134,7 @@ public class CommandLineClient implements PacketListener {
 			if (pubType != -1) {
 				if (cnt % 10000 == 0)
 					System.out.println("Number of events sent: " + cnt);
-				//Thread.sleep(50);
+				Thread.sleep(100);
 				client.publish(allPubTypes[curIndex], allkeys[curIndex], allvalues[curIndex]);
 				//curIndex = (curIndex + 1) % 2;
 				++cnt;
