@@ -1,7 +1,8 @@
 #!/bin/bash
-if [[ -z $1 ]]
+rule_directory=$1
+if [[ -z $rule_directory || ! -d $rule_directory ]]
 then
-	echo "USAGE: script <directory>"
+	echo "USAGE: script <path to rule file>"
 	exit
 fi
 cd $1
