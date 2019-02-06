@@ -27,4 +27,3 @@ do
 	trex_event_cnt=$(($trex_event_cnt+2))
 	cd ..
 done
-
