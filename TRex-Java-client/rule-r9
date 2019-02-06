@@ -4,4 +4,4 @@ From   Temp(value > 40) and
 last   Humidity([string] area = Temp.area, percentage < 25)
 within 5000 from Temp
 Where   area := Temp.area, temp := Temp.value
-Consuming Temp, Humidity, Fire;
+Consuming Temp, Humidity;

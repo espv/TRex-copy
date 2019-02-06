@@ -39,6 +39,8 @@ import polimi.trex.packets.SubPkt;
 import polimi.trex.packets.TRexPkt;
 import polimi.trex.ruleparser.TRexRuleParser;
 
+import java.util.Random;
+
 /**
  * @authors Gianpaolo Cugola, Daniele Rogora
  * 
@@ -119,10 +121,11 @@ public class CommandLineClient implements PacketListener {
 		keys2.add("area");
 		keys2.add("value");
 		values2.add("office");
-		values2.add("100");
 		ArrayList<String>[] allkeys = new ArrayList[]{keys1, keys2};
 		ArrayList<String>[] allvalues = new ArrayList[]{values1, values2};
 		int curIndex = 1;
+		Random rand = new Random();
+		values2.add(Integer.toString(rand.nextInt(46) + 50));
 		while (true) {
 			client = new CommandLineClient(serverHost, serverPort);
 			if (subTypes.size() > 0) {
@@ -139,6 +142,7 @@ public class CommandLineClient implements PacketListener {
 				//curIndex = (curIndex + 1) % 2;
 				++cnt;
 			}
+			values2.set(1, Integer.toString(rand.nextInt(46) + 50));
 			if (pubType == -1)
 				break;
 			client.tManager.stop();

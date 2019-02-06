@@ -1,0 +1,5 @@
+Assign      10 => Temp, 12 => Fire
+Define      Fire(area: string, temp: float)
+From        Temp(value > 45)
+Where       area := Temp.area, temp := AVG(Temp.value(value>45)) within 5000 from Temp
+Consuming   Temp;
