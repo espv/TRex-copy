@@ -1,4 +1,4 @@
-Assign      10 => Temp, 11 => Humidity, 12 => Fire
+Assign      INCOMING_EVENT_TEMP => Temp, INCOMING_EVENT_HUMIDITY => Humidity, 12 => Fire
 Define      Fire(area: string, temp: float)
 From        Humidity(percentage < 25) and
 last        Temp([string] area = Humidity.area, value=TEMPERATURE_VALUE_PLACEHOLDER)

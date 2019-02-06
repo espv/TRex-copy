@@ -6,13 +6,11 @@ then
 	exit
 fi
 cd $1
-original_trex_event1=10
-original_trex_event2=11
 trex_event_cnt=20
 for dir_name in BC DE FG HI JK LM NO PQ RS TU;
 do
-	new_trex_event1=$trex_event_cnt
-	new_trex_event2=$(($trex_event_cnt+1))
+	new_trex_event_temp=$trex_event_cnt
+	new_trex_event_humidity=$(($trex_event_cnt+1))
 	mkdir -p $dir_name
 	cd $dir_name
 	for j in {1..100}
@@ -20,8 +18,8 @@ do
 		file_name=$dir_name-$j
 		new_temp_constraint=$j
 		cp ../original ./$file_name
-		sed -i s/$original_trex_event1/$new_trex_event1/g $file_name
-		sed -i s/$original_trex_event2/$new_trex_event2/g $file_name
+		sed -i s/INCOMING_EVENT_TEMP/$new_trex_event_temp/g $file_name
+		sed -i s/INCOMING_EVENT_HUMIDITY/$new_trex_event_humidity/g $file_name
 		# 45 is the original value constraint on the temperature
 		sed -i s/TEMPERATURE_VALUE_PLACEHOLDER/$new_temp_constraint/g $file_name
 	done
