@@ -1,0 +1,24 @@
+#!/bin/bash
+rule_directory=$1
+if [[ -z $rule_directory ]]
+then
+	echo "USAGE: script directory"
+	exit
+fi
+cd $rule_directory
+
+file=$(ls . | shuf -n 1)
+while [[ ! -d $file ]]
+do
+	file=$(ls . | shuf -n 1)
+done
+
+cd $file
+file=$(ls . | shuf -n 1)
+while [[ ! -f $file ]]
+do
+	file=$(ls . | shuf -n 1)
+done
+
+echo "Randomly chosen file is" `pwd`/$file
+
