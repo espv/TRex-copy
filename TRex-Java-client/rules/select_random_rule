@@ -20,4 +20,5 @@ do
 	file=$(ls . | shuf -n 1)
 done
 
-echo "Randomly chosen file is" `pwd`/$file
+echo `pwd`/$file
+cat `pwd`/$file
