@@ -1,4 +1,4 @@
-Assign INCOMING_EVENT_TEMP => Temp, 12 => Fire
+Assign INCOMING_EVENT_TEMP => Temp, 1 => Fire
 Define  Fire(area: string, temp: float)
 From   Temp(value=45)
 Where   area := Temp.area, temp := Temp.value

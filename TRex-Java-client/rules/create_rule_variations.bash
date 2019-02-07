@@ -6,7 +6,7 @@ then
 	exit
 fi
 cd $1
-trex_event_cnt=20
+trex_event_cnt=2
 for dir_name in BC DE FG HI JK LM NO PQ RS TU;
 do
 	new_trex_event_temp=$trex_event_cnt
