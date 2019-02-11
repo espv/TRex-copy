@@ -106,7 +106,15 @@ public class CommandLineClient implements PacketListener {
 	    printUsageAndExit();
 	}
 	try {
-		int cnt = 0;
+		client = new CommandLineClient(serverHost, serverPort);
+		if(subTypes.size()>0) {
+			client.tManager.addPacketListener(client);
+			client.tManager.start();
+			client.subscribe(subTypes);
+		}
+		if (sendRule) client.sendRule();
+		if(pubType!=-1) client.publish(pubType, keys, values);
+		/*int cnt = 0;
 		int []allPubTypes = new int[2];
 		ArrayList<String> keys1 = new ArrayList<String>();
 		ArrayList<String> keys2 = new ArrayList<String>();
@@ -146,7 +154,7 @@ public class CommandLineClient implements PacketListener {
 			if (pubType == -1)
 				break;
 			client.tManager.stop();
-		}
+		}*/
 	} catch(IOException e) { e.printStackTrace(); }
     }
 

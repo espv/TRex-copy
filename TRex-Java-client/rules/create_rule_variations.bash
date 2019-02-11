@@ -16,7 +16,7 @@ do
 	for j in {1..100}
 	do
 		file_name=$dir_name-$j
-		new_temp_constraint=$j
+		new_temp_constraint=$(echo $j%10 | bc)
 		cp ../original ./$file_name
 		sed -i s/INCOMING_EVENT_TEMP/$new_trex_event_temp/g $file_name
 		sed -i s/INCOMING_EVENT_HUMIDITY/$new_trex_event_humidity/g $file_name

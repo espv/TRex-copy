@@ -1,0 +1,30 @@
+#!/bin/bash
+event_list=(
+	'1 area office value'
+	'2 area office percentage'
+	'3 area office value'
+	'4 area office percentage'
+	'5 area office value'
+	'6 area office percentage'
+	'7 area office value'
+	'8 area office percentage'
+	'9 area office value'
+	'10 area office percentage'
+	'11 area office value'
+	'12 area office percentage'
+	'13 area office value'
+	'14 area office percentage'
+	'15 area office value'
+	'16 area office percentage'
+	'17 area office value'
+	'18 area office percentage'
+	'19 area office value'
+	'20 area office percentage'
+)
+while true
+do
+	r1=$(echo $RANDOM % 20 + 1 | bc)
+	r2=$(echo $RANDOM % 10 | bc)
+	java -jar TRex-client.jar localhost 50254 -pub ${event_list[$r1]} $r2
+done
+
