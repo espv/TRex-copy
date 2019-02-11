@@ -106,23 +106,11 @@ public class CommandLineClient implements PacketListener {
 	    printUsageAndExit();
 	}
 	try {
-		client = new CommandLineClient(serverHost, serverPort);
-		if(subTypes.size()>0) {
-			client.tManager.addPacketListener(client);
-			client.tManager.start();
-			client.subscribe(subTypes);
-		}
-		if (sendRule) client.sendRule();
-		if(pubType!=-1) client.publish(pubType, keys, values);
-		/*int cnt = 0;
-		int []allPubTypes = new int[2];
-		ArrayList<String> keys1 = new ArrayList<String>();
-		ArrayList<String> keys2 = new ArrayList<String>();
-		ArrayList<String> values1 = new ArrayList<String>();
-		ArrayList<String> values2 = new ArrayList<String>();
-        allPubTypes[0] = 11;
-        allPubTypes[1] = 10;
-		keys1.add("area");
+		int cnt = 0;
+		int []allPubTypes = new int[20];
+        //allPubTypes[0] = 2;
+        //allPubTypes[1] = 3;
+		/*keys1.add("area");
 		keys1.add("percentage");
 		values1.add("office");
 		values1.add("20");
@@ -130,11 +118,35 @@ public class CommandLineClient implements PacketListener {
 		keys2.add("value");
 		values2.add("office");
 		ArrayList<String>[] allkeys = new ArrayList[]{keys1, keys2};
-		ArrayList<String>[] allvalues = new ArrayList[]{values1, values2};
+		ArrayList<String>[] allvalues = new ArrayList[]{values1, values2};*/
 		int curIndex = 1;
 		Random rand = new Random();
-		values2.add(Integer.toString(rand.nextInt(46) + 50));
+		//values2.add(Integer.toString(rand.nextInt(46) + 50));
+
+        ArrayList<ArrayList<String> > allkeys = new ArrayList<>();
+        ArrayList<ArrayList<String> > allvalues = new ArrayList<>();
+        for (int j = 0; j < 100; j++) {
+            ArrayList<String> keys1 = new ArrayList<String>();
+            ArrayList<String> keys2 = new ArrayList<String>();
+            ArrayList<String> values1 = new ArrayList<String>();
+            ArrayList<String> values2 = new ArrayList<String>();
+            allPubTypes[j%10] = j*2+1;
+            allPubTypes[(j+1)%10] = j*2+2;
+            keys1.add("area");
+            keys1.add("percentage");
+            values1.add("office");
+            values1.add("20");
+            keys2.add("area");
+            keys2.add("value");
+            values2.add("office");
+            values2.add(Integer.toString(j%10));
+            allkeys.add(keys1);
+            allkeys.add(keys2);
+            allvalues.add(values1);
+            allvalues.add(values2);
+        }
 		while (true) {
+		    curIndex = rand.nextInt(1) % 10;
 			client = new CommandLineClient(serverHost, serverPort);
 			if (subTypes.size() > 0) {
 				client.tManager.addPacketListener(client);
@@ -145,16 +157,15 @@ public class CommandLineClient implements PacketListener {
 			if (pubType != -1) {
 				if (cnt % 10000 == 0)
 					System.out.println("Number of events sent: " + cnt);
-				Thread.sleep(100);
-				client.publish(allPubTypes[curIndex], allkeys[curIndex], allvalues[curIndex]);
+				//Thread.sleep(100);
+				client.publish(allPubTypes[curIndex], allkeys.get(curIndex), allvalues.get(curIndex));
 				//curIndex = (curIndex + 1) % 2;
 				++cnt;
 			}
-			values2.set(1, Integer.toString(rand.nextInt(46) + 50));
 			if (pubType == -1)
 				break;
 			client.tManager.stop();
-		}*/
+		}
 	} catch(IOException e) { e.printStackTrace(); }
     }
 
