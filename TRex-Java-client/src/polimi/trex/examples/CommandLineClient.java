@@ -107,7 +107,7 @@ public class CommandLineClient implements PacketListener {
 	}
 	try {
 		int cnt = 0;
-		int []allPubTypes = new int[20];
+		int []allPubTypes = new int[200];
         //allPubTypes[0] = 2;
         //allPubTypes[1] = 3;
 		/*keys1.add("area");
@@ -130,8 +130,8 @@ public class CommandLineClient implements PacketListener {
             ArrayList<String> keys2 = new ArrayList<String>();
             ArrayList<String> values1 = new ArrayList<String>();
             ArrayList<String> values2 = new ArrayList<String>();
-            allPubTypes[j%10] = j*2+1;
-            allPubTypes[(j+1)%10] = j*2+2;
+            allPubTypes[j] = j;
+            allPubTypes[j] = j+1;
             keys1.add("area");
             keys1.add("percentage");
             values1.add("office");
@@ -146,7 +146,7 @@ public class CommandLineClient implements PacketListener {
             allvalues.add(values2);
         }
 		while (true) {
-		    curIndex = rand.nextInt(1) % 10;
+		    curIndex = 3;//rand.nextInt(1) % 10;
 			client = new CommandLineClient(serverHost, serverPort);
 			if (subTypes.size() > 0) {
 				client.tManager.addPacketListener(client);

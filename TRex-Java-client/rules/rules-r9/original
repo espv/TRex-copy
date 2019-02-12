@@ -1,6 +1,6 @@
 Assign INCOMING_EVENT_TEMP => Temp, INCOMING_EVENT_HUMIDITY => Humidity, 1 => Fire
 Define  Fire(area: string, temp: float)
-From   Temp(value = 45) and
+From   Temp(value = TEMPERATURE_VALUE_PLACEHOLDER) and
 last   Humidity([string] area = Temp.area, percentage<25)
 within 5000 from Temp
 Where   area := Temp.area, temp := Temp.value

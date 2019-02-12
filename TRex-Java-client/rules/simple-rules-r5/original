@@ -1,5 +1,5 @@
 Assign      INCOMING_EVENT_TEMP => Temp, 1 => Fire
 Define      Fire(area: string, temp: float)
-From        Temp(value=45)
+From        Temp(value=TEMPERATURE_VALUE_PLACEHOLDER)
 Where       area := Temp.area, temp := AVG(Temp.value(value=45)) within 5000 from Temp
 Consuming   Temp;
