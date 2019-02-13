@@ -12,7 +12,7 @@ do
     if [[ -d $dir ]]
     then
         for rule in $dir/*; do
-            java -jar ../../TRex-client.jar localhost 50254 -rule $dir/$rule
+            java -jar ../../TRex-client.jar localhost 50254 -rule $rule
         done
     fi
 done
