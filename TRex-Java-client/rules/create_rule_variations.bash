@@ -6,6 +6,8 @@ then
 	exit
 fi
 cd $1
+mkdir -p Generated
+cd Generated
 trex_event_cnt=2
 for dir_name in BC DE FG HI JK LM NO PQ RS TU;
 do

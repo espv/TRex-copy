@@ -6,6 +6,7 @@ then
 	exit
 fi
 cd $rule_directory
+cd Generated
 
 file=$(ls . | shuf -n 1)
 while [[ ! -d $file ]]

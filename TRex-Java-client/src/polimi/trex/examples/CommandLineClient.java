@@ -40,6 +40,7 @@ import polimi.trex.packets.TRexPkt;
 import polimi.trex.ruleparser.TRexRuleParser;
 
 import java.util.Random;
+import java.util.function.Consumer;
 
 /**
  * @authors Gianpaolo Cugola, Daniele Rogora
@@ -58,6 +59,19 @@ public class CommandLineClient implements PacketListener {
 			    fis.close();
 			    return encoding.decode(ByteBuffer.wrap(encoded)).toString();
 			}
+
+	public static void fetchFiles(File f, Consumer<CommandLineClient> client, CommandLineClient c)
+		throws java.io.IOException {
+
+		if (f.isDirectory()) {
+			for (File file1 : f.listFiles()) {
+				fetchFiles(file1, client, c);
+			}
+		} else {
+			teslaRule = readFile(f.getAbsolutePath(), Charset.defaultCharset());
+			client.accept(c);
+		}
+	}
 	
 	private TransportManager tManager = new TransportManager(true);
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -97,7 +111,7 @@ public class CommandLineClient implements PacketListener {
 		if(i<args.length && args[i].equals("-rule")) {
 		    i++;
 		    sendRule = true;
-		    teslaRule = readFile(args[i], Charset.defaultCharset());
+		    teslaRule = args[i]; //readFile(args[i], Charset.defaultCharset());
 		    i++;
 		}
 	    }
@@ -153,7 +167,10 @@ public class CommandLineClient implements PacketListener {
 				client.tManager.start();
 				client.subscribe(subTypes);
 			}
-			if (sendRule) client.sendRule();
+			if (sendRule) {
+				File file = new File(teslaRule);
+				fetchFiles(file, c -> c.sendRule(), client);
+			}
 			if (pubType != -1) {
 				if (cnt % 10000 == 0)
 					System.out.println("Number of events sent: " + cnt);
