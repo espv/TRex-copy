@@ -116,15 +116,14 @@ boost::posix_time::microsec interval(100);
 boost::asio::io_service io;
 boost::asio::deadline_timer t(io, interval);
 
+std::time_t now = std::time(0);
+boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
 void HandlePubPacket(const boost::system::error_code&)
 {
+    auto start = std::chrono::system_clock::now().time_since_epoch().count();
     //std::cout << "start of HandlePubPkt" << std::endl;
-    std::time_t now = std::time(0);
-    boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
     if (packetQueue.size() < PACKET_CAPACITY) {
-        ++cur_pkt_index;
-        ++number_placed_packets;
-        if (number_placed_packets % 10000 == 0)
+        if (++number_placed_packets % 10000 == 0)
             std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
         packetQueue.push_back(new PubPkt(*allPackets.at(gen()%100)));
         //memcpy(&packetQueue[cur_pkt_index], pkt, sizeof(PubPkt));
@@ -136,6 +135,8 @@ void HandlePubPacket(const boost::system::error_code&)
     //std::cout << "HandlePubPacket is done" << std::endl;
 
     t.expires_at(t.expires_at() + interval);
+    auto stop = std::chrono::system_clock::now().time_since_epoch().count();
+    std::cout << "HandlePubPacket took " << stop-start << " nanoseconds" << std::endl;
     t.async_wait(&HandlePubPacket);
 
     /*
