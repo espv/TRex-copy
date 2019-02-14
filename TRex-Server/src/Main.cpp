@@ -22,27 +22,28 @@
 #include "util.hpp"
 #include "../../TRex2-lib/src/Common/trace-framework.hpp"
 #include "../../TRex2-lib/src/Packets/PubPkt.h"
+#include "../../TRex2-lib/src/Engine/TRexEngine.h"
 
 using concept::server::SOEPServer;
 using namespace concept::test;
 using concept::util::Logging;
 using namespace std;
 
-#define USE_SINGLE_CORE
 void my_handler(int s){
 	writeBufferToFile();
 	exit(1);
 }
 
 
+int number_threads = boost::thread::hardware_concurrency();
 void runServer(bool useGPU){
 	// Create server with default port and #threads = #CPUs
 #ifdef USE_SINGLE_CORE
-    std::cout << "Using 1 thread" << std::endl;
-	SOEPServer server(SOEPServer::DEFAULT_PORT, 1, false, useGPU);
+    std::cout << "Using 2 thread" << std::endl;
+	SOEPServer server(SOEPServer::DEFAULT_PORT, 5, false, useGPU);
 # else
-	std::cout << "Using " << boost::thread::hardware_concurrency() << " threads" << std::endl;
-	SOEPServer server(SOEPServer::DEFAULT_PORT, boost::thread::hardware_concurrency(), false, useGPU);
+	std::cout << "Using " << number_threads << " threads" << std::endl;
+	SOEPServer server(SOEPServer::DEFAULT_PORT, number_threads, false, useGPU);
 #endif
 
 	server.run();
@@ -73,6 +74,13 @@ int main(int argc, char* argv[]){
         doTrace = true;
 	else
 	    doTrace = false;
+
+	for (int i = 1; i < argc; i++) {
+	    if (!strcmp(argv[i], "-trace"))
+	        doTrace = true;
+	    else if (!strcmp(argv[i], "-number-threads"))
+	        number_threads = std::atoi(argv[i+1]);
+	}
 
     boost::log::core::get()->set_logging_enabled(false);
 	struct sigaction sigIntHandler;
