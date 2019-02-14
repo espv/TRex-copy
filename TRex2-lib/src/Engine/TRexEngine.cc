@@ -112,25 +112,28 @@ long long cnt = 0;
 std::vector<PubPkt*> allPackets;
 auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
 TRexEngine *this_engine;
-boost::posix_time::seconds interval(2);  // 1 second
+boost::posix_time::microsec interval(100);
 boost::asio::io_service io;
 boost::asio::deadline_timer t(io, interval);
 
 void HandlePubPacket(const boost::system::error_code&)
 {
-    std::cout << "start of HandlePubPkt" << std::endl;
+    //std::cout << "start of HandlePubPkt" << std::endl;
     std::time_t now = std::time(0);
     boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
     if (packetQueue.size() < PACKET_CAPACITY) {
         ++cur_pkt_index;
-        std::cout << "Inserted packet into queue" << std::endl;
+        ++number_placed_packets;
+        if (number_placed_packets % 10000 == 0)
+            std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
         packetQueue.push_back(new PubPkt(*allPackets.at(gen()%100)));
         //memcpy(&packetQueue[cur_pkt_index], pkt, sizeof(PubPkt));
-        ++number_placed_packets;
     } else {
         ++number_dropped_packets;
+        if (number_dropped_packets % 10000 == 0)
+            std::cout << "Dropped " << number_dropped_packets << " packets" << std::endl;
     }
-    std::cout << "HandlePubPacket is done" << std::endl;
+    //std::cout << "HandlePubPacket is done" << std::endl;
 
     t.expires_at(t.expires_at() + interval);
     t.async_wait(&HandlePubPacket);
@@ -186,7 +189,7 @@ PublishPackets()
 {
     while (true) {
         if (packetQueue.size() > 0) {
-            std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
+            //std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
             PubPkt *pkt = packetQueue.front();
             traceEvent(1, true);
             if (++cnt % 2000 == 0) {
@@ -197,9 +200,9 @@ PublishPackets()
 
             this_engine->processPubPkt(pkt);
             traceEvent(100, true);
-            std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
+            //std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
             packetQueue.erase(packetQueue.begin());
-            std::cout << "Finished processing packet" << std::endl;
+            //std::cout << "Finished processing packet" << std::endl;
         }
     }
 }
