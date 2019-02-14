@@ -45,6 +45,11 @@ public:
    */
   PubPkt(const PubPkt& pkt);
 
+  /*
+   * Default constructor
+   */
+  PubPkt();
+
   /**
    * Destructor
    */
@@ -123,7 +128,7 @@ public:
    */
   bool decRefCount();
 
-private:
+//private:
 #if LOG == 1
   static int count;
 #endif

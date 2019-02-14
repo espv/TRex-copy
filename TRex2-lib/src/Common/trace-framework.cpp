@@ -37,7 +37,7 @@ TraceEvent events[1000000];
 bool writeTraceToFile = true;
 void traceEvent(int traceId, bool reset)
 {
-    if (!doTrace || (traceId != 1 && traceId != 100 && traceId != 50 && traceId != 51 && traceId != 155 && traceId != 5 && traceId != 6 && traceId != 7 && traceId != 12 && traceId != 57 && traceId != 58 && traceId != 59 && traceId != 110 && traceId != 111))
+    if (!doTrace || (traceId != 1 && traceId != 100 && traceId != 230)) //(traceId != 1 && traceId != 100 && traceId != 50 && traceId != 51 && traceId != 155 && traceId != 5 && traceId != 6 && traceId != 7 && traceId != 12 && traceId != 57 && traceId != 58 && traceId != 59 && traceId != 110 && traceId != 111))
         return;
     int pid = syscall(SYS_gettid);
     pthread_mutex_lock(traceMutex);

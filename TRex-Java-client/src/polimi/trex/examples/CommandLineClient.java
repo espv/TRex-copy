@@ -20,9 +20,7 @@
 
 package polimi.trex.examples;
 
-import java.util.List;
-import java.util.ArrayList;
-import java.util.Date;
+import java.util.*;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
@@ -39,7 +37,6 @@ import polimi.trex.packets.SubPkt;
 import polimi.trex.packets.TRexPkt;
 import polimi.trex.ruleparser.TRexRuleParser;
 
-import java.util.Random;
 import java.util.function.Consumer;
 
 /**
@@ -137,15 +134,16 @@ public class CommandLineClient implements PacketListener {
 		Random rand = new Random();
 		//values2.add(Integer.toString(rand.nextInt(46) + 50));
 
+        HashMap<Integer, ArrayList<ArrayList<String>>> pub = new HashMap<>();
         ArrayList<ArrayList<String> > allkeys = new ArrayList<>();
         ArrayList<ArrayList<String> > allvalues = new ArrayList<>();
-        for (int j = 0; j < 100; j++) {
+        for (int j = 0; j < 200; j+=2) {
             ArrayList<String> keys1 = new ArrayList<String>();
             ArrayList<String> keys2 = new ArrayList<String>();
             ArrayList<String> values1 = new ArrayList<String>();
             ArrayList<String> values2 = new ArrayList<String>();
-            allPubTypes[j] = j;
-            allPubTypes[j] = j+1;
+            allPubTypes[j] = j%21+2;
+            allPubTypes[j+1] = (j+1)%21+2;
             keys1.add("area");
             keys1.add("percentage");
             values1.add("office");
@@ -159,29 +157,33 @@ public class CommandLineClient implements PacketListener {
             allvalues.add(values1);
             allvalues.add(values2);
         }
+        client = new CommandLineClient(serverHost, serverPort);
+        if (subTypes.size() > 0) {
+            client.tManager.addPacketListener(client);
+            client.tManager.start();
+            client.subscribe(subTypes);
+        }
+
 		while (true) {
-		    curIndex = 3;//rand.nextInt(1) % 10;
-			client = new CommandLineClient(serverHost, serverPort);
-			if (subTypes.size() > 0) {
-				client.tManager.addPacketListener(client);
-				client.tManager.start();
-				client.subscribe(subTypes);
-			}
+		    curIndex = rand.nextInt(200);
 			if (sendRule) {
 				File file = new File(teslaRule);
 				fetchFiles(file, c -> c.sendRule(), client);
 			}
 			if (pubType != -1) {
-				if (cnt % 10000 == 0)
+				if (cnt % 2000 == 0)
 					System.out.println("Number of events sent: " + cnt);
-				//Thread.sleep(100);
-				client.publish(allPubTypes[curIndex], allkeys.get(curIndex), allvalues.get(curIndex));
+				//Thread.sleep(10);
+				ArrayList<String> key = allkeys.get(curIndex);
+				ArrayList<String> value = allvalues.get(curIndex);
+				int pt = allPubTypes[curIndex];
+				client.publish(pt, key, value);
 				//curIndex = (curIndex + 1) % 2;
 				++cnt;
 			}
 			if (pubType == -1)
 				break;
-			client.tManager.stop();
+			//client.tManager.stop();
 		}
 	} catch(IOException e) { e.printStackTrace(); }
     }

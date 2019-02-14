@@ -19,6 +19,7 @@
 //
 
 #include "StacksRule.h"
+#include "../../../TRex2-lib/src/Common/trace-framework.hpp"
 
 using namespace std;
 
@@ -394,7 +395,7 @@ list<PartialEvent*>* StacksRule::getPartialResults(PubPkt* pkt) {
   // Iterates over all states
   for (int state = 1; state < stacksNum; state++) {
     Stack* stack = stacks[state];
-    // Iterates over all previously generated events
+    // Iterates over all previously Generated events
     for (auto event : *prevEvents) {
       // Extract events for next iteration
       int refState = referenceState[state];
@@ -489,6 +490,7 @@ void StacksRule::createComplexEvents(list<PartialEvent*>* partialEvents,
           pe, aggregates, aggsSize, receivedPkts, receivedAggs,
           aggregateComplexParameters);
     }
+    traceEvent(230, false);
     results.insert(genPkt);
   }
 }

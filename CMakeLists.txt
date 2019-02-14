@@ -27,6 +27,9 @@ include_directories(TRex2-lib/src/Packets)
 add_custom_target(TRexServer COMMAND ${PROJECT_SOURCE_DIR}/TRex-Server/custom_setup.sh
         CLION_EXE_DIR=${PROJECT_SOURCE_DIR}/TRex-Server/src)
 
+add_custom_target(JustRunTRexServer
+        CLION_EXE_DIR=${PROJECT_SOURCE_DIR}/TRex-Server/src)
+
 add_custom_target(ConfigureDebugTRex COMMAND ${PROJECT_SOURCE_DIR}/TRex2-lib/run_debug_configure && ${PROJECT_SOURCE_DIR}/TRex-Server/run_debug_configure
         CLION_EXE_DIR=${PROJECT_SOURCE_DIR}/TRex2-Server/src)
 

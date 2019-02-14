@@ -84,7 +84,7 @@ private:
 	};
 
 	// Space reserved for buffer
-	static const std::size_t BUFFER_LENGTH= 2048;
+	static const std::size_t BUFFER_LENGTH= 80;
 
 	// Heartbeat timeout (in ms). Connection is considered lost when no heartbeat is received
 	// by this timeout.

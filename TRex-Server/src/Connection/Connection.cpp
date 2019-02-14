@@ -66,7 +66,10 @@ void Connection::start()
 	}
 }
 
+static int cnt = 0;
 void Connection::handleRead(const boost::system::error_code& error, std::size_t bytes_transferred) {
+    //if (++cnt % 10000 == 0)
+    //    std::cout << "Received " << cnt << " packets" << std::endl;
 	if (!error) {
 		if (usePing) {
 			pingReceiveTimer.cancel();
