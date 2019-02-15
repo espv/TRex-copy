@@ -54,6 +54,13 @@ PubPkt::PubPkt(const PubPkt& pkt) {
     attributes[i] = pkt.attributes[i];
   timeStamp = pkt.timeStamp;
   referenceCount = 1;
+#if MP_MODE == MP_LOCK
+  mutex = new pthread_mutex_t;
+  pthread_mutex_init(mutex, NULL);
+#endif
+#if LOG == 1
+  count++;
+#endif
 }
 
 PubPkt::~PubPkt() {

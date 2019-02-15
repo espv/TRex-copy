@@ -21,6 +21,7 @@
 #include "TRexEngine.h"
 #include "../Common/trace-framework.hpp"
 #include <sys/time.h>
+#include <sys/syscall.h>
 
 using namespace std;
 
@@ -187,6 +188,7 @@ void TRexEngine::processRulePkt(RulePkt* pkt) {
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
+  //std::cout << "PID: " << syscall(SYS_gettid) << std::endl;
   if (recursion == false)
     recursionDepth = 0;
   else

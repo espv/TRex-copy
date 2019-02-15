@@ -32,7 +32,9 @@ long long first_time = 0;
 
 int tracedEvents = 0;
 
-TraceEvent events[1000000];
+//#define MAX_NUMBER_EVENTS 60000000
+#define MAX_NUMBER_EVENTS 100000
+TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
 void traceEvent(int traceId, bool reset)
@@ -43,6 +45,9 @@ void traceEvent(int traceId, bool reset)
     pthread_mutex_lock(traceMutex);
     auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
     if (writeTraceToFile) {
+        if (tracedEvents == MAX_NUMBER_EVENTS-1) {
+            writeBufferToFile();
+        }
         events[tracedEvents].locationId = traceId;
         events[tracedEvents].cpuId = sched_getcpu();
         events[tracedEvents].threadId = pid;
@@ -61,13 +66,14 @@ void traceEvent(int traceId, bool reset)
     pthread_mutex_unlock(traceMutex);
 };
 
+int trace_index = 0;
 void writeBufferToFile()
 {
     ofstream myfile;
     std::ostringstream oss;
     random_generator gen;
     uuid id = gen();
-    oss << "../analysis/traces/" << std::time(0) << "-" << id << ".trace";
+    oss << "../analysis/traces/" << std::time(0) << "-" << id << "-" << trace_index << ".trace";
     std::string fn = oss.str();
     myfile.open (fn);
     for (int i = 0; i < tracedEvents; ++i)
@@ -76,4 +82,8 @@ void writeBufferToFile()
         myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
     }
     myfile.close();
+    tracedEvents = 0;
+    trace_index += 1;
+    memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
+    exit(0);
 }
