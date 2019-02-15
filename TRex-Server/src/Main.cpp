@@ -51,10 +51,10 @@ void runServer(bool useGPU){
 
 void testEngine(){
 	TRexEngine engine(2);
+    engine.finalize();
 	RuleR1 testRule;
 
 	engine.processRulePkt(testRule.buildRule());
-	engine.finalize();
 
 	ResultListener* listener= new TestResultListener(testRule.buildSubscription());
 	engine.addResultListener(listener);
@@ -70,16 +70,14 @@ void testEngine(){
 
 extern bool doTrace;
 int main(int argc, char* argv[]){
-	if (argc > 1 && !strcmp(argv[1], "-trace"))  // If first argument is -trace
-        doTrace = true;
-	else
-	    doTrace = false;
-
+	bool test = false;
 	for (int i = 1; i < argc; i++) {
 	    if (!strcmp(argv[i], "-trace"))
 	        doTrace = true;
 	    else if (!strcmp(argv[i], "-number-threads"))
 	        number_threads = std::atoi(argv[i+1]);
+	    else if (!strcmp(argv[i], "-test"))
+	    	test = true;
 	}
 
     boost::log::core::get()->set_logging_enabled(false);
@@ -102,6 +100,9 @@ int main(int argc, char* argv[]){
 	  runServer(false);
 	}
 #else
-	runServer(false);
+	if (test)
+		testEngine();
+	else
+		runServer(false);
 #endif
 }
