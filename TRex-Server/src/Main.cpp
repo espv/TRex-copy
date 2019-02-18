@@ -50,7 +50,7 @@ void runServer(bool useGPU){
 }
 
 void testEngine(){
-	TRexEngine engine(2);
+	TRexEngine engine(number_threads);
     engine.finalize();
 	RuleR1 testRule;
 
