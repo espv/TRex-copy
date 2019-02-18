@@ -33,6 +33,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include "boost/random.hpp"
 #include "boost/generator_iterator.hpp"
+#include "Test/RuleR0.hpp"
 #include <boost/thread.hpp>
 #include <cstring>
 
@@ -61,10 +62,7 @@ void runServer(bool useGPU){
 	server.run();
 }
 
-void testEngine(){
-	TRexEngine engine(number_threads);
-    engine.finalize();
-	RuleR1 testRule;
+/*
 #define PACKET_CAPACITY 10
 int cur_pkt_index = 0;
 int number_dropped_packets = 0;
@@ -74,7 +72,6 @@ std::vector<PubPkt*> packetQueue;
 long long cnt = 0;
 std::vector<PubPkt*> allPackets;
 auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
-TRexEngine *this_engine;
 boost::posix_time::microsec interval(10000);
 boost::asio::io_service io;
 boost::asio::deadline_timer t(io, interval);
@@ -83,7 +80,7 @@ boost::interprocess::interprocess_semaphore packet_thread_semaphore(0);
 std::time_t now = std::time(0);
 boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
 
-void HandlePubPacket(const boost::system::error_code&)
+void HandlePubPacketMainCpp(const boost::system::error_code&)
 {
     if (packetQueue.size() < PACKET_CAPACITY) {
         ++cur_pkt_index;
@@ -99,8 +96,8 @@ void HandlePubPacket(const boost::system::error_code&)
     }
 
     t.expires_at(t.expires_at() + interval);
-    t.async_wait(&HandlePubPacket);
-
+    t.async_wait(&HandlePubPacketMainCpp);
+*/
     /*
     traceEvent(1, true);
     if (++cnt % 2000 == 0) {
@@ -111,91 +108,25 @@ void HandlePubPacket(const boost::system::error_code&)
 
     this_engine->processPubPkt(pkt);
     traceEvent(100, true);*/
-}
+//}
 
-TRexEngine *engine;
-RuleR1 testRule;
-
-void
-PublishPackets()
-{
-    while (true) {
-        packet_thread_semaphore.wait();
-        //if (packetQueue.size() > 0) {
-        //std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
-        PubPkt *pkt = packetQueue.front();
-        traceEvent(1, true);
-        if (++cnt % 100000 == 0) {
-            auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-            std::cout << cnt << " - " << current_time - prev_time << std::endl;
-            prev_time = current_time;
-        }
-
-        engine->processPubPkt(pkt);
-        traceEvent(100, true);
-        //std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
-        packetQueue.erase(packetQueue.begin());
-        //std::cout << "Finished processing packet" << std::endl;
-        //}
-    }
-}
-
-void sendTestPackets() {
-    vector<PubPkt*> pubPkts= testRule.buildPublication();
-    for (vector<PubPkt*>::iterator it= pubPkts.begin(); it != pubPkts.end(); it++){
-        engine->processPubPkt(*it);
-    }
-}
 
 void testEngine(){
-    engine = new TRexEngine(number_threads);
-    engine->finalize();
+    TRexEngine *this_engine = new TRexEngine(number_threads);
+	this_engine->finalize();
+	RuleR0 testRule;
 
     for (int i = 0; i < 1000; i++)
-	    engine->processRulePkt(testRule.buildRule());
+		this_engine->processRulePkt(testRule.buildRule());
 
 	ResultListener* listener= new TestResultListener(testRule.buildSubscription());
-	engine->addResultListener(listener);
+	this_engine->addResultListener(listener);
 
-	allPackets = testRule.buildPublication();
+	this_engine->StartTest(testRule.buildPublication());
 
-	/*
-    for (int i = 0; i < 100; i++) {
-        auto attributes = new Attribute[2];
-        //strncpy(attributes[0].name, "value", sizeof(attributes[0].name) - 1);
-
-        attributes[0].name[0] = 'v';
-        attributes[0].name[1] = 'a';
-        attributes[0].name[2] = 'l';
-        attributes[0].name[3] = 'u';
-        attributes[0].name[4] = 'e';
-        attributes[0].name[5] = '\0';
-        attributes[0].intVal = 98;
-
-        //strlcpy(attributes[1].name, "area", sizeof(attributes[1].name) - 1);
-        //strlcpy(attributes[1].stringVal, "office", sizeof(attributes[1].stringVal) - 1);
-
-        attributes[1].name[0] = 'a';
-        attributes[1].name[1] = 'r';
-        attributes[1].name[2] = 'e';
-        attributes[1].name[3] = 'a';
-        attributes[1].name[4] = '\0';
-        attributes[1].stringVal[0] = 'o';
-        attributes[1].stringVal[1] = 'f';
-        attributes[1].stringVal[2] = 'f';
-        attributes[1].stringVal[3] = 'i';
-        attributes[1].stringVal[4] = 'c';
-        attributes[1].stringVal[5] = 'e';
-        attributes[1].stringVal[6] = '\0';
-        PubPkt *pkt = new PubPkt(i % 20 + 2, attributes, 2);
-        allPackets.push_back(pkt);
-    }*/
-    for (int i = 0; i < number_threads; ++i) {
-        boost::thread th{PublishPackets};
-    }
-    t.async_wait(&HandlePubPacket);
-    io.run();
-    //while (true);
+    //boost::thread th{engine->PublishPackets};
+    //t.async_wait(&engine->HandlePubPacket);
+    //io.run();
 
 	/* Expected output: complex event should be created by T-Rex and published
 	 * to the TestResultListener, which should print it to screen.

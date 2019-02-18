@@ -77,30 +77,28 @@ SubPkt* RuleR1::buildSubscription() {
 }
 
 vector<PubPkt*> RuleR1::buildPublication(){
-	vector < PubPkt * > pubPkts;
-	for (int i = 0; i < 1000; i++) {
-		// Temp event
-		Attribute tempAttr[2];
-		// Value attribute
-		strcpy(tempAttr[0].name, RuleR0::ATTR_TEMPVALUE);
-		tempAttr[0].type = INT;
-		tempAttr[0].intVal = 50;
-		// Area attribute
-		strcpy(tempAttr[1].name, RuleR0::ATTR_AREA);
-		tempAttr[1].type = STRING;
-		strcpy(tempAttr[1].stringVal, RuleR0::AREA_OFFICE);
-		PubPkt *tempPubPkt = new PubPkt(EVENT_TEMP, tempAttr, 2);
+    // Temp event
+    Attribute tempAttr[2];
+    // Value attribute
+    strcpy(tempAttr[0].name, RuleR0::ATTR_TEMPVALUE);
+    tempAttr[0].type= INT;
+    tempAttr[0].intVal= 50;
+    // Area attribute
+    strcpy(tempAttr[1].name, RuleR0::ATTR_AREA);
+    tempAttr[1].type= STRING;
+    strcpy(tempAttr[1].stringVal, RuleR0::AREA_OFFICE);
+    PubPkt* tempPubPkt= new PubPkt(EVENT_TEMP, tempAttr, 2);
 
-		// Smoke event
-		// Area attribute
-		Attribute smokeAttr[1];
-		strcpy(smokeAttr[0].name, RuleR0::ATTR_AREA);
-		smokeAttr[0].type = STRING;
-		strcpy(smokeAttr[0].stringVal, RuleR0::AREA_OFFICE);
-		PubPkt *smokePubPkt = new PubPkt(EVENT_SMOKE, smokeAttr, 1);
+    // Smoke event
+    // Area attribute
+    Attribute smokeAttr[1];
+    strcpy(smokeAttr[0].name, RuleR0::ATTR_AREA);
+    smokeAttr[0].type= STRING;
+    strcpy(smokeAttr[0].stringVal, RuleR0::AREA_OFFICE);
+    PubPkt* smokePubPkt= new PubPkt(EVENT_SMOKE, smokeAttr, 1);
 
-		pubPkts.push_back(tempPubPkt);
-		pubPkts.push_back(smokePubPkt);
-	}
-	return pubPkts;
+    vector<PubPkt*> pubPkts;
+    pubPkts.push_back(tempPubPkt);
+    pubPkts.push_back(smokePubPkt);
+    return pubPkts;
 }

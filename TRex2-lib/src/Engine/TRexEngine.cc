@@ -125,7 +125,7 @@ void HandlePubPacket(const boost::system::error_code&)
     if (packetQueue.size() < PACKET_CAPACITY) {
         if (++number_placed_packets % 10000 == 0)
             std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
-        packetQueue.push_back(new PubPkt(*allPackets.at(gen()%100)));
+        packetQueue.push_back(new PubPkt(*allPackets.at(gen()%allPackets.size())));
         //memcpy(&packetQueue[cur_pkt_index], pkt, sizeof(PubPkt));
     } else {
         ++number_dropped_packets;
@@ -149,6 +149,36 @@ void HandlePubPacket(const boost::system::error_code&)
 
     this_engine->processPubPkt(pkt);
     traceEvent(100, 0, true);*/
+}
+
+void PublishPackets()
+{
+    while (true) {
+        if (packetQueue.size() > 0) {
+            //std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
+            PubPkt *pkt = packetQueue.front();
+            traceEvent(1, 0, true);
+            if (++cnt % 2000 == 0) {
+                auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
+                std::cout << cnt << " - " << current_time - prev_time << std::endl;
+                prev_time = current_time;
+            }
+
+            this_engine->processPubPkt(pkt);
+            traceEvent(100, false);
+            //std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
+            packetQueue.erase(packetQueue.begin());
+            //std::cout << "Finished processing packet" << std::endl;
+        }
+    }
+}
+
+void
+TRexEngine::StartTest(std::vector<PubPkt*> pubPackets) {
+    allPackets = pubPackets;
+    boost::thread th{PublishPackets};
+    t.async_wait(&HandlePubPacket);
+    io.run();
 }
 
 TRexEngine::TRexEngine(int parNumProc) {
@@ -185,29 +215,6 @@ TRexEngine::~TRexEngine() {
     delete stacksRules;
 }
 
-void
-PublishPackets()
-{
-    while (true) {
-        if (packetQueue.size() > 0) {
-            //std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
-            PubPkt *pkt = packetQueue.front();
-            traceEvent(1, 0, true);
-            if (++cnt % 2000 == 0) {
-                auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-                std::cout << cnt << " - " << current_time - prev_time << std::endl;
-                prev_time = current_time;
-            }
-
-            this_engine->processPubPkt(pkt);
-            traceEvent(100, false);
-            //std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
-            packetQueue.erase(packetQueue.begin());
-            //std::cout << "Finished processing packet" << std::endl;
-        }
-    }
-}
-
 void TRexEngine::finalize() {
   // Creates shared memory and initializes threads
   int size = stacksRules->size() / numProc + 1;
@@ -234,7 +241,7 @@ void TRexEngine::finalize() {
   }
   usleep(1000);
 
-    for (int i = 0; i < 100; i++) {
+    /*for (int i = 0; i < 100; i++) {
         auto attributes = new Attribute[2];
         //strncpy(attributes[0].name, "value", sizeof(attributes[0].name) - 1);
 
@@ -263,12 +270,9 @@ void TRexEngine::finalize() {
         attributes[1].stringVal[6] = '\0';
         PubPkt *pkt = new PubPkt(i % 20 + 2, attributes, 2);
         allPackets.push_back(pkt);
-    }
+    }*/
 
     this_engine = this;
-    boost::thread th{PublishPackets};
-    t.async_wait(&HandlePubPacket);
-    io.run();
 }
 
 

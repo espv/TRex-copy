@@ -79,6 +79,8 @@ public:
    */
   void processPubPkt(PubPkt* pkt);
 
+  void StartTest(std::vector<PubPkt*> pubPackets);
+
   /**
    * Adds a new ResultHandler
    */
