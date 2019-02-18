@@ -65,7 +65,7 @@ void HandlePubPacket(const boost::system::error_code&)
 	std::time_t now = std::time(0);
 	boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
 	PubPkt *pkt = &allPackets[gen()%100];
-	traceEvent(1, true);
+	traceEvent(1, 0, true);
 	if (++cnt % 2000 == 0) {
 		auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
 		std::cout << cnt << " - " << current_time-prev_time << std::endl;
@@ -79,7 +79,7 @@ void HandlePubPacket(const boost::system::error_code&)
 	// Let TRex process (and *delete*) the packet
 	p->tRexEngine.processPubPkt(pkt);
 	//pkt = newPkt;
-	traceEvent(100, true);
+	traceEvent(100, 0, true);
 #ifdef HAVE_GTREX
 	if (useGPU) {
           parent.gtRexEngine.processPubPkt(pkt);
@@ -158,7 +158,7 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 long long cnt = 0;
 auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
 void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
-    traceEvent(1, true);
+    traceEvent(1, 0, true);
     if (++cnt % 2000 == 0) {
         auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
         std::cout << cnt << " - " << current_time-prev_time << std::endl;
@@ -172,7 +172,7 @@ void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
     // Let TRex process (and *delete*) the packet
     if (!useGPU) parent.tRexEngine.processPubPkt(pkt);
     //pkt = newPkt;
-    traceEvent(100, true);
+    traceEvent(100);
 #ifdef HAVE_GTREX
     if (useGPU) {
           parent.gtRexEngine.processPubPkt(pkt);

@@ -38,19 +38,19 @@ using namespace std;
 void* processor(void* parShared) {
   Shared* s = (Shared*)parShared;
   bool first = true;
-  traceEvent(57, false);
+  traceEvent(57);
   while (true) {
     if (first) {
       pthread_mutex_lock(s->processMutex);
       first = false;
     }
 
-    traceEvent(58, false);
+    //traceEvent(58);
     pthread_cond_wait(s->processCond, s->processMutex);
     // At this point, s->processMutex is locked by this thread, and s->lowerBound and s->upperBound will not be changed by TRexEngine::processRulePkt
     int lowerBound = s->lowerBound;
     int upperBound = s->upperBound;
-    traceEvent(6, false);
+    traceEvent(6, 1);
     // End processing
     if (s->finish) {
       pthread_mutex_unlock(s->processMutex);
@@ -60,7 +60,7 @@ void* processor(void* parShared) {
     MatchingHandler* mh = s->mh;
     set<PubPkt*> generatedPkts;
     for (int i = lowerBound; i < upperBound; i++) {
-      traceEvent(7, false);
+      traceEvent(7);
       auto negsIt = mh->matchingNegations.find(i);
       if (negsIt != mh->matchingNegations.end()) {
         for (auto index : negsIt->second) {
@@ -90,6 +90,7 @@ void* processor(void* parShared) {
         }
       }
     }
+    traceEvent(59);
     pthread_mutex_lock(s->processMutex);
     pthread_mutex_lock(s->resultMutex);
     *(s->stillProcessing) = *(s->stillProcessing) - 1;
@@ -97,7 +98,6 @@ void* processor(void* parShared) {
       pthread_cond_signal(s->resultCond);
     pthread_mutex_unlock(s->resultMutex);
 
-    traceEvent(59, false);
   }
   pthread_exit(NULL);
 }
@@ -120,7 +120,7 @@ std::time_t now = std::time(0);
 boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
 void HandlePubPacket(const boost::system::error_code&)
 {
-    auto start = std::chrono::system_clock::now().time_since_epoch().count();
+    //auto start = std::chrono::system_clock::now().time_since_epoch().count();
     //std::cout << "start of HandlePubPkt" << std::endl;
     if (packetQueue.size() < PACKET_CAPACITY) {
         if (++number_placed_packets % 10000 == 0)
@@ -135,12 +135,12 @@ void HandlePubPacket(const boost::system::error_code&)
     //std::cout << "HandlePubPacket is done" << std::endl;
 
     t.expires_at(t.expires_at() + interval);
-    auto stop = std::chrono::system_clock::now().time_since_epoch().count();
-    std::cout << "HandlePubPacket took " << stop-start << " nanoseconds" << std::endl;
+    //auto stop = std::chrono::system_clock::now().time_since_epoch().count();
+    //std::cout << stop-start << " ns" << std::endl;
     t.async_wait(&HandlePubPacket);
 
     /*
-    traceEvent(1, true);
+    traceEvent(1, 0, true);
     if (++cnt % 2000 == 0) {
         auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
         std::cout << cnt << " - " << current_time-prev_time << std::endl;
@@ -148,7 +148,7 @@ void HandlePubPacket(const boost::system::error_code&)
     }
 
     this_engine->processPubPkt(pkt);
-    traceEvent(100, true);*/
+    traceEvent(100, 0, true);*/
 }
 
 TRexEngine::TRexEngine(int parNumProc) {
@@ -192,7 +192,7 @@ PublishPackets()
         if (packetQueue.size() > 0) {
             //std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
             PubPkt *pkt = packetQueue.front();
-            traceEvent(1, true);
+            traceEvent(1, 0, true);
             if (++cnt % 2000 == 0) {
                 auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
                 std::cout << cnt << " - " << current_time - prev_time << std::endl;
@@ -200,7 +200,7 @@ PublishPackets()
             }
 
             this_engine->processPubPkt(pkt);
-            traceEvent(100, true);
+            traceEvent(100, false);
             //std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
             packetQueue.erase(packetQueue.begin());
             //std::cout << "Finished processing packet" << std::endl;
@@ -319,10 +319,10 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   indexingTable.processMessage(pkt, *mh);
   set<PubPkt*> result;
 
-  traceEvent(110, false);
+  traceEvent(110);
   // Installs information in shared memory
   for (int i = 0; i < numProc; i++) {
-    traceEvent(5, false);
+    traceEvent(5);
     pthread_mutex_lock(shared[i].processMutex);
     shared[i].mh = mh;
 #if MP_MODE == MP_COPY
@@ -337,13 +337,13 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   // Waits until all processes finish
   pthread_mutex_lock(shared[0].resultMutex);
   // If not all thread have finished, wait until last one
-  //traceEvent(8, false);
+  //traceEvent(8);
   if (*(shared[0].stillProcessing) != 0)
     pthread_cond_wait(shared[0].resultCond, shared[0].resultMutex);
   pthread_mutex_unlock(shared[0].resultMutex);
   *(shared[0].stillProcessing) = numProc;
   for (int i = 0; i < numProc; i++)  // Part of tracing only to connect trace event 8 with 111 for all processes
-    traceEvent(111, false);
+    traceEvent(111, 1);
 
   // Collects results
   for (int i = 0; i < numProc; i++) {
@@ -365,13 +365,13 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   double duration = (tValEnd.tv_sec - tValStart.tv_sec) * 1000000 +
                     tValEnd.tv_usec - tValStart.tv_usec;
 
-  traceEvent(9, false);
+  traceEvent(9);
   // Notifies results to listeners
   for (auto listener : resultListeners) {
-    traceEvent(10, false);
+    traceEvent(10);
     listener->handleResult(result, duration);
   }
-  traceEvent(11, false);
+  traceEvent(11);
 
   for (auto pkt : result) {
     if (recursionNeeded && recursionDepth < MAX_RECURSION_DEPTH)
@@ -380,7 +380,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
       //delete pkt;  // Added by Espen for experiments. We do not want to delete the packets since we'll reuse them.
     }
   }
-  traceEvent(12, false);
+  traceEvent(12);
 }
 
 void TRexEngine::processPubPkt(PubPkt* pkt) {

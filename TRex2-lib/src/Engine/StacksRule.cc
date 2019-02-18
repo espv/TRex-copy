@@ -490,7 +490,7 @@ void StacksRule::createComplexEvents(list<PartialEvent*>* partialEvents,
           pe, aggregates, aggsSize, receivedPkts, receivedAggs,
           aggregateComplexParameters);
     }
-    traceEvent(230, false);
+    traceEvent(230);
     results.insert(genPkt);
   }
 }

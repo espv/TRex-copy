@@ -32,21 +32,25 @@ long long first_time = 0;
 
 int tracedEvents = 0;
 
-TraceEvent events[1000000];
+#define MAX_NUMBER_EVENTS 100000
+TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
-void traceEvent(int traceId, bool reset)
+void traceEvent(int traceId, int eventType, bool reset)
 {
-    if (!doTrace || (traceId != 1 && traceId != 100 && traceId != 230)) //(traceId != 1 && traceId != 100 && traceId != 50 && traceId != 51 && traceId != 155 && traceId != 5 && traceId != 6 && traceId != 7 && traceId != 12 && traceId != 57 && traceId != 58 && traceId != 59 && traceId != 110 && traceId != 111))
+    if (!doTrace || (traceId != 1 && traceId != 100 && traceId != 50 && traceId != 51 && traceId != 155 && traceId != 5 && traceId != 6 && traceId != 7 && traceId != 12 && traceId != 57 && traceId != 58 && traceId != 59 && traceId != 110 && traceId != 111 && traceId != 230))
         return;
     int pid = syscall(SYS_gettid);
     pthread_mutex_lock(traceMutex);
     auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
     if (writeTraceToFile) {
+        if (tracedEvents >= MAX_NUMBER_EVENTS -1)
+            writeBufferToFile();
         events[tracedEvents].locationId = traceId;
         events[tracedEvents].cpuId = sched_getcpu();
         events[tracedEvents].threadId = pid;
         events[tracedEvents].timestamp = current_time;
+        events[tracedEvents].type = eventType;
         ++tracedEvents;
     } else {
         if (first_time == 0)
@@ -61,19 +65,21 @@ void traceEvent(int traceId, bool reset)
     pthread_mutex_unlock(traceMutex);
 };
 
+int trace_index = 0;
 void writeBufferToFile()
 {
     ofstream myfile;
     std::ostringstream oss;
     random_generator gen;
     uuid id = gen();
-    oss << "../analysis/traces/" << std::time(0) << "-" << id << ".trace";
+    oss << "../analysis/traces/" << std::time(0) << "-" << id << "-" << trace_index++ << ".trace";
     std::string fn = oss.str();
     myfile.open (fn);
     for (int i = 0; i < tracedEvents; ++i)
     {
         TraceEvent *event = &events[i];
-        myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
+        myfile << event->locationId << "\t" << event->type << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
     }
     myfile.close();
+    exit(0);
 }

@@ -49,13 +49,13 @@ void BoolConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (pkt->getAttribute(i).type != BOOL)
       continue;
 
-    traceEvent(50, false);
+    traceEvent(50);
     string name = pkt->getAttribute(i).name;
     bool val = pkt->getBoolAttributeVal(i);
     if (indexes.find(name) == indexes.end())
       continue;
 
-    traceEvent(41, false);
+    traceEvent(41);
     // Equality constraints
     auto it = indexes[name].eq.find(val);
     if (it != indexes[name].eq.end()) {
@@ -109,7 +109,7 @@ inline void BoolConstraintIndex::processConstraint(
   BoolTableConstraint* c, MatchingHandler& mh,
   map<TablePred*, int>& predCount) {
   for (auto it : c->connectedPredicates) {
-    traceEvent(42, false);
+    traceEvent(42);
     // If satisfied for the first time, sets count to 1
     if (predCount.find(it) == predCount.end())
       predCount.insert(make_pair(it, 1));
