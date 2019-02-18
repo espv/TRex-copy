@@ -15,11 +15,11 @@ do
 	new_trex_event_humidity=$(($trex_event_cnt+1))
 	mkdir -p $dir_name
 	cd $dir_name
-	for j in {1..100}
+	for j in {0..99}
 	do
 		file_name=$dir_name-$j
 		new_temp_constraint=$(echo $j%10 | bc)
-		cp ../original ./$file_name
+		cp ../../original ./$file_name
 		sed -i s/INCOMING_EVENT_TEMP/$new_trex_event_temp/g $file_name
 		sed -i s/INCOMING_EVENT_HUMIDITY/$new_trex_event_humidity/g $file_name
 		# 45 is the original value constraint on the temperature

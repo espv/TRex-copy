@@ -50,7 +50,7 @@ void StringConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (pkt->getAttribute(i).type != STRING)
       continue;
 
-    traceEvent(20, false);
+    traceEvent(20);
     string name = pkt->getAttribute(i).name;
     string val = pkt->getAttribute(i).stringVal;
     if (indexes.find(name) == indexes.end())
@@ -68,7 +68,7 @@ void StringConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
         continue;
       StringTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
-      traceEvent(21, false);
+      traceEvent(21);
     }
   }
 }

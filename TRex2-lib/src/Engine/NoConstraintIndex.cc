@@ -33,7 +33,7 @@ void NoConstraintIndex::installPredicate(TablePred* predicate) {
 
 void NoConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh, map<TablePred*, int>& predCount) {
   for (auto pred : predicates) {
-    traceEvent(30, false);
+    traceEvent(30);
     addToMatchingHandler(mh, pred);
   }
 }

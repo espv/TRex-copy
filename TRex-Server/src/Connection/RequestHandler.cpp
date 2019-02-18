@@ -18,8 +18,17 @@
 
 #include "RequestHandler.hpp"
 #include "../../../TRex2-lib/src/Common/trace-framework.hpp"
+#include "../../../TRex2-lib/src/Packets/PubPkt.h"
 #include <sys/syscall.h>
 #include <chrono>
+#include <stdlib.h>
+#include <iostream>
+#include <boost/asio.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include "boost/random.hpp"
+#include "boost/generator_iterator.hpp"
+#include <cstring>
+
 
 using concept::connection::RequestHandler;
 using namespace concept::packet;
@@ -47,8 +56,74 @@ using namespace std;
 	{}
 #endif
 
+/*long long cnt = 0;
+PubPkt allPackets[100];
+RequestHandler *p;
+auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
+void HandlePubPacket(const boost::system::error_code&)
+{
+	std::time_t now = std::time(0);
+	boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
+	PubPkt *pkt = &allPackets[gen()%100];
+	traceEvent(1, 0, true);
+	if (++cnt % 2000 == 0) {
+		auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
+		std::cout << cnt << " - " << current_time-prev_time << std::endl;
+		prev_time = current_time;
+	}
+	//LOG(info) << "Publication from " << p.connection.remoteToString() << ":" << endl
+	//          << "  " << toString(pkt);
+	//continue;
+	//PubPkt *newPkt = pkt->copy();
+	p->subTable.processPublication(pkt);
+	// Let TRex process (and *delete*) the packet
+	p->tRexEngine.processPubPkt(pkt);
+	//pkt = newPkt;
+	traceEvent(100, 0, true);
+#ifdef HAVE_GTREX
+	if (useGPU) {
+          parent.gtRexEngine.processPubPkt(pkt);
+        }
+#endif
+}*/
 
 RequestHandler::~RequestHandler(){
+	/*boost::asio::io_service io;
+
+	boost::asio::deadline_timer t(io, boost::posix_time::seconds(5));
+    for (int i = 0; i < 100; i++) {
+        PubPkt *pkt = &allPackets[i];
+        pkt->eventType = i % 20 + 2;
+        pkt->attributesNum = 2;
+        pkt->attributes = new Attribute[2];
+		//strncpy(pkt->attributes[0].name, "value", sizeof(pkt->attributes[0].name) - 1);
+
+        pkt->attributes[0].name[0] = 'v';
+        pkt->attributes[0].name[1] = 'a';
+        pkt->attributes[0].name[2] = 'l';
+        pkt->attributes[0].name[3] = 'u';
+        pkt->attributes[0].name[4] = 'e';
+        pkt->attributes[0].name[5] = '\0';
+        pkt->attributes[0].intVal = 98;
+
+		//strlcpy(pkt->attributes[1].name, "area", sizeof(pkt->attributes[1].name) - 1);
+		//strlcpy(pkt->attributes[1].stringVal, "office", sizeof(pkt->attributes[1].stringVal) - 1);
+
+		pkt->attributes[1].name[0] = 'a';
+		pkt->attributes[1].name[1] = 'r';
+		pkt->attributes[1].name[2] = 'e';
+		pkt->attributes[1].name[3] = 'a';
+		pkt->attributes[1].name[4] = '\0';
+		pkt->attributes[1].stringVal[0] = 'o';
+		pkt->attributes[1].stringVal[1] = 'f';
+		pkt->attributes[1].stringVal[2] = 'f';
+		pkt->attributes[1].stringVal[3] = 'i';
+		pkt->attributes[1].stringVal[4] = 'c';
+		pkt->attributes[1].stringVal[5] = 'e';
+		pkt->attributes[1].stringVal[6] = '\0';
+    }
+
+	t.async_wait(&HandlePubPacket);*/
 	if (firstSubscriptionDone) {
 		if (!useGPU) tRexEngine.removeResultListener(&resultListener);
 #ifdef HAVE_GTREX
@@ -66,6 +141,7 @@ void RequestHandler::handleRequest(std::vector<PktPtr> & pkts){
 }
 
 void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
+	//p = &parent;
 	LOG(info) << "Rule from " << parent.connection.remoteToString() << ":" << endl
 			<< "  " << toString(pkt);
 	// Let TRex process (and *delete*) the packet
@@ -79,16 +155,15 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 #endif
 }
 
-//long long cnt = 0;
-//auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
+long long cnt = 0;
+auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
 void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
-    //while (true) {
-    traceEvent(1, true);
-    /*if (++cnt % 2000 == 0) {
+    traceEvent(1, 0, true);
+    if (++cnt % 2000 == 0) {
         auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
         std::cout << cnt << " - " << current_time-prev_time << std::endl;
         prev_time = current_time;
-    }*/
+    }
     //LOG(info) << "Publication from " << parent.connection.remoteToString() << ":" << endl
     //          << "  " << toString(pkt);
     //continue;
@@ -97,13 +172,12 @@ void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
     // Let TRex process (and *delete*) the packet
     if (!useGPU) parent.tRexEngine.processPubPkt(pkt);
     //pkt = newPkt;
-    traceEvent(100, true);
+    traceEvent(100);
 #ifdef HAVE_GTREX
     if (useGPU) {
           parent.gtRexEngine.processPubPkt(pkt);
         }
 #endif
-    //}
 }
 
 void RequestHandler::PktHandleVisitor::operator()(SubPkt * pkt) const{

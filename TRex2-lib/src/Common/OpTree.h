@@ -120,7 +120,7 @@ private:
   OpValueReference* value;
   // Operation to be performed (in case of inner type)
   OpTreeOperation op;
-  // Type of the value generated or referenced
+  // Type of the value Generated or referenced
   ValType valType;
 };
 

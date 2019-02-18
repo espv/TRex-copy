@@ -49,7 +49,7 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (pkt->getAttribute(i).type != FLOAT)
       continue;
 
-    traceEvent(40, false);
+    traceEvent(40);
     string name = pkt->getAttribute(i).name;
     float val = pkt->getFloatAttributeVal(i);
     if (indexes.find(name) == indexes.end())
@@ -65,7 +65,7 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
       if (rit->first <= val)
         break;
 
-      traceEvent(41, false);
+      traceEvent(41);
       FloatTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
@@ -74,7 +74,7 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
       if (rit->first < val)
         break;
 
-      traceEvent(42, false);
+      traceEvent(42);
       FloatTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
@@ -83,7 +83,7 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
       if (it->first >= val)
         break;
 
-      traceEvent(43, false);
+      traceEvent(43);
       FloatTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -92,7 +92,7 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
       if (it->first > val)
         break;
 
-      traceEvent(44, false);
+      traceEvent(44);
       FloatTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -101,7 +101,7 @@ void FloatConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
       if (it->first == val)
         continue;
 
-      traceEvent(44, false);
+      traceEvent(44);
       FloatTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }
@@ -147,7 +147,7 @@ inline void FloatConstraintIndex::installConstraint(FloatTableConstraint* c) {
 inline void FloatConstraintIndex::processConstraint(FloatTableConstraint* c,
                                                     MatchingHandler& mh, map<TablePred*, int>& predCount) {
   for (auto it : c->connectedPredicates) {
-    traceEvent(45, false);
+    traceEvent(45);
     // If satisfied for the first time, sets count to 1
     if (predCount.find(it) == predCount.end())
       predCount.insert(make_pair(it, 1));

@@ -134,149 +134,149 @@ public class CommandLineClient implements PacketListener {
 			Random rand = new Random();
 			//values2.add(Integer.toString(rand.nextInt(46) + 50));
 
-			HashMap<Integer, ArrayList<ArrayList<String>>> pub = new HashMap<>();
-			ArrayList<ArrayList<String> > allkeys = new ArrayList<>();
-			ArrayList<ArrayList<String> > allvalues = new ArrayList<>();
-			for (int j = 0; j < 200; j+=2) {
-				ArrayList<String> keys1 = new ArrayList<String>();
-				ArrayList<String> keys2 = new ArrayList<String>();
-				ArrayList<String> values1 = new ArrayList<String>();
-				ArrayList<String> values2 = new ArrayList<String>();
-				allPubTypes[j] = j%21+2;
-				allPubTypes[j+1] = (j+1)%21+2;
-				keys1.add("area");
-				keys1.add("percentage");
-				values1.add("office");
-				values1.add("20");
-				keys2.add("area");
-				keys2.add("value");
-				values2.add("office");
-				values2.add(Integer.toString(j%10));
-				allkeys.add(keys1);
-				allkeys.add(keys2);
-				allvalues.add(values1);
-				allvalues.add(values2);
+        HashMap<Integer, ArrayList<ArrayList<String>>> pub = new HashMap<>();
+        ArrayList<ArrayList<String> > allkeys = new ArrayList<>();
+        ArrayList<ArrayList<String> > allvalues = new ArrayList<>();
+        for (int j = 0; j < 200; j+=2) {
+            ArrayList<String> keys1 = new ArrayList<String>();
+            ArrayList<String> keys2 = new ArrayList<String>();
+            ArrayList<String> values1 = new ArrayList<String>();
+            ArrayList<String> values2 = new ArrayList<String>();
+            allPubTypes[j] = j%21+2;
+            allPubTypes[j+1] = (j+1)%21+2;
+            keys1.add("area");
+            keys1.add("percentage");
+            values1.add("office");
+            values1.add("20");
+            keys2.add("area");
+            keys2.add("value");
+            values2.add("office");
+            values2.add(Integer.toString(j%10));
+            allkeys.add(keys1);
+            allkeys.add(keys2);
+            allvalues.add(values1);
+            allvalues.add(values2);
+        }
+        client = new CommandLineClient(serverHost, serverPort);
+        if (subTypes.size() > 0) {
+            client.tManager.addPacketListener(client);
+            client.tManager.start();
+            client.subscribe(subTypes);
+        }
+
+		while (true) {
+		    curIndex = rand.nextInt(200);
+			if (sendRule) {
+				File file = new File(teslaRule);
+				fetchFiles(file, c -> c.sendRule(), client);
 			}
-			client = new CommandLineClient(serverHost, serverPort);
-			if (subTypes.size() > 0) {
-				client.tManager.addPacketListener(client);
-				client.tManager.start();
-				client.subscribe(subTypes);
+			if (pubType != -1) {
+				if (cnt % 2000 == 0)
+					System.out.println("Number of events sent: " + cnt);
+				//Thread.sleep(10);
+				ArrayList<String> key = allkeys.get(curIndex);
+				ArrayList<String> value = allvalues.get(curIndex);
+				int pt = allPubTypes[curIndex];
+				client.publish(pt, key, value);
+				//curIndex = (curIndex + 1) % 2;
+				++cnt;
 			}
+			if (pubType == -1)
+				break;
+			//client.tManager.stop();
+		}
+	} catch(IOException e) { e.printStackTrace(); }
+    }
 
-			while (true) {
-				curIndex = rand.nextInt(200);
-				if (sendRule) {
-					File file = new File(teslaRule);
-					fetchFiles(file, c -> c.sendRule(), client);
-				}
-				if (pubType != -1) {
-					if (cnt % 2000 == 0)
-						System.out.println("Number of events sent: " + cnt);
-					//Thread.sleep(10);
-					ArrayList<String> key = allkeys.get(curIndex);
-					ArrayList<String> value = allvalues.get(curIndex);
-					int pt = allPubTypes[curIndex];
-					client.publish(pt, key, value);
-					//curIndex = (curIndex + 1) % 2;
-					++cnt;
-				}
-				if (pubType == -1)
-					break;
-				//client.tManager.stop();
-			}
-		} catch(IOException e) { e.printStackTrace(); }
-	}
+    private static void printUsageAndExit() {
+	System.out.println("Usage: java -jar TRexClient-JavaEx.jar "+
+			   "<server_host> <server_port> "+
+			   "[-rule path/to/file]"+
+			   "[-sub <evt_type_1> ... <evt_type_n>]"+
+			   "[-pub <evt_type> [<key_1> <val_1> ... <key_n> <val_n>]]");
+	System.exit(-1);
+    }
 
-	private static void printUsageAndExit() {
-		System.out.println("Usage: java -jar TRexClient-JavaEx.jar "+
-				"<server_host> <server_port> "+
-				"[-rule path/to/file]"+
-				"[-sub <evt_type_1> ... <evt_type_n>]"+
-				"[-pub <evt_type> [<key_1> <val_1> ... <key_n> <val_n>]]");
-		System.exit(-1);
-	}
+    public CommandLineClient(String serverHost, int serverPort) throws IOException {
+    	tManager.connect(serverHost, serverPort);
+    }
 
-	public CommandLineClient(String serverHost, int serverPort) throws IOException {
-		tManager.connect(serverHost, serverPort);
-	}
-
-	public void sendRule() {
-		RulePkt rule = TRexRuleParser.parse(teslaRule, 2000);
-		try {
+    public void sendRule() {
+    	RulePkt rule = TRexRuleParser.parse(teslaRule, 2000);
+    	try {
 			tManager.sendRule(rule, EngineType.CPU);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-	}
+    }
 
-	public void subscribe(List<Integer> subTypes) {
-		for(int subType : subTypes) {
-			SubPkt sub = new SubPkt(subType);
-			try {
-				tManager.send(sub);
-			} catch (IOException e) { e.printStackTrace(); }
-		}
-	}
+    public void subscribe(List<Integer> subTypes) {
+	for(int subType : subTypes) {
+		SubPkt sub = new SubPkt(subType);
+	    try {
+		    tManager.send(sub);
+		 } catch (IOException e) { e.printStackTrace(); }
+	    }
+    }
 
-	public void publish(int pubType, List<String> keys, List<String> values) {
-		PubPkt pub;
-		boolean boolVal;
-		int intVal;
-		float floatVal;
+    public void publish(int pubType, List<String> keys, List<String> values) {
+	PubPkt pub;
+	boolean boolVal;
+	int intVal;
+	float floatVal;
 
-		pub = new PubPkt(pubType);
-		for(int i=0; i<keys.size(); i++) {
-			if(values.get(i).equals("true")) {
-				boolVal = true;
-				pub.addAttribute(new Attribute(keys.get(i), boolVal)); // add a bool attr
-			} else if(values.get(i).equals("false")) {
-				boolVal = false;
-				pub.addAttribute(new Attribute(keys.get(i), boolVal)); // add a bool attr
-			} else {
-				try {
-					intVal = Integer.parseInt(values.get(i));
-					pub.addAttribute(new Attribute(keys.get(i), intVal)); // add an int attr
-				} catch(NumberFormatException e1) {
-					try {
-						floatVal = Float.parseFloat(values.get(i));
-						pub.addAttribute(new Attribute(keys.get(i), floatVal)); // add a float attr
-					} catch(NumberFormatException e2) {
-						pub.addAttribute(new Attribute(keys.get(i), values.get(i))); // add a String attr
-					}
-				}
-			}
-		}
+	pub = new PubPkt(pubType);
+	for(int i=0; i<keys.size(); i++) {
+	    if(values.get(i).equals("true")) {
+		boolVal = true;
+		pub.addAttribute(new Attribute(keys.get(i), boolVal)); // add a bool attr
+	    } else if(values.get(i).equals("false")) {
+		boolVal = false;
+		pub.addAttribute(new Attribute(keys.get(i), boolVal)); // add a bool attr
+	    } else {
 		try {
-			tManager.send(pub);
-		} catch (IOException e) { e.printStackTrace(); }
+		    intVal = Integer.parseInt(values.get(i));
+		    pub.addAttribute(new Attribute(keys.get(i), intVal)); // add an int attr
+		} catch(NumberFormatException e1) {
+		    try {
+			floatVal = Float.parseFloat(values.get(i));
+			pub.addAttribute(new Attribute(keys.get(i), floatVal)); // add a float attr
+		    } catch(NumberFormatException e2) {
+			pub.addAttribute(new Attribute(keys.get(i), values.get(i))); // add a String attr
+		    }
+		}
+	    }
 	}
+	try {
+	    tManager.send(pub);
+	} catch (IOException e) { e.printStackTrace(); }
+    }
 
-	@Override
-	public void notifyPktReceived(TRexPkt pkt) {
-		if(! (pkt instanceof PubPkt)) {
-			System.out.println("Ingnoring wrong packet: "+pkt);
-			return;
-		}
-		PubPkt pub = (PubPkt) pkt;
-		System.out.print("PubPacket received: {");
-		System.out.print(pub.getEventType());
-		for(Attribute att : pub.getAttributes()) {
-			System.out.print(" <"+att.getName());
-			switch(att.getValType()) {
-				case BOOL: System.out.print(" : bool = "+att.getBoolVal()+">"); break;
-				case INT: System.out.print(" : int = "+att.getIntVal()+">"); break;
-				case FLOAT: System.out.print(" : float = "+att.getFloatVal()+">"); break;
-				case STRING: System.out.print(" : string = "+att.getStringVal()+">"); break;
-			}
-		}
-		System.out.print("}@");
-		System.out.println(new Date(pub.getTimeStamp()).toLocaleString());
+    @Override
+    public void notifyPktReceived(TRexPkt pkt) {
+	if(! (pkt instanceof PubPkt)) {
+	    System.out.println("Ingnoring wrong packet: "+pkt);
+	    return;
 	}
-	@Override
-	public void notifyConnectionError() {
-		System.out.println("Connection error. Exiting.");
-		System.exit(-1);
+	PubPkt pub = (PubPkt) pkt;
+	System.out.print("PubPacket received: {");
+	System.out.print(pub.getEventType());
+	for(Attribute att : pub.getAttributes()) {
+	    System.out.print(" <"+att.getName());
+	    switch(att.getValType()) {
+	    case BOOL: System.out.print(" : bool = "+att.getBoolVal()+">"); break;
+	    case INT: System.out.print(" : int = "+att.getIntVal()+">"); break;
+	    case FLOAT: System.out.print(" : float = "+att.getFloatVal()+">"); break;
+	    case STRING: System.out.print(" : string = "+att.getStringVal()+">"); break;
+	    }
 	}
+	System.out.print("}@");
+	System.out.println(new Date(pub.getTimeStamp()).toLocaleString());
+    }
+    @Override
+    public void notifyConnectionError() {
+	System.out.println("Connection error. Exiting.");
+	System.exit(-1);
+    }
 }
     

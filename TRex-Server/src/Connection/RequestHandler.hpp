@@ -45,7 +45,7 @@ public:
 		handleRequest(pkts);
 	}
 
-private:
+//private:
 
 	class PktHandleVisitor : public boost::static_visitor<>{
 		RequestHandler &parent;
