@@ -61,6 +61,10 @@ void runServer(bool useGPU){
 	server.run();
 }
 
+void testEngine(){
+	TRexEngine engine(number_threads);
+    engine.finalize();
+	RuleR1 testRule;
 #define PACKET_CAPACITY 10
 int cur_pkt_index = 0;
 int number_dropped_packets = 0;
