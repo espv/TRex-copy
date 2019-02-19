@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(TRexServerProject)
+project(T-Rex)
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -42,7 +42,7 @@ set_target_properties(JustRunTRexServer PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(ConfigureDebugTRex PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(ConfigureProdTRex PROPERTIES LINKER_LANGUAGE CXX)
 
-add_executable(TRexServerProject
+add_executable(T-Rex
         TRex2-lib/config.h
         TRex2-lib/src/Packets/JoinPkt.h
         TRex2-lib/src/Packets/PubPkt.h
@@ -110,7 +110,7 @@ add_executable(TRexServerProject
         TRex-Server/src/Test/TestRule.hpp
         TRex-Server/src/connection.hpp)
 
-set_target_properties(TRexServerProject PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(T-Rex PROPERTIES LINKER_LANGUAGE CXX)
 
 set(SOURCE_FILES
         ./TRex2-lib/src/Common/trace-framework.cpp
