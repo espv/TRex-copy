@@ -120,99 +120,99 @@ std::time_t now = std::time(0);
 boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
 void HandlePubPacket(const boost::system::error_code&)
 {
-    //auto start = std::chrono::system_clock::now().time_since_epoch().count();
-    //std::cout << "start of HandlePubPkt" << std::endl;
-    if (packetQueue.size() < PACKET_CAPACITY) {
-        if (++number_placed_packets % 10000 == 0)
-            std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
-        packetQueue.push_back(new PubPkt(*allPackets.at(gen()%allPackets.size())));
-        //memcpy(&packetQueue[cur_pkt_index], pkt, sizeof(PubPkt));
-    } else {
-        ++number_dropped_packets;
-        if (number_dropped_packets % 10000 == 0)
-            std::cout << "Dropped " << number_dropped_packets << " packets" << std::endl;
-    }
-    //std::cout << "HandlePubPacket is done" << std::endl;
+  //auto start = std::chrono::system_clock::now().time_since_epoch().count();
+  //std::cout << "start of HandlePubPkt" << std::endl;
+  if (packetQueue.size() < PACKET_CAPACITY) {
+    if (++number_placed_packets % 10000 == 0)
+      std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
+    packetQueue.push_back(new PubPkt(*allPackets.at(gen()%allPackets.size())));
+    //memcpy(&packetQueue[cur_pkt_index], pkt, sizeof(PubPkt));
+  } else {
+    ++number_dropped_packets;
+    if (number_dropped_packets % 10000 == 0)
+      std::cout << "Dropped " << number_dropped_packets << " packets" << std::endl;
+  }
+  //std::cout << "HandlePubPacket is done" << std::endl;
 
-    t.expires_at(t.expires_at() + interval);
-    //auto stop = std::chrono::system_clock::now().time_since_epoch().count();
-    //std::cout << stop-start << " ns" << std::endl;
-    t.async_wait(&HandlePubPacket);
+  t.expires_at(t.expires_at() + interval);
+  //auto stop = std::chrono::system_clock::now().time_since_epoch().count();
+  //std::cout << stop-start << " ns" << std::endl;
+  t.async_wait(&HandlePubPacket);
 
-    /*
-    traceEvent(1, 0, true);
-    if (++cnt % 2000 == 0) {
-        auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-        std::cout << cnt << " - " << current_time-prev_time << std::endl;
-        prev_time = current_time;
-    }
+  /*
+  traceEvent(1, 0, true);
+  if (++cnt % 2000 == 0) {
+      auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
+      std::cout << cnt << " - " << current_time-prev_time << std::endl;
+      prev_time = current_time;
+  }
 
-    this_engine->processPubPkt(pkt);
-    traceEvent(100, 0, true);*/
+  this_engine->processPubPkt(pkt);
+  traceEvent(100, 0, true);*/
 }
 
 void PublishPackets()
 {
-    while (true) {
-        if (packetQueue.size() > 0) {
-            //std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
-            PubPkt *pkt = packetQueue.front();
-            traceEvent(1, 0, true);
-            if (++cnt % 2000 == 0) {
-                auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-                std::cout << cnt << " - " << current_time - prev_time << std::endl;
-                prev_time = current_time;
-            }
+  while (true) {
+    if (packetQueue.size() > 0) {
+      //std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
+      PubPkt *pkt = packetQueue.front();
+      traceEvent(1, 0, true);
+      if (++cnt % 2000 == 0) {
+        auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
+        std::cout << cnt << " - " << current_time - prev_time << std::endl;
+        prev_time = current_time;
+      }
 
-            this_engine->processPubPkt(pkt);
-            traceEvent(100, false);
-            //std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
-            packetQueue.erase(packetQueue.begin());
-            //std::cout << "Finished processing packet" << std::endl;
-        }
+      this_engine->processPubPkt(pkt);
+      traceEvent(100, false);
+      //std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
+      packetQueue.erase(packetQueue.begin());
+      //std::cout << "Finished processing packet" << std::endl;
     }
+  }
 }
 
 void
 TRexEngine::StartTest(std::vector<PubPkt*> pubPackets) {
-    allPackets = pubPackets;
-    boost::thread th{PublishPackets};
-    t.async_wait(&HandlePubPacket);
-    io.run();
+  allPackets = pubPackets;
+  boost::thread th{PublishPackets};
+  t.async_wait(&HandlePubPacket);
+  io.run();
 }
 
 TRexEngine::TRexEngine(int parNumProc) {
-    numProc = parNumProc;
-    threads = new pthread_t[numProc];
-    stacksRules = new StacksRules;
-    shared = new Shared[numProc];
-    recursionNeeded = false;
+  numProc = parNumProc;
+  threads = new pthread_t[numProc];
+  stacksRules = new StacksRules;
+  shared = new Shared[numProc];
+  recursionNeeded = false;
 }
 
 TRexEngine::~TRexEngine() {
-    for (int i = 0; i < numProc; i++) {
-        shared[i].finish = true;
-        pthread_mutex_lock(shared[i].processMutex);
-        pthread_cond_signal(shared[i].processCond);
-        pthread_mutex_unlock(shared[i].processMutex);
-        pthread_join(threads[i], NULL);
-        pthread_mutex_destroy(shared[i].processMutex);
-        pthread_cond_destroy(shared[i].processCond);
-        delete shared[i].processMutex;
-        delete shared[i].processCond;
-    }
-    pthread_mutex_destroy(shared[0].resultMutex);
-    pthread_cond_destroy(shared[0].resultCond);
-    delete shared[0].resultMutex;
-    delete shared[0].resultCond;
-    delete shared[0].stillProcessing;
-    delete[] shared;
-    delete[] threads;
-    for (auto it : *stacksRules) {
-        StacksRule* stackRule = it.second;
-        delete stackRule;
-    }
-    delete stacksRules;
+  for (int i = 0; i < numProc; i++) {
+    shared[i].finish = true;
+    pthread_mutex_lock(shared[i].processMutex);
+    pthread_cond_signal(shared[i].processCond);
+    pthread_mutex_unlock(shared[i].processMutex);
+    pthread_join(threads[i], NULL);
+    pthread_mutex_destroy(shared[i].processMutex);
+    pthread_cond_destroy(shared[i].processCond);
+    delete shared[i].processMutex;
+    delete shared[i].processCond;
+  }
+  pthread_mutex_destroy(shared[0].resultMutex);
+  pthread_cond_destroy(shared[0].resultCond);
+  delete shared[0].resultMutex;
+  delete shared[0].resultCond;
+  delete shared[0].stillProcessing;
+  delete[] shared;
+  delete[] threads;
+  for (auto it : *stacksRules) {
+    StacksRule* stackRule = it.second;
+    delete stackRule;
+  }
+  delete stacksRules;
 }
 
 void TRexEngine::finalize() {
@@ -240,38 +240,6 @@ void TRexEngine::finalize() {
     pthread_create(&threads[i], NULL, processor, (void *) &shared[i]);
   }
   usleep(1000);
-
-    /*for (int i = 0; i < 100; i++) {
-        auto attributes = new Attribute[2];
-        //strncpy(attributes[0].name, "value", sizeof(attributes[0].name) - 1);
-
-        attributes[0].name[0] = 'v';
-        attributes[0].name[1] = 'a';
-        attributes[0].name[2] = 'l';
-        attributes[0].name[3] = 'u';
-        attributes[0].name[4] = 'e';
-        attributes[0].name[5] = '\0';
-        attributes[0].intVal = 98;
-
-        //strlcpy(attributes[1].name, "area", sizeof(attributes[1].name) - 1);
-        //strlcpy(attributes[1].stringVal, "office", sizeof(attributes[1].stringVal) - 1);
-
-        attributes[1].name[0] = 'a';
-        attributes[1].name[1] = 'r';
-        attributes[1].name[2] = 'e';
-        attributes[1].name[3] = 'a';
-        attributes[1].name[4] = '\0';
-        attributes[1].stringVal[0] = 'o';
-        attributes[1].stringVal[1] = 'f';
-        attributes[1].stringVal[2] = 'f';
-        attributes[1].stringVal[3] = 'i';
-        attributes[1].stringVal[4] = 'c';
-        attributes[1].stringVal[5] = 'e';
-        attributes[1].stringVal[6] = '\0';
-        PubPkt *pkt = new PubPkt(i % 20 + 2, attributes, 2);
-        allPackets.push_back(pkt);
-    }*/
-
     this_engine = this;
 }
 
