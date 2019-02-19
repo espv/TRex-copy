@@ -155,14 +155,14 @@ void RequestHandler::PktHandleVisitor::operator()(RulePkt * pkt) const{
 #endif
 }
 
-long long cnt = 0;
-auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
+long long pktsProcessed = 0;
+auto prev_time_processed = std::chrono::system_clock::now().time_since_epoch().count();
 void RequestHandler::PktHandleVisitor::operator()(PubPkt * pkt) const{
     traceEvent(1, 0, true);
-    if (++cnt % 2000 == 0) {
+    if (++pktsProcessed % 2000 == 0) {
         auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-        std::cout << cnt << " - " << current_time-prev_time << std::endl;
-        prev_time = current_time;
+        std::cout << pktsProcessed << " - " << current_time-prev_time_processed << std::endl;
+      prev_time_processed = current_time;
     }
     //LOG(info) << "Publication from " << parent.connection.remoteToString() << ":" << endl
     //          << "  " << toString(pkt);

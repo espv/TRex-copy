@@ -23,14 +23,6 @@
 #include <sys/time.h>
 #include <sys/syscall.h>
 #include <chrono>
-#include <stdlib.h>
-#include <iostream>
-#include <boost/asio.hpp>
-#include <boost/date_time/posix_time/posix_time.hpp>
-#include "boost/random.hpp"
-#include "boost/generator_iterator.hpp"
-#include <boost/thread.hpp>
-#include <cstring>
 
 using namespace std;
 
@@ -102,85 +94,6 @@ void* processor(void* parShared) {
   pthread_exit(NULL);
 }
 
-#define PACKET_CAPACITY 10
-int cur_pkt_index = 0;
-int number_dropped_packets = 0;
-int number_placed_packets = 0;
-std::vector<PubPkt*> packetQueue;
-
-long long cnt = 0;
-std::vector<PubPkt*> allPackets;
-auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
-TRexEngine *this_engine;
-boost::posix_time::microsec interval(10000);
-boost::asio::io_service io;
-boost::asio::deadline_timer t(io, interval);
-
-std::time_t now = std::time(0);
-boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
-void HandlePubPacket(const boost::system::error_code&)
-{
-  //auto start = std::chrono::system_clock::now().time_since_epoch().count();
-  //std::cout << "start of HandlePubPkt" << std::endl;
-  if (packetQueue.size() < PACKET_CAPACITY) {
-    if (++number_placed_packets % 10000 == 0)
-      std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
-    packetQueue.push_back(new PubPkt(*allPackets.at(gen()%allPackets.size())));
-    //memcpy(&packetQueue[cur_pkt_index], pkt, sizeof(PubPkt));
-  } else {
-    ++number_dropped_packets;
-    if (number_dropped_packets % 10000 == 0)
-      std::cout << "Dropped " << number_dropped_packets << " packets" << std::endl;
-  }
-  //std::cout << "HandlePubPacket is done" << std::endl;
-
-  t.expires_at(t.expires_at() + interval);
-  //auto stop = std::chrono::system_clock::now().time_since_epoch().count();
-  //std::cout << stop-start << " ns" << std::endl;
-  t.async_wait(&HandlePubPacket);
-
-  /*
-  traceEvent(1, 0, true);
-  if (++cnt % 2000 == 0) {
-      auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-      std::cout << cnt << " - " << current_time-prev_time << std::endl;
-      prev_time = current_time;
-  }
-
-  this_engine->processPubPkt(pkt);
-  traceEvent(100, 0, true);*/
-}
-
-void PublishPackets()
-{
-  while (true) {
-    if (packetQueue.size() > 0) {
-      //std::cout << "Handling a published packet with size " << packetQueue.size() << std::endl;
-      PubPkt *pkt = packetQueue.front();
-      traceEvent(1, 0, true);
-      if (++cnt % 2000 == 0) {
-        auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-        std::cout << cnt << " - " << current_time - prev_time << std::endl;
-        prev_time = current_time;
-      }
-
-      this_engine->processPubPkt(pkt);
-      traceEvent(100, false);
-      //std::cout << "Freeing up packet in queue with size " << packetQueue.size() << std::endl;
-      packetQueue.erase(packetQueue.begin());
-      //std::cout << "Finished processing packet" << std::endl;
-    }
-  }
-}
-
-void
-TRexEngine::StartTest(std::vector<PubPkt*> pubPackets) {
-  allPackets = pubPackets;
-  boost::thread th{PublishPackets};
-  t.async_wait(&HandlePubPacket);
-  io.run();
-}
-
 TRexEngine::TRexEngine(int parNumProc) {
   numProc = parNumProc;
   threads = new pthread_t[numProc];
@@ -240,7 +153,6 @@ void TRexEngine::finalize() {
     pthread_create(&threads[i], NULL, processor, (void *) &shared[i]);
   }
   usleep(1000);
-    this_engine = this;
 }
 
 
