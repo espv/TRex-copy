@@ -112,7 +112,7 @@ long long cnt = 0;
 std::vector<PubPkt*> allPackets;
 auto prev_time = std::chrono::system_clock::now().time_since_epoch().count();
 TRexEngine *this_engine;
-boost::posix_time::microsec interval(100);
+boost::posix_time::microsec interval(10000);
 boost::asio::io_service io;
 boost::asio::deadline_timer t(io, interval);
 
