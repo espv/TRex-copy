@@ -112,12 +112,13 @@ void HandlePubPacketMainCpp(const boost::system::error_code&)
 
 
 void testEngine(){
-    TRexEngine *this_engine = new TRexEngine(number_threads);
+	TRexEngine *this_engine = new TRexEngine(number_threads);
 	this_engine->finalize();
-	RuleR0 testRule;
+	RuleR1 testRule;
 
-    for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 1000; i++) {
 		this_engine->processRulePkt(testRule.buildRule());
+	}
 
 	ResultListener* listener= new TestResultListener(testRule.buildSubscription());
 	this_engine->addResultListener(listener);
@@ -137,16 +138,16 @@ extern bool doTrace;
 int main(int argc, char* argv[]){
 	bool test = false;
 	for (int i = 1; i < argc; i++) {
-	    if (!strcmp(argv[i], "-trace"))
-	        doTrace = true;
-	    else if (!strcmp(argv[i], "-number-threads")) {
-	        ++i;
-            number_threads = std::atoi(argv[i]);
-        } else if (!strcmp(argv[i], "-test"))
-	    	test = true;
+		if (!strcmp(argv[i], "-trace"))
+			doTrace = true;
+		else if (!strcmp(argv[i], "-number-threads")) {
+			++i;
+				number_threads = std::atoi(argv[i]);
+			} else if (!strcmp(argv[i], "-test"))
+		test = true;
 	}
 
-    boost::log::core::get()->set_logging_enabled(false);
+	boost::log::core::get()->set_logging_enabled(false);
 	struct sigaction sigIntHandler;
 
 	sigIntHandler.sa_handler = my_handler;
