@@ -190,7 +190,10 @@ public class CommandLineClient implements PacketListener {
 					client.tManager.start();
 					client.subscribe(subTypes);
 				}
-				if (sendRule) client.sendRule();
+                if (sendRule) {
+                    File file = new File(teslaRule);
+                    fetchFiles(file, c -> c.sendRule(), client);
+                }
 				if(pubType!=-1) client.publish(pubType, keys, values);
 			}
 		} catch(IOException e) { e.printStackTrace(); }
