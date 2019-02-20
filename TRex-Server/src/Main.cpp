@@ -122,8 +122,8 @@ void testEngine(){
 	this_engine->finalize();
 	RuleR1 testRule;
 
-	for (int i = 0; i < 2; i+=2) {
-	    for (int j = 0; j < 1; j++) {
+	for (int i = 0; i < 20; i+=2) {
+	    for (int j = 0; j < 100; j++) {
             this_engine->processRulePkt(testRule.buildRule(i, i + 1, 1001, j%10));
             auto testPackets = testRule.buildPublication(i, i + 1, j%10);
             allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
