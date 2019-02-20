@@ -22,7 +22,7 @@
 
 using namespace concept::test;
 
-RulePkt* RuleR1::buildRule(){
+RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int temperature){
 	RulePkt* rule= new RulePkt(false);
 
 	// predicate 0 is the root predicate
@@ -42,18 +42,18 @@ RulePkt* RuleR1::buildRule(){
 	Constraint tempConstr[1];
 	strcpy(tempConstr[0].name, RuleR0::ATTR_TEMPVALUE);
 	tempConstr[0].type= INT;
-	tempConstr[0].op= GT;
-	tempConstr[0].intVal= 45;
+	tempConstr[0].op= EQ;
+	tempConstr[0].intVal= temperature;
 
     Constraint humidityConstr[1];
     strcpy(humidityConstr[0].name, "percentage");
     humidityConstr[0].type= INT;
     humidityConstr[0].op = LT;
     humidityConstr[0].intVal = 25;
-    //rule->addRootPredicate(EVENT_SMOKE, humidityConstr, 1);
-    rule->addRootPredicate(EVENT_TEMP, tempConstr, 1);//, indexSecondPredicate, fiveMin, LAST_WITHIN);
-    rule->addPredicate(EVENT_SMOKE, humidityConstr, 1, indexSecondPredicate, fiveMin, LAST_WITHIN);
-    //rule->addPredicate(EVENT_TEMP, tempConstr, 0, indexSecondPredicate, fiveMin, LAST_WITHIN);
+    //rule->addRootPredicate(event_humidity, humidityConstr, 1);
+    rule->addRootPredicate(event_temp, tempConstr, 1);//, indexSecondPredicate, fiveMin, LAST_WITHIN);
+    rule->addPredicate(event_humidity, humidityConstr, 1, indexSecondPredicate, fiveMin, LAST_WITHIN);
+    //rule->addPredicate(event_temp, tempConstr, 0, indexSecondPredicate, fiveMin, LAST_WITHIN);
 
 	// Fire template
 	CompositeEventTemplate* fireTemplate= new CompositeEventTemplate(EVENT_FIRE);
@@ -99,12 +99,12 @@ vector<PubPkt*> RuleR1::buildPublication(){
     // Value attribute
     strcpy(tempAttr[0].name, RuleR0::ATTR_TEMPVALUE);
     tempAttr[0].type= INT;
-    tempAttr[0].intVal= 50;
+    tempAttr[0].intVal= 2;
     // Area attribute
     strcpy(tempAttr[1].name, RuleR0::ATTR_AREA);
     tempAttr[1].type= STRING;
     strcpy(tempAttr[1].stringVal, RuleR0::AREA_OFFICE);
-    PubPkt* tempPubPkt= new PubPkt(EVENT_TEMP, tempAttr, 2);
+    PubPkt* tempPubPkt= new PubPkt(4, tempAttr, 2);
 
     // Smoke event
     // Area attribute
@@ -116,10 +116,10 @@ vector<PubPkt*> RuleR1::buildPublication(){
     strcpy(humidityAttr[1].name, RuleR0::ATTR_AREA);
     humidityAttr[1].type= STRING;
     strcpy(humidityAttr[1].stringVal, RuleR0::AREA_OFFICE);
-    PubPkt* smokePubPkt= new PubPkt(EVENT_SMOKE, humidityAttr, 2);
+    PubPkt* humidityPubPkt= new PubPkt(5, humidityAttr, 2);
 
     vector<PubPkt*> pubPkts;
     pubPkts.push_back(tempPubPkt);
-    pubPkts.push_back(smokePubPkt);
+    pubPkts.push_back(humidityPubPkt);
     return pubPkts;
 }

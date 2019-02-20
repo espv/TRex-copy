@@ -42,7 +42,7 @@ public:
 	/**
 	 * Generates the rule
 	 */
-	virtual RulePkt* buildRule() =0;
+	//virtual RulePkt* buildRule() =0;
 
 	/**
 	 * Generates a possible subscription to this rule

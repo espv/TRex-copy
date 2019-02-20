@@ -104,7 +104,7 @@ void PublishPackets()
 			if (++pktsPublished % 2000 == 0) {
 				auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
 				std::cout << pktsPublished << " - " << current_time - prev_time_published << std::endl;
-        prev_time_published = current_time;
+                prev_time_published = current_time;
 			}
 
 			this_engine->processPubPkt(pkt);
@@ -118,10 +118,12 @@ void PublishPackets()
 void testEngine(){
 	this_engine = new TRexEngine(number_threads);
 	this_engine->finalize();
-	RuleR0 testRule;
+	RuleR1 testRule;
 
-	for (int i = 0; i < 1000; i++) {
-		this_engine->processRulePkt(testRule.buildRule());
+	for (int i = 0; i < 20; i+=2) {
+	    for (int j = 0; j < 100; j++) {
+            this_engine->processRulePkt(testRule.buildRule(i, i + 1, j%10));
+        }
 	}
 
 	ResultListener* listener= new TestResultListener(testRule.buildSubscription());
