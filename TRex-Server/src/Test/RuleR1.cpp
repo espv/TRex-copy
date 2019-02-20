@@ -18,26 +18,24 @@
 
 #include "RuleR1.hpp"
 #include "RuleR0.hpp"
+#include "../../../TRex2-lib/src/Common/Structures.h"
 
 using namespace concept::test;
 
 RulePkt* RuleR1::buildRule(){
 	RulePkt* rule= new RulePkt(false);
 
-	int indexPredSmoke= 0;
-	int indexPredTemp= 1;
+	// predicate 0 is the root predicate
+    int indexRootPredicate= 0;
+    //int indexPredTemp= 1;
+	int indexSecondPredicate= 1;
+	//int indexPredSmoke= 0;
 
 	TimeMs fiveMin(1000*60*5);
 
 	// Smoke root predicate
 	// Fake constraint as a temporary workaround to an engine's bug
 	// FIXME remove workaround when bug fixed
-	Constraint fakeConstr[1];
-	strcpy(fakeConstr[0].name, RuleR0::ATTR_AREA);
-	fakeConstr[0].type= STRING;
-	fakeConstr[0].op = IN;
-	strcpy(fakeConstr[0].stringVal, "");
-	rule->addRootPredicate(EVENT_SMOKE, fakeConstr, 1);
 
 	// Temp predicate
 	// Constraint: Temp.value > 45
@@ -46,18 +44,37 @@ RulePkt* RuleR1::buildRule(){
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
 	tempConstr[0].intVal= 45;
-	rule->addPredicate(EVENT_TEMP, tempConstr, 1, indexPredSmoke, fiveMin, EACH_WITHIN);
 
-	// Parameter: Smoke.area=Temp.area
-	rule->addParameterBetweenStates(indexPredSmoke, RuleR0::ATTR_AREA, indexPredTemp, RuleR0::ATTR_AREA);
+    Constraint humidityConstr[1];
+    strcpy(humidityConstr[0].name, "percentage");
+    humidityConstr[0].type= INT;
+    humidityConstr[0].op = LT;
+    humidityConstr[0].intVal = 25;
+    //rule->addRootPredicate(EVENT_SMOKE, humidityConstr, 1);
+    rule->addRootPredicate(EVENT_TEMP, tempConstr, 1);//, indexSecondPredicate, fiveMin, LAST_WITHIN);
+    rule->addPredicate(EVENT_SMOKE, humidityConstr, 1, indexSecondPredicate, fiveMin, LAST_WITHIN);
+    //rule->addPredicate(EVENT_TEMP, tempConstr, 0, indexSecondPredicate, fiveMin, LAST_WITHIN);
 
 	// Fire template
 	CompositeEventTemplate* fireTemplate= new CompositeEventTemplate(EVENT_FIRE);
 	// Area attribute in template
-	OpTree* areaOpTree= new OpTree(new RulePktValueReference(indexPredSmoke, RuleR0::ATTR_AREA, STATE), STRING);
+	OpTree* areaOpTree= new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
 	fireTemplate->addAttribute(RuleR0::ATTR_AREA, areaOpTree);
 	// MeasuredTemp attribute in template
-	OpTree* measuredTempOpTree= new OpTree(new RulePktValueReference(indexPredTemp, RuleR0::ATTR_TEMPVALUE, STATE), INT);
+	OpTree* measuredTempOpTree= new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_TEMPVALUE, STATE), INT);
+
+	ComplexParameter par;
+	par.operation = EQ;
+	par.type = STATE;
+	par.leftTree = new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
+	par.rightTree = new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
+	par.vtype = STRING;
+	rule->addComplexParameter(par.operation, par.vtype, par.leftTree,
+                              par.rightTree);
+
+    // Parameter: Smoke.area=Temp.area
+    //rule->addParameterBetweenStates(indexRootPredicate, RuleR0::ATTR_AREA, indexSecondPredicate, RuleR0::ATTR_AREA);
+
 	fireTemplate->addAttribute(RuleR0::ATTR_MEASUREDTEMP, measuredTempOpTree);
 
 	rule->setCompositeEventTemplate(fireTemplate);
@@ -91,11 +108,15 @@ vector<PubPkt*> RuleR1::buildPublication(){
 
     // Smoke event
     // Area attribute
-    Attribute smokeAttr[1];
-    strcpy(smokeAttr[0].name, RuleR0::ATTR_AREA);
-    smokeAttr[0].type= STRING;
-    strcpy(smokeAttr[0].stringVal, RuleR0::AREA_OFFICE);
-    PubPkt* smokePubPkt= new PubPkt(EVENT_SMOKE, smokeAttr, 1);
+    Attribute humidityAttr[2];
+    strcpy(humidityAttr[0].name, "percentage");
+    humidityAttr[0].type= INT;
+    humidityAttr[0].intVal= 22;
+
+    strcpy(humidityAttr[1].name, RuleR0::ATTR_AREA);
+    humidityAttr[1].type= STRING;
+    strcpy(humidityAttr[1].stringVal, RuleR0::AREA_OFFICE);
+    PubPkt* smokePubPkt= new PubPkt(EVENT_SMOKE, humidityAttr, 2);
 
     vector<PubPkt*> pubPkts;
     pubPkts.push_back(tempPubPkt);
