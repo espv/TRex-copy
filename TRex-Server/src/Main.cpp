@@ -36,6 +36,7 @@
 #include "Test/RuleR0.hpp"
 #include <boost/thread.hpp>
 #include <cstring>
+#include <ctime>
 
 using concept::server::SOEPServer;
 using namespace concept::test;
@@ -107,6 +108,7 @@ void PublishPackets()
                 prev_time_published = current_time;
 			}
 
+			pkt->timeStamp = clock();
 			this_engine->processPubPkt(pkt);
 			traceEvent(100, false);
 			packetQueue.erase(packetQueue.begin());
@@ -120,16 +122,16 @@ void testEngine(){
 	this_engine->finalize();
 	RuleR1 testRule;
 
-	for (int i = 0; i < 20; i+=2) {
-	    for (int j = 0; j < 100; j++) {
-            this_engine->processRulePkt(testRule.buildRule(i, i + 1, j%10));
+	for (int i = 0; i < 2; i+=2) {
+	    for (int j = 0; j < 1; j++) {
+            this_engine->processRulePkt(testRule.buildRule(i, i + 1, 1001, j%10));
+            auto testPackets = testRule.buildPublication(i, i + 1, j%10);
+            allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
         }
 	}
+    ResultListener* listener= new TestResultListener(testRule.buildSubscription(1001));
+    this_engine->addResultListener(listener);
 
-	ResultListener* listener= new TestResultListener(testRule.buildSubscription());
-	this_engine->addResultListener(listener);
-
-	allPackets = testRule.buildPublication();
 	boost::thread th{PublishPackets};
 	t.async_wait(&HandlePubPacket);
 	io.run();

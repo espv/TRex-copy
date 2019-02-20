@@ -18,11 +18,12 @@
 
 #include "RuleR1.hpp"
 #include "RuleR0.hpp"
-#include "../../../TRex2-lib/src/Common/Structures.h"
+#include "../../../TRex2-lib/src/Packets/RulePkt.h"
+#include "../../../../../../../../../../usr/include/c++/5/cstring"
 
 using namespace concept::test;
 
-RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int temperature){
+RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int event_fire, int temperature) {
 	RulePkt* rule= new RulePkt(false);
 
 	// predicate 0 is the root predicate
@@ -51,26 +52,26 @@ RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int temperature){
     humidityConstr[0].op = LT;
     humidityConstr[0].intVal = 25;
     //rule->addRootPredicate(event_humidity, humidityConstr, 1);
-    rule->addRootPredicate(event_temp, tempConstr, 1);//, indexSecondPredicate, fiveMin, LAST_WITHIN);
-    rule->addPredicate(event_humidity, humidityConstr, 1, indexSecondPredicate, fiveMin, LAST_WITHIN);
-    //rule->addPredicate(event_temp, tempConstr, 0, indexSecondPredicate, fiveMin, LAST_WITHIN);
+    rule->addRootPredicate(event_temp, tempConstr, 0);//, indexSecondPredicate, fiveMin, LAST_WITHIN);
+    rule->addPredicate(event_humidity, humidityConstr, 0, indexRootPredicate, fiveMin, LAST_WITHIN);
+    //rule->addPredicate(event_temp, tempConstr, 0, indexRootPredicate, fiveMin, LAST_WITHIN);
 
 	// Fire template
-	CompositeEventTemplate* fireTemplate= new CompositeEventTemplate(EVENT_FIRE);
+	CompositeEventTemplate* fireTemplate= new CompositeEventTemplate(event_fire);
 	// Area attribute in template
 	OpTree* areaOpTree= new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
 	fireTemplate->addAttribute(RuleR0::ATTR_AREA, areaOpTree);
 	// MeasuredTemp attribute in template
 	OpTree* measuredTempOpTree= new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_TEMPVALUE, STATE), INT);
 
-	ComplexParameter par;
+	/*ComplexParameter par;
 	par.operation = EQ;
 	par.type = STATE;
 	par.leftTree = new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
-	par.rightTree = new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
+	par.rightTree = new OpTree(new RulePktValueReference(indexSecondPredicate, RuleR0::ATTR_AREA, STATE), STRING);
 	par.vtype = STRING;
 	rule->addComplexParameter(par.operation, par.vtype, par.leftTree,
-                              par.rightTree);
+                              par.rightTree);*/
 
     // Parameter: Smoke.area=Temp.area
     //rule->addParameterBetweenStates(indexRootPredicate, RuleR0::ATTR_AREA, indexSecondPredicate, RuleR0::ATTR_AREA);
@@ -82,7 +83,7 @@ RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int temperature){
 	return rule;
 }
 
-SubPkt* RuleR1::buildSubscription() {
+SubPkt* RuleR1::buildSubscription(int event_fire) {
 	Constraint constr[1];
 	// Area constraint
 	strcpy(constr[0].name, RuleR0::ATTR_AREA);
@@ -90,21 +91,21 @@ SubPkt* RuleR1::buildSubscription() {
 	constr[0].op= EQ;
 	strcpy(constr[0].stringVal, RuleR0::AREA_OFFICE);
 
-	return new SubPkt(EVENT_FIRE, constr, 1);
+	return new SubPkt(event_fire, constr, 1);
 }
 
-vector<PubPkt*> RuleR1::buildPublication(){
+vector<PubPkt*> RuleR1::buildPublication(int event_temp, int event_humidity, int temperature) {
     // Temp event
     Attribute tempAttr[2];
     // Value attribute
     strcpy(tempAttr[0].name, RuleR0::ATTR_TEMPVALUE);
     tempAttr[0].type= INT;
-    tempAttr[0].intVal= 2;
+    tempAttr[0].intVal= temperature;
     // Area attribute
     strcpy(tempAttr[1].name, RuleR0::ATTR_AREA);
     tempAttr[1].type= STRING;
     strcpy(tempAttr[1].stringVal, RuleR0::AREA_OFFICE);
-    PubPkt* tempPubPkt= new PubPkt(4, tempAttr, 2);
+    PubPkt* tempPubPkt= new PubPkt(event_temp, tempAttr, 0);
 
     // Smoke event
     // Area attribute
@@ -116,7 +117,7 @@ vector<PubPkt*> RuleR1::buildPublication(){
     strcpy(humidityAttr[1].name, RuleR0::ATTR_AREA);
     humidityAttr[1].type= STRING;
     strcpy(humidityAttr[1].stringVal, RuleR0::AREA_OFFICE);
-    PubPkt* humidityPubPkt= new PubPkt(5, humidityAttr, 2);
+    PubPkt* humidityPubPkt= new PubPkt(event_humidity, humidityAttr, 0);
 
     vector<PubPkt*> pubPkts;
     pubPkts.push_back(tempPubPkt);

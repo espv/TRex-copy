@@ -47,7 +47,7 @@ public:
 	/**
 	 * Generates a possible subscription to this rule
 	 */
-	virtual SubPkt* buildSubscription() =0;
+	//virtual SubPkt* buildSubscription() =0;
 
 	/**
 	 * Generates a possible sequence of "simple" events to be published in T-Rex,
@@ -56,7 +56,7 @@ public:
 	 * The PubPkt(s) should be published in T-Rex in the order in which they are contained
 	 * in the vector.
 	 */
-	virtual vector<PubPkt*> buildPublication() =0;
+	//virtual vector<PubPkt*> buildPublication() =0;
 
 protected:
 	Constraint NO_CONSTRAINTS[0];

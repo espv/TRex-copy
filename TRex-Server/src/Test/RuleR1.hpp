@@ -35,9 +35,9 @@ namespace test{
  */
 class RuleR1: public TestRule{
 public:
-	RulePkt* buildRule(int event_temp, int event_humidity, int temperature);
-	SubPkt* buildSubscription();
-	vector<PubPkt*> buildPublication();
+	RulePkt* buildRule(int event_temp, int event_humidity, int event_fire, int temperature);
+	SubPkt* buildSubscription(int event_fire);
+	vector<PubPkt*> buildPublication(int event_temp, int event_humidity, int temperature);
 };
 
 } // test
