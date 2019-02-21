@@ -17,6 +17,9 @@
  */
 
 #include "RuleR0.hpp"
+#include "../../../TRex2-lib/src/Packets/RulePkt.h"
+#include "../../../TRex2-lib/src/Packets/PubPkt.h"
+#include "../../../TRex2-lib/src/Packets/SubPkt.h"
 
 using namespace concept::test;
 
@@ -67,7 +70,7 @@ SubPkt* RuleR0::buildSubscription() {
 	return new SubPkt(EVENT_FIRE, constr, 1);
 }
 
-vector<PubPkt*> RuleR0::buildPublication(){
+std::vector<PubPkt*> RuleR0::buildPublication(){
 	Attribute attr[2];
 	// Value attribute
 	strcpy(attr[0].name, ATTR_TEMPVALUE);
@@ -77,9 +80,9 @@ vector<PubPkt*> RuleR0::buildPublication(){
 	strcpy(attr[1].name, ATTR_AREA);
 	attr[1].type= STRING;
 	strcpy(attr[1].stringVal, AREA_OFFICE);
-	PubPkt* pubPkt= new PubPkt(EVENT_TEMP, attr, 2);
+	auto pubPkt= new PubPkt(EVENT_TEMP, attr, 2);
 
-	vector<PubPkt*> pubPkts;
+	std::vector<PubPkt*> pubPkts;
 	pubPkts.push_back(pubPkt);
 	return pubPkts;
 }

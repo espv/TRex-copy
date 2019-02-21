@@ -19,6 +19,8 @@
 #include "RuleR1.hpp"
 #include "RuleR0.hpp"
 #include "../../../TRex2-lib/src/Packets/RulePkt.h"
+#include "../../../TRex2-lib/src/Packets/PubPkt.h"
+#include "../../../TRex2-lib/src/Packets/SubPkt.h"
 
 using namespace concept::test;
 
@@ -92,7 +94,7 @@ SubPkt* RuleR1::buildSubscription(int event_fire) {
 	return new SubPkt(event_fire, constr, 1);
 }
 
-vector<PubPkt*> RuleR1::buildPublication(int event_temp, int event_humidity, int temperature) {
+std::vector<PubPkt*> RuleR1::buildPublication(int event_temp, int event_humidity, int temperature) {
     // Temp event
     Attribute tempAttr[2];
     // Value attribute
@@ -103,7 +105,7 @@ vector<PubPkt*> RuleR1::buildPublication(int event_temp, int event_humidity, int
     strcpy(tempAttr[1].name, RuleR0::ATTR_AREA);
     tempAttr[1].type= STRING;
     strcpy(tempAttr[1].stringVal, RuleR0::AREA_OFFICE);
-    PubPkt* tempPubPkt= new PubPkt(event_temp, tempAttr, 2);
+    auto tempPubPkt= new PubPkt(event_temp, tempAttr, 2);
 
     // Smoke event
     // Area attribute
@@ -115,9 +117,9 @@ vector<PubPkt*> RuleR1::buildPublication(int event_temp, int event_humidity, int
     strcpy(humidityAttr[1].name, RuleR0::ATTR_AREA);
     humidityAttr[1].type= STRING;
     strcpy(humidityAttr[1].stringVal, RuleR0::AREA_OFFICE);
-    PubPkt* humidityPubPkt= new PubPkt(event_humidity, humidityAttr, 2);
+    auto humidityPubPkt= new PubPkt(event_humidity, humidityAttr, 2);
 
-    vector<PubPkt*> pubPkts;
+    std::vector<PubPkt*> pubPkts;
     pubPkts.push_back(tempPubPkt);
     pubPkts.push_back(humidityPubPkt);
     return pubPkts;
