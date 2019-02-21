@@ -105,7 +105,7 @@ void PublishPackets()
 			if (++pktsPublished % 2000 == 0) {
 				auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
 				std::cout << pktsPublished << " - " << current_time - prev_time_published << std::endl;
-                prev_time_published = current_time;
+        prev_time_published = current_time;
 			}
 
 			pkt->timeStamp = clock();

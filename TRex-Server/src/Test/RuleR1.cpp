@@ -19,24 +19,17 @@
 #include "RuleR1.hpp"
 #include "RuleR0.hpp"
 #include "../../../TRex2-lib/src/Packets/RulePkt.h"
-#include "../../../../../../../../../../usr/include/c++/5/cstring"
 
 using namespace concept::test;
 
 RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int event_fire, int temperature) {
-	RulePkt* rule= new RulePkt(false);
+	auto rule= new RulePkt(false);
 
 	// predicate 0 is the root predicate
-    int indexRootPredicate= 0;
-    //int indexPredTemp= 1;
+  int indexRootPredicate= 0;
 	int indexSecondPredicate= 1;
-	//int indexPredSmoke= 0;
 
 	TimeMs fiveMin(1000*60*5);
-
-	// Smoke root predicate
-	// Fake constraint as a temporary workaround to an engine's bug
-	// FIXME remove workaround when bug fixed
 
 	// Temp predicate
 	// Constraint: Temp.value > 45
@@ -46,37 +39,40 @@ RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int event_fire, i
 	tempConstr[0].op= EQ;
 	tempConstr[0].intVal= temperature;
 
-    Constraint humidityConstr[1];
-    strcpy(humidityConstr[0].name, "percentage");
-    humidityConstr[0].type= INT;
-    humidityConstr[0].op = LT;
-    humidityConstr[0].intVal = 25;
-    //rule->addRootPredicate(event_humidity, humidityConstr, 1);
-    rule->addRootPredicate(event_temp, tempConstr, 1);//, indexSecondPredicate, fiveMin, LAST_WITHIN);
-    rule->addPredicate(event_humidity, humidityConstr, 1, indexRootPredicate, fiveMin, LAST_WITHIN);
-    rule->addConsuming(event_humidity);
-    rule->addConsuming(event_temp);
-    //rule->addPredicate(event_temp, tempConstr, 0, indexRootPredicate, fiveMin, LAST_WITHIN);
+  // Humidity predicate
+	// Constraint: Humidity.percentage < 25
+  Constraint humidityConstr[1];
+  strcpy(humidityConstr[0].name, "percentage");
+  humidityConstr[0].type= INT;
+  humidityConstr[0].op = LT;
+  humidityConstr[0].intVal = 25;
+  //rule->addRootPredicate(event_humidity, humidityConstr, 1);
+  rule->addRootPredicate(event_temp, tempConstr, 1);
+  rule->addPredicate(event_humidity, humidityConstr, 1, indexRootPredicate, fiveMin, LAST_WITHIN);
+  rule->addConsuming(event_humidity);
+  rule->addConsuming(event_temp);
+  //rule->addPredicate(event_temp, tempConstr, 0, indexRootPredicate, fiveMin, LAST_WITHIN);
 
 	// Fire template
-	CompositeEventTemplate* fireTemplate= new CompositeEventTemplate(event_fire);
+  auto fireTemplate= new CompositeEventTemplate(event_fire);
 	// Area attribute in template
-	OpTree* areaOpTree= new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
+  auto areaOpTree= new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
 	fireTemplate->addAttribute(RuleR0::ATTR_AREA, areaOpTree);
 	// MeasuredTemp attribute in template
-	OpTree* measuredTempOpTree= new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_TEMPVALUE, STATE), INT);
+	auto measuredTempOpTree= new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_TEMPVALUE, STATE), INT);
 
-	/*ComplexParameter par;
+	// Humidity.area=Temp.area
+	ComplexParameter par;
 	par.operation = EQ;
 	par.type = STATE;
 	par.leftTree = new OpTree(new RulePktValueReference(indexRootPredicate, RuleR0::ATTR_AREA, STATE), STRING);
 	par.rightTree = new OpTree(new RulePktValueReference(indexSecondPredicate, RuleR0::ATTR_AREA, STATE), STRING);
 	par.vtype = STRING;
 	rule->addComplexParameter(par.operation, par.vtype, par.leftTree,
-                              par.rightTree);*/
+                              par.rightTree);
 
-    // Parameter: Smoke.area=Temp.area
-    //rule->addParameterBetweenStates(indexRootPredicate, RuleR0::ATTR_AREA, indexSecondPredicate, RuleR0::ATTR_AREA);
+  // Parameter: Smoke.area=Temp.area  // Espen: doesn't seem to work
+  //rule->addParameterBetweenStates(indexRootPredicate, RuleR0::ATTR_AREA, indexSecondPredicate, RuleR0::ATTR_AREA);
 
 	fireTemplate->addAttribute(RuleR0::ATTR_MEASUREDTEMP, measuredTempOpTree);
 

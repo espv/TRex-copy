@@ -29,7 +29,7 @@ char RuleR0::AREA_OFFICE[]= "office";
 char RuleR0::AREA_TOILET[]= "toilet";
 
 RulePkt* RuleR0::buildRule(){
-	RulePkt* rule= new RulePkt(false);
+  auto rule= new RulePkt(false);
 
 	int indexPredTemp= 0;
 
@@ -42,13 +42,13 @@ RulePkt* RuleR0::buildRule(){
 	rule->addRootPredicate(EVENT_TEMP, tempConstr, 1);
 
 	// Fire template
-	CompositeEventTemplate* fireTemplate= new CompositeEventTemplate(EVENT_FIRE);
+	auto fireTemplate= new CompositeEventTemplate(EVENT_FIRE);
 
 	// Area attribute in template
-	OpTree* areaOpTree= new OpTree(new RulePktValueReference(indexPredTemp, ATTR_AREA, STATE), STRING);
+  auto areaOpTree= new OpTree(new RulePktValueReference(indexPredTemp, ATTR_AREA, STATE), STRING);
 	fireTemplate->addAttribute(ATTR_AREA, areaOpTree);
 	// MeasuredTemp attribute in template
-	OpTree* measuredTempOpTree= new OpTree(new RulePktValueReference(indexPredTemp, ATTR_TEMPVALUE, STATE), INT);
+  auto measuredTempOpTree= new OpTree(new RulePktValueReference(indexPredTemp, ATTR_TEMPVALUE, STATE), INT);
 	fireTemplate->addAttribute(ATTR_MEASUREDTEMP, measuredTempOpTree);
 
 	rule->setCompositeEventTemplate(fireTemplate);
