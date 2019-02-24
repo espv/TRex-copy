@@ -32,7 +32,7 @@ long long first_time = 0;
 
 int tracedEvents = 0;
 
-#define MAX_NUMBER_EVENTS 100000
+#define MAX_NUMBER_EVENTS 10000000
 TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
@@ -81,7 +81,6 @@ void writeBufferToFile()
         myfile << event->locationId << "\t" << event->type << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
     }
     myfile.close();
-    exit(0);
     tracedEvents = 0;
     memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
     exit(0);

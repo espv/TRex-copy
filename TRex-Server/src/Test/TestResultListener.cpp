@@ -48,5 +48,5 @@ void TestResultListener::handleResult(set<PubPkt *> &genPkts, double procTime){
 }
 
 void TestResultListener::printMessage(std::string msg){
-	cout << "TestResultListener" << id << " > " << msg << endl;
+	//cout << "TestResultListener" << id << " > " << msg << endl;
 }

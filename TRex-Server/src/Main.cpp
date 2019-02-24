@@ -105,7 +105,7 @@ void PublishPackets()
 			if (++pktsPublished % 2000 == 0) {
 				auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
 				std::cout << pktsPublished << " - " << current_time - prev_time_published << std::endl;
-        prev_time_published = current_time;
+                prev_time_published = current_time;
 			}
 
 			pkt->timeStamp = clock();
@@ -124,13 +124,14 @@ void testEngine(){
 
 	for (int i = 0; i < 20; i+=2) {
 	    for (int j = 0; j < 100; j++) {
-            this_engine->processRulePkt(testRule.buildRule(i, i + 1, 1001, j%10));
+	        int fire_event = ((i+1)*(j+1))+101;
+            this_engine->processRulePkt(testRule.buildRule(i, i + 1, fire_event, j%10));
             auto testPackets = testRule.buildPublication(i, i + 1, j%10);
             allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
+            ResultListener* listener= new TestResultListener(testRule.buildSubscription(fire_event));
+            this_engine->addResultListener(listener);
         }
 	}
-    ResultListener* listener= new TestResultListener(testRule.buildSubscription(1001));
-    this_engine->addResultListener(listener);
 
 	boost::thread th{PublishPackets};
 	t.async_wait(&HandlePubPacket);
