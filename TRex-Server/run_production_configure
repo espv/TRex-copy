@@ -1,2 +1,2 @@
 cd "$(dirname "$0")"
-CFLAGS="-g0 -O3" CXXFLAGS="-g0 -O3" CPPFLAGS="-g0 -O3" ./configure
+CFLAGS="-g0 -O3" CXXFLAGS="-g0 -O3" CPPFLAGS="-g0 -O3" ./configure --with-TRex2=../TRex2-lib
