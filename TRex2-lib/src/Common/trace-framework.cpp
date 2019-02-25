@@ -33,7 +33,7 @@ long long first_time = 0;
 
 int tracedEvents = 0;
 
-#define MAX_NUMBER_EVENTS 1000
+#define MAX_NUMBER_EVENTS 10000
 TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
@@ -88,6 +88,7 @@ void writeBufferToFile()
   }
   std::cout << "Finished writing" << std::endl;
   myfile.close();
+
   tracedEvents = 0;
   memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
   exit(0);
