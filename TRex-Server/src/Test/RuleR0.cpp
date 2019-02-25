@@ -57,7 +57,7 @@ RulePkt* RuleR0::buildRule(){
 	strcpy(tempConstr[3].name, "sc1");
 	tempConstr[3].type = STRING;
 	tempConstr[3].op = EQ;
-	strcpy(tempConstr[3].stringVal, "office");
+	strcpy(tempConstr[3].stringVal, "sa1");
 
 	strcpy(tempConstr[4].name, "sc2");
 	tempConstr[4].type = STRING;
@@ -110,7 +110,7 @@ std::vector<PubPkt*> RuleR0::buildPublication(){
 	// Area attribute
 	strcpy(attr[3].name, "sc1");
 	attr[3].type= STRING;
-	strcpy(attr[3].stringVal, "sc2");
+	strcpy(attr[3].stringVal, "sa1");
 
 	strcpy(attr[4].name, "sc2");
 	attr[4].type = STRING;
