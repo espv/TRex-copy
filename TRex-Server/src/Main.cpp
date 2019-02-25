@@ -106,7 +106,7 @@ void PublishPackets()
 	while (true) {
 		//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 		if (packetQueue.size() > 0) {
-			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
+			std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 			PubPkt *pkt = packetQueue.front();
 			traceEvent(1, 0, true);
 			if (++pktsPublished % 2000 == 0) {
