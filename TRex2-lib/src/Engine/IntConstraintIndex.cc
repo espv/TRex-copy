@@ -50,7 +50,7 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (pkt->getAttribute(i).type != INT)
       continue;
 
-    traceEvent(30);
+    traceEvent(502);
     string name = pkt->getAttribute(i).name;
     int val = pkt->getIntAttributeVal(i);
     if (indexes.find(name) == indexes.end())
@@ -75,7 +75,7 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
       if (rit->first < val)
         break;
 
-      traceEvent(32);
+      //traceEvent(32);
       IntTableConstraint* itc = rit->second;
       processConstraint(itc, mh, predCount);
     }
@@ -84,7 +84,7 @@ void IntConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
       if (it->first >= val)
         break;
 
-      traceEvent(33);
+      //traceEvent(33);
       IntTableConstraint* itc = it->second;
       processConstraint(itc, mh, predCount);
     }

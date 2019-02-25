@@ -49,13 +49,13 @@ void BoolConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (pkt->getAttribute(i).type != BOOL)
       continue;
 
-    traceEvent(50);
+    traceEvent(504);
     string name = pkt->getAttribute(i).name;
     bool val = pkt->getBoolAttributeVal(i);
     if (indexes.find(name) == indexes.end())
       continue;
 
-    traceEvent(41);
+    //traceEvent(41);
     // Equality constraints
     auto it = indexes[name].eq.find(val);
     if (it != indexes[name].eq.end()) {

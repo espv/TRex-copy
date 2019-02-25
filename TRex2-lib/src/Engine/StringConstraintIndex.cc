@@ -50,7 +50,8 @@ void StringConstraintIndex::processMessage(PubPkt* pkt, MatchingHandler& mh,
     if (pkt->getAttribute(i).type != STRING)
       continue;
 
-    traceEvent(20);
+    //traceEvent(20);
+    traceEvent(505);
     string name = pkt->getAttribute(i).name;
     string val = pkt->getAttribute(i).stringVal;
     if (indexes.find(name) == indexes.end())
