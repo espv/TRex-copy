@@ -82,11 +82,11 @@ boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
 
 void HandlePubPacket(const boost::system::error_code&)
 {
-	std::cout << "HandlePubPacket" << std::endl;
+	//std::cout << "HandlePubPacket" << std::endl;
 	if (packetQueue.size() < PACKET_CAPACITY) {
 		if (++number_placed_packets % 10000 == 0)
 			std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
-		std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
+		//std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
 		packetQueue.push_back(new PubPkt(*allPackets.at(gen()%allPackets.size())));
 	} else {
 		++number_dropped_packets;
@@ -101,7 +101,7 @@ void HandlePubPacket(const boost::system::error_code&)
 void PublishPackets()
 {
 	while (true) {
-		std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
+		//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 		if (packetQueue.size() > 0) {
 			PubPkt *pkt = packetQueue.front();
 			traceEvent(1, 0, true);
@@ -112,9 +112,9 @@ void PublishPackets()
 			}
 
 			pkt->timeStamp = clock();
-			std::cout << "before processPubPkt" << std::endl;
+			//std::cout << "before processPubPkt" << std::endl;
 			this_engine->processPubPkt(pkt);
-			std::cout << "after processPubPkt" << std::endl;
+			//std::cout << "after processPubPkt" << std::endl;
 			traceEvent(100, false);
 			packetQueue.erase(packetQueue.begin());
 		}

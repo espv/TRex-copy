@@ -43,7 +43,7 @@ void traceEvent(int traceId, int eventType, bool reset)
     return;
   int pid = syscall(SYS_gettid);
   pthread_mutex_lock(traceMutex);
-  std::cout << "tracing " << traceId << std::endl;
+  //std::cout << "tracing " << traceId << std::endl;
   auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
   if (writeTraceToFile) {
     if (tracedEvents >= MAX_NUMBER_EVENTS -1)
@@ -64,9 +64,9 @@ void traceEvent(int traceId, int eventType, bool reset)
     cout << traceId << "-" << sched_getcpu() << "-" << pid << "-" << current_time - first_time << std::endl;
     previous_time = current_time;
   }
-  std::cout << "tracing2" << std::endl;
+  //std::cout << "tracing2" << std::endl;
   pthread_mutex_unlock(traceMutex);
-  std::cout << "tracing3" << std::endl;
+  //std::cout << "tracing3" << std::endl;
 };
 
 int trace_index = 0;
