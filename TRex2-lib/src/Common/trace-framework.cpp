@@ -39,6 +39,7 @@ TraceEvent events[MAX_NUMBER_EVENTS];
 bool writeTraceToFile = true;
 void traceEvent(int traceId, int eventType, bool reset)
 {
+  std::cout << "tracing" << std::endl;
   if (!doTrace || (traceId != 1 && traceId != 100 && traceId != 50 && traceId != 51 && traceId != 155 && traceId != 5 && traceId != 6 && traceId != 7 && traceId != 12 && traceId != 57 && traceId != 58 && traceId != 59 && traceId != 110 && traceId != 111 && traceId != 230))
     return;
   int pid = syscall(SYS_gettid);
@@ -63,8 +64,6 @@ void traceEvent(int traceId, int eventType, bool reset)
     cout << traceId << "-" << sched_getcpu() << "-" << pid << "-" << current_time - first_time << std::endl;
     previous_time = current_time;
   }
-  if (tracedEvents % 100 == 0)
-    std::cout << "tracing" << std::endl;
   pthread_mutex_unlock(traceMutex);
 };
 
