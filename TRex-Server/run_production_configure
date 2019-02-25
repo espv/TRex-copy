@@ -1,2 +1,2 @@
 cd "$(dirname "$0")"
-CFLAGS="-g0 -O3" CXXFLAGS="-g0 -O3" CPPFLAGS="-g0 -O3" ./configure --with-TRex2=/home/espen/Research/instrumented-trex-plus-configs-and-scripts/TRex/TRex2-lib
+CFLAGS="-g0 -O3" CXXFLAGS="-g0 -O3" CPPFLAGS="-g0 -O3" ./configure --with-TRex2=`realpath ../TRex2-lib`
