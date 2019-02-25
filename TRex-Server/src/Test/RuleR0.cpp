@@ -37,7 +37,7 @@ RulePkt* RuleR0::buildRule(){
 	int indexPredTemp= 0;
 
 	// Temp root predicate
-	Constraint tempConstr[3];
+	Constraint tempConstr[4];
 	strcpy(tempConstr[0].name, ATTR_TEMPVALUE);
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
@@ -46,11 +46,17 @@ RulePkt* RuleR0::buildRule(){
 	tempConstr[1].type= INT;
 	tempConstr[1].op= LT;
 	tempConstr[1].intVal= 1000;
-	strcpy(tempConstr[2].name, "area");
-	tempConstr[2].type = STRING;
-	tempConstr[2].op = EQ;
-	strcpy(tempConstr[2].stringVal, "office");
-	rule->addRootPredicate(EVENT_TEMP, tempConstr, 3);
+
+  strcpy(tempConstr[2].name, "integer_constraint_3");
+  tempConstr[2].type= INT;
+  tempConstr[2].op= LT;
+  tempConstr[2].intVal= 1000;
+
+	strcpy(tempConstr[3].name, "area");
+	tempConstr[3].type = STRING;
+	tempConstr[3].op = EQ;
+	strcpy(tempConstr[3].stringVal, "office");
+	rule->addRootPredicate(EVENT_TEMP, tempConstr, 4);
 
 	// Fire template
 	auto fireTemplate= new CompositeEventTemplate(EVENT_FIRE);
@@ -88,11 +94,16 @@ std::vector<PubPkt*> RuleR0::buildPublication(){
 	strcpy(attr[1].name, "integer_constraint_2");
 	attr[1].type = INT;
 	attr[1].intVal=88;
+
+  strcpy(attr[2].name, "integer_constraint_2");
+  attr[2].type = INT;
+  attr[2].intVal=88;
+
 	// Area attribute
-	strcpy(attr[2].name, ATTR_AREA);
-	attr[2].type= STRING;
-	strcpy(attr[2].stringVal, AREA_OFFICE);
-	auto pubPkt= new PubPkt(EVENT_TEMP, attr, 3);
+	strcpy(attr[3].name, ATTR_AREA);
+	attr[3].type= STRING;
+	strcpy(attr[3].stringVal, AREA_OFFICE);
+	auto pubPkt= new PubPkt(EVENT_TEMP, attr, 4);
 
 	std::vector<PubPkt*> pubPkts;
 	pubPkts.push_back(pubPkt);
