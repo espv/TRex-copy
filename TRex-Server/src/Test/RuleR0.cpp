@@ -85,7 +85,7 @@ SubPkt* RuleR0::buildSubscription() {
 }
 
 std::vector<PubPkt*> RuleR0::buildPublication(){
-	Attribute attr[3];
+	Attribute attr[4];
 	// Value attribute
 	strcpy(attr[0].name, ATTR_TEMPVALUE);
 	attr[0].type= INT;
