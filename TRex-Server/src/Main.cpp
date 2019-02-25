@@ -73,7 +73,7 @@ long long pktsPublished = 0;
 std::vector<PubPkt*> allPackets;
 auto prev_time_published = std::chrono::system_clock::now().time_since_epoch().count();
 TRexEngine *this_engine;
-boost::posix_time::microsec interval(10000);
+boost::posix_time::microsec interval(20000);
 boost::asio::io_service io;
 boost::asio::deadline_timer t(io, interval);
 
