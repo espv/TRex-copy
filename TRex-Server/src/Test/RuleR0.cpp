@@ -51,7 +51,7 @@ RulePkt* RuleR0::buildRule(){
 
   strcpy(tempConstr[2].name, "ic3");
   tempConstr[2].type= INT;
-  tempConstr[2].op= GT;
+  tempConstr[2].op= EQ;
   tempConstr[2].intVal= 22;
 
 	strcpy(tempConstr[3].name, "sc1");
@@ -105,7 +105,7 @@ std::vector<PubPkt*> RuleR0::buildPublication(){
 
   strcpy(attr[2].name, "ic3");
   attr[2].type = INT;
-  attr[2].intVal=88;
+  attr[2].intVal=22;
 
 	// Area attribute
 	strcpy(attr[3].name, "sc1");
