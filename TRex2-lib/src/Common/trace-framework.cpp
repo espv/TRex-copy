@@ -69,20 +69,21 @@ void traceEvent(int traceId, int eventType, bool reset)
 int trace_index = 0;
 void writeBufferToFile()
 {
-    ofstream myfile;
-    std::ostringstream oss;
-    random_generator gen;
-    uuid id = gen();
-    oss << "../analysis/traces/" << std::time(0) << "-" << id << "-" << trace_name << "-" << trace_index++ << ".trace";
-    std::string fn = oss.str();
-    myfile.open (fn);
-    for (int i = 0; i < tracedEvents; ++i)
-    {
-        TraceEvent *event = &events[i];
-        myfile << event->locationId << "\t" << event->type << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
-    }
-    myfile.close();
-    tracedEvents = 0;
-    memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
-    exit(0);
+  std::cout << "Writing trace to file" << std::endl;
+  ofstream myfile;
+  std::ostringstream oss;
+  random_generator gen;
+  uuid id = gen();
+  oss << "../analysis/traces/" << std::time(0) << "-" << id << "-" << trace_name << "-" << trace_index++ << ".trace";
+  std::string fn = oss.str();
+  myfile.open (fn);
+  for (int i = 0; i < tracedEvents; ++i)
+  {
+    TraceEvent *event = &events[i];
+    myfile << event->locationId << "\t" << event->type << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
+  }
+  myfile.close();
+  tracedEvents = 0;
+  memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
+  exit(0);
 }
