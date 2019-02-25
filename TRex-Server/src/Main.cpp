@@ -98,6 +98,7 @@ void HandlePubPacket(const boost::system::error_code&)
 
 void PublishPackets()
 {
+  std::cout << "PublishPackets" << std::endl;
 	while (true) {
 		if (packetQueue.size() > 0) {
 			PubPkt *pkt = packetQueue.front();
@@ -118,10 +119,12 @@ void PublishPackets()
 
 #define SINGLE_RULE
 void testEngine(){
+  std::cout << "testEngine" << std::endl;
 	this_engine = new TRexEngine(number_threads);
 	this_engine->finalize();
 
 #ifdef SINGLE_RULE
+  std::cout << "SINGLE_RULE" << std::endl;
   RuleR0 testRule;
 	this_engine->processRulePkt(testRule.buildRule());
   auto testPackets = testRule.buildPublication();
