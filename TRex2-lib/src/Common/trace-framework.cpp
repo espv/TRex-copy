@@ -63,6 +63,8 @@ void traceEvent(int traceId, int eventType, bool reset)
     cout << traceId << "-" << sched_getcpu() << "-" << pid << "-" << current_time - first_time << std::endl;
     previous_time = current_time;
   }
+  if (tracedEvents % 100 == 0)
+    std::cout << "tracing" << std::endl;
   pthread_mutex_unlock(traceMutex);
 };
 
