@@ -107,7 +107,10 @@ void PublishPackets()
 {
 	while (continue_publishing) {
 		//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
-		if (!packetQueue.empty()) {
+    pthread_mutex_lock(packetQueueMutex);
+    auto packetQueueEmpty = packetQueue.empty();
+    pthread_mutex_unlock(packetQueueMutex);
+		if (!packetQueueEmpty) {
 			std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 			PubPkt *pkt = packetQueue.front();
 			traceEvent(1, 0, true);
