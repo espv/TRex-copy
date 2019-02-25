@@ -50,7 +50,7 @@ RulePkt* RuleR0::buildRule(){
 	tempConstr[2].type = STRING;
 	tempConstr[2].op = EQ;
 	strcpy(tempConstr[2].stringVal, "office");
-	rule->addRootPredicate(EVENT_TEMP, tempConstr, 2);
+	rule->addRootPredicate(EVENT_TEMP, tempConstr, 3);
 
 	// Fire template
 	auto fireTemplate= new CompositeEventTemplate(EVENT_FIRE);
