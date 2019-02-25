@@ -140,7 +140,7 @@ void TRexEngine::finalize() {
 
   for (int i = 0; i < numProc; i++) {
     shared[i].lowerBound = size * i;
-    shared[i].upperBound = size * (i + 1);
+    shared[i].upperBound = size * i;
     shared[i].finish = false;
     shared[i].stacksRule = stacksRules;
     shared[i].stillProcessing = stillProcessing;
@@ -177,7 +177,7 @@ void TRexEngine::processRulePkt(RulePkt* pkt) {
   setRecursionNeeded(pkt);
   StacksRule* stacksRule = new StacksRule(pkt);
   stacksRules->insert(make_pair(stacksRule->getRuleId(), stacksRule));
-  int size = stacksRules->size() / numProc + 1;
+  int size = stacksRules->size() / numProc;
   for (int i = 0; i < numProc; i++) {
     pthread_mutex_lock(shared[i].processMutex);
     // The processor function will only access shared[i].lowerBound and shared[i].upperBound after locking shared[i].processMutex
