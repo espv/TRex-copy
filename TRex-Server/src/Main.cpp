@@ -92,7 +92,7 @@ void HandlePubPacket(const boost::system::error_code&)
 		pthread_mutex_lock(packetQueueMutex);
 		packetQueue.push_back(new PubPkt(*allPackets.at(gen()%allPackets.size())));
 		pthread_mutex_unlock(packetQueueMutex);
-		std::cout << "Inserted packet #" << number_placed_packets << " into queue. Size of packetQueue: " << packetQueue.size() << std::endl;
+		//std::cout << "Inserted packet #" << number_placed_packets << " into queue. Size of packetQueue: " << packetQueue.size() << std::endl;
 	} else {
 		++number_dropped_packets;
 		if (number_dropped_packets % 10000 == 0)
@@ -111,7 +111,7 @@ void PublishPackets()
     auto packetQueueEmpty = packetQueue.empty();
     pthread_mutex_unlock(packetQueueMutex);
 		if (!packetQueueEmpty) {
-			std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
+			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 			PubPkt *pkt = packetQueue.front();
 			traceEvent(1, 0, true);
 			if (++pktsPublished % 2000 == 0) {
