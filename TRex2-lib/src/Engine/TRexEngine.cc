@@ -249,19 +249,19 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   double duration = (tValEnd.tv_sec - tValStart.tv_sec) * 1000000 +
                     tValEnd.tv_usec - tValStart.tv_usec;
 
-  traceEvent(9);
+  //traceEvent(9);
   // Notifies results to listeners
   for (auto listener : resultListeners) {
     traceEvent(10);
     listener->handleResult(result, duration);
   }
-  traceEvent(11);
+  //traceEvent(11);
 
   for (auto pkt : result) {
     if (recursionNeeded && recursionDepth < MAX_RECURSION_DEPTH)
       processPubPkt(pkt->copy(), true);
     if (pkt->decRefCount()) {
-      //delete pkt;  // Added by Espen for experiments. We do not want to delete the packets since we'll reuse them.
+      delete pkt;  // Added by Espen for experiments. We do not want to delete the packets since we'll reuse them.
     }
   }
   traceEvent(12);
