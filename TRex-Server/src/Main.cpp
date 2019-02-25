@@ -105,7 +105,7 @@ void PublishPackets()
 {
 	while (true) {
 		if (packetQueue.size() > 0) {
-			std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
+			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 			pthread_mutex_lock(packetQueueMutex);
 			PubPkt *pkt = packetQueue.front();
 			pthread_mutex_unlock(packetQueueMutex);
@@ -128,6 +128,7 @@ void PublishPackets()
 
 #define SINGLE_RULE
 void testEngine(){
+	pthread_mutex_init(packetQueueMutex, NULL);
   std::cout << "testEngine" << std::endl;
 	this_engine = new TRexEngine(number_threads);
 	this_engine->finalize();
