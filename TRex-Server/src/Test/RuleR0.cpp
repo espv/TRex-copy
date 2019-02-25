@@ -44,12 +44,12 @@ RulePkt* RuleR0::buildRule(){
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
 	tempConstr[0].intVal= 45;
-	strcpy(tempConstr[1].name, "integer_constraint2");
+	strcpy(tempConstr[1].name, "ic2");
 	tempConstr[1].type= INT;
 	tempConstr[1].op= LT;
 	tempConstr[1].intVal= 1000;
 
-  strcpy(tempConstr[2].name, "integer_constraint3");
+  strcpy(tempConstr[2].name, "ic3");
   tempConstr[2].type= INT;
   tempConstr[2].op= GT;
   tempConstr[2].intVal= 22;
@@ -99,11 +99,11 @@ std::vector<PubPkt*> RuleR0::buildPublication(){
 	attr[0].type= INT;
 	attr[0].intVal= 50;
 
-	strcpy(attr[1].name, "integer_constraint2");
+	strcpy(attr[1].name, "ic2");
 	attr[1].type = INT;
 	attr[1].intVal=88;
 
-  strcpy(attr[2].name, "integer_constraint3");
+  strcpy(attr[2].name, "ic3");
   attr[2].type = INT;
   attr[2].intVal=88;
 
