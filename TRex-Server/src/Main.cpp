@@ -116,12 +116,20 @@ void PublishPackets()
 	}
 }
 
-
+#define SINGLE_RULE
 void testEngine(){
 	this_engine = new TRexEngine(number_threads);
 	this_engine->finalize();
-	RuleR1 testRule;
 
+#ifdef SINGLE_RULE
+  RuleR0 testRule;
+	this_engine->processRulePkt(testRule.buildRule());
+  auto testPackets = testRule.buildPublication();
+  allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
+  ResultListener* listener= new TestResultListener(testRule.buildSubscription());
+  this_engine->addResultListener(listener);
+#else
+  RuleR1 testRule;
 	for (int i = 0; i < 20; i+=2) {
 	    for (int j = 0; j < 100; j++) {
 	        int fire_event = ((i+1)*(j+1))+101;
@@ -132,6 +140,7 @@ void testEngine(){
             this_engine->addResultListener(listener);
         }
 	}
+#endif
 
 	boost::thread th{PublishPackets};
 	t.async_wait(&HandlePubPacket);
@@ -142,6 +151,7 @@ void testEngine(){
 	 */
 }
 
+extern std::string trace_name = "";
 extern bool doTrace;
 int main(int argc, char* argv[]){
 	bool test = false;
@@ -149,10 +159,14 @@ int main(int argc, char* argv[]){
 		if (!strcmp(argv[i], "-trace"))
 			doTrace = true;
 		else if (!strcmp(argv[i], "-number-threads")) {
-			++i;
-				number_threads = std::atoi(argv[i]);
-			} else if (!strcmp(argv[i], "-test"))
-		test = true;
+      ++i;
+      number_threads = std::atoi(argv[i]);
+    } else if (!strcmp(argv[i], "-test")) {
+      test = true;
+    } else if (!strcmp(argv[i], "-trace-name")) {
+		  ++i;
+		  trace_name = argv[i];
+		}
 	}
 
 	boost::log::core::get()->set_logging_enabled(false);

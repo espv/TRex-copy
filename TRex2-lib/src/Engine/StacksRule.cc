@@ -491,6 +491,7 @@ void StacksRule::createComplexEvents(list<PartialEvent*>* partialEvents,
           aggregateComplexParameters);
     }
     traceEvent(230);
+    //std::cout << "Created complex event" << std::endl;
     results.insert(genPkt);
   }
 }

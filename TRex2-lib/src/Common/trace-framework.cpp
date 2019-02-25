@@ -26,13 +26,14 @@ using namespace boost::uuids;
 using namespace std;
 
 bool doTrace = false;
+std::string trace_name = "";
 pthread_mutex_t* traceMutex = new pthread_mutex_t;
 double previous_time;
 long long first_time = 0;
 
 int tracedEvents = 0;
 
-#define MAX_NUMBER_EVENTS 10000000
+#define MAX_NUMBER_EVENTS 100000
 TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
@@ -72,7 +73,7 @@ void writeBufferToFile()
     std::ostringstream oss;
     random_generator gen;
     uuid id = gen();
-    oss << "../analysis/traces/" << std::time(0) << "-" << id << "-" << trace_index++ << ".trace";
+    oss << "../analysis/traces/" << std::time(0) << "-" << id << "-" << trace_name << "-" << trace_index++ << ".trace";
     std::string fn = oss.str();
     myfile.open (fn);
     for (int i = 0; i < tracedEvents; ++i)
