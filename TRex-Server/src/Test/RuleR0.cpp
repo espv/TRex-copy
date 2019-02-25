@@ -46,8 +46,8 @@ RulePkt* RuleR0::buildRule(){
 	tempConstr[0].intVal= 45;
 	strcpy(tempConstr[1].name, "ic2");
 	tempConstr[1].type= INT;
-	tempConstr[1].op= LT;
-	tempConstr[1].intVal= 1000;
+	tempConstr[1].op= GT;
+	tempConstr[1].intVal= 1;
 
   strcpy(tempConstr[2].name, "ic3");
   tempConstr[2].type= INT;
@@ -59,10 +59,10 @@ RulePkt* RuleR0::buildRule(){
 	tempConstr[3].op = EQ;
 	strcpy(tempConstr[3].stringVal, "office");
 
-	strcpy(tempConstr[4].name, "string_constraint_2");
+	strcpy(tempConstr[4].name, "sc2");
 	tempConstr[4].type = STRING;
 	tempConstr[4].op = EQ;
-	strcpy(tempConstr[4].stringVal, "string_attribute_2");
+	strcpy(tempConstr[4].stringVal, "sa2");
 	rule->addRootPredicate(EVENT_TEMP, tempConstr, number_constraints);
 
 	// Fire template
@@ -112,9 +112,9 @@ std::vector<PubPkt*> RuleR0::buildPublication(){
 	attr[3].type= STRING;
 	strcpy(attr[3].stringVal, AREA_OFFICE);
 
-	strcpy(attr[4].name, "string_constraint_2");
+	strcpy(attr[4].name, "sc2");
 	attr[4].type = STRING;
-	strcpy(attr[4].stringVal, "string_attribute_2");
+	strcpy(attr[4].stringVal, "sa2");
 	auto pubPkt= new PubPkt(EVENT_TEMP, attr, number_attributes);
 
 	std::vector<PubPkt*> pubPkts;
