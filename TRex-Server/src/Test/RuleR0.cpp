@@ -37,15 +37,15 @@ RulePkt* RuleR0::buildRule(){
 	int indexPredTemp= 0;
 
 	// Temp root predicate
-	Constraint tempConstr[1];
+	Constraint tempConstr[2];
 	strcpy(tempConstr[0].name, ATTR_TEMPVALUE);
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
 	tempConstr[0].intVal= 45;
-	/*tempConstr[1].type = STRING;
+	tempConstr[1].type = STRING;
 	tempConstr[1].op = EQ;
-	strcpy(tempConstr[1].stringVal, "office");*/
-	rule->addRootPredicate(EVENT_TEMP, tempConstr, 1);
+	strcpy(tempConstr[1].stringVal, "office");
+	rule->addRootPredicate(EVENT_TEMP, tempConstr, 2);
 
 	// Fire template
 	auto fireTemplate= new CompositeEventTemplate(EVENT_FIRE);
