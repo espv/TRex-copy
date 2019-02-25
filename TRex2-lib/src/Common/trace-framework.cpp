@@ -66,6 +66,7 @@ void traceEvent(int traceId, int eventType, bool reset)
   }
   std::cout << "tracing2" << std::endl;
   pthread_mutex_unlock(traceMutex);
+  std::cout << "tracing3" << std::endl;
 };
 
 int trace_index = 0;
