@@ -51,8 +51,8 @@ RulePkt* RuleR0::buildRule(){
 
   strcpy(tempConstr[2].name, "integer_constraint_3");
   tempConstr[2].type= INT;
-  tempConstr[2].op= LT;
-  tempConstr[2].intVal= 1000;
+  tempConstr[2].op= GT;
+  tempConstr[2].intVal= 22;
 
 	strcpy(tempConstr[3].name, "area");
 	tempConstr[3].type = STRING;
