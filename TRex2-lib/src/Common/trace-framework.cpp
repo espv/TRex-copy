@@ -80,11 +80,13 @@ void writeBufferToFile()
   oss << "../analysis/traces/" << std::time(0) << "-" << id << "-" << trace_name << "-" << trace_index++ << ".trace";
   std::string fn = oss.str();
   myfile.open (fn);
+  std::cout << "About to write to file" << std::endl;
   for (int i = 0; i < tracedEvents; ++i)
   {
     TraceEvent *event = &events[i];
     myfile << event->locationId << "\t" << event->type << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
   }
+  std::cout << "Finished writing" << std::endl;
   myfile.close();
   tracedEvents = 0;
   memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
