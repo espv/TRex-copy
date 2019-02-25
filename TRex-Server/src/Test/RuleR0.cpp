@@ -42,7 +42,7 @@ RulePkt* RuleR0::buildRule(){
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
 	tempConstr[0].intVal= 45;
-	strcpy(tempConstr[1].name, ATTR_TEMPVALUE);
+	strcpy(tempConstr[1].name, "integer_constraint_2");
 	tempConstr[1].type= INT;
 	tempConstr[1].op= LT;
 	tempConstr[1].intVal= 1000;
@@ -79,16 +79,20 @@ SubPkt* RuleR0::buildSubscription() {
 }
 
 std::vector<PubPkt*> RuleR0::buildPublication(){
-	Attribute attr[2];
+	Attribute attr[3];
 	// Value attribute
 	strcpy(attr[0].name, ATTR_TEMPVALUE);
 	attr[0].type= INT;
 	attr[0].intVal= 50;
+
+	strcpy(attr[1].name, "integer_constraint_2");
+	attr[1].type = INT;
+	attr[1].intVal=88;
 	// Area attribute
-	strcpy(attr[1].name, ATTR_AREA);
-	attr[1].type= STRING;
-	strcpy(attr[1].stringVal, AREA_OFFICE);
-	auto pubPkt= new PubPkt(EVENT_TEMP, attr, 2);
+	strcpy(attr[2].name, ATTR_AREA);
+	attr[2].type= STRING;
+	strcpy(attr[2].stringVal, AREA_OFFICE);
+	auto pubPkt= new PubPkt(EVENT_TEMP, attr, 3);
 
 	std::vector<PubPkt*> pubPkts;
 	pubPkts.push_back(pubPkt);
