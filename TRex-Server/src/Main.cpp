@@ -100,8 +100,8 @@ void HandlePubPacket(const boost::system::error_code&)
 
 void PublishPackets()
 {
-  std::cout << "PublishPackets" << std::endl;
 	while (true) {
+		std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 		if (packetQueue.size() > 0) {
 			PubPkt *pkt = packetQueue.front();
 			traceEvent(1, 0, true);
