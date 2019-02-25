@@ -43,7 +43,9 @@ using namespace concept::test;
 using concept::util::Logging;
 using namespace std;
 
+bool continue_publishing = true;
 void my_handler(int s){
+	continue_publishing = false;
 	writeBufferToFile();
 	exit(1);
 }
@@ -103,9 +105,9 @@ void HandlePubPacket(const boost::system::error_code&)
 
 void PublishPackets()
 {
-	while (true) {
+	while (continue_publishing) {
 		//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
-		if (packetQueue.size() > 0) {
+		if (!packetQueue.empty()) {
 			std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 			PubPkt *pkt = packetQueue.front();
 			traceEvent(1, 0, true);
