@@ -31,7 +31,7 @@ RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int event_fire, i
   int indexRootPredicate= 0;
 	int indexSecondPredicate= 1;
 
-	TimeMs fiveMin(1000*60*5);
+	TimeMs fiftenSeconds(15*1000);
 
 	// Temp predicate
 	// Constraint: Temp.value > 45
@@ -50,7 +50,7 @@ RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int event_fire, i
   humidityConstr[0].intVal = 25;
   //rule->addRootPredicate(event_humidity, humidityConstr, 1);
   rule->addRootPredicate(event_temp, tempConstr, 1);
-  rule->addPredicate(event_humidity, humidityConstr, 1, indexRootPredicate, fiveMin, LAST_WITHIN);
+  rule->addPredicate(event_humidity, humidityConstr, 1, indexRootPredicate, fiftenSeconds, LAST_WITHIN);
   rule->addConsuming(event_humidity);
   rule->addConsuming(event_temp);
   //rule->addPredicate(event_temp, tempConstr, 0, indexRootPredicate, fiveMin, LAST_WITHIN);
