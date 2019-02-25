@@ -37,14 +37,19 @@ RulePkt* RuleR0::buildRule(){
 	int indexPredTemp= 0;
 
 	// Temp root predicate
-	Constraint tempConstr[2];
+	Constraint tempConstr[3];
 	strcpy(tempConstr[0].name, ATTR_TEMPVALUE);
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
 	tempConstr[0].intVal= 45;
-	tempConstr[1].type = STRING;
-	tempConstr[1].op = EQ;
-	strcpy(tempConstr[1].stringVal, "office");
+	strcpy(tempConstr[1].name, ATTR_TEMPVALUE);
+	tempConstr[1].type= INT;
+	tempConstr[1].op= LT;
+	tempConstr[1].intVal= 1000;
+	strcpy(tempConstr[2].name, "area");
+	tempConstr[2].type = STRING;
+	tempConstr[2].op = EQ;
+	strcpy(tempConstr[2].stringVal, "office");
 	rule->addRootPredicate(EVENT_TEMP, tempConstr, 2);
 
 	// Fire template
