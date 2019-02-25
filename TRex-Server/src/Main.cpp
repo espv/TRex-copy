@@ -79,6 +79,7 @@ boost::asio::deadline_timer t(io, interval);
 
 std::time_t now = std::time(0);
 boost::random::mt19937 gen{static_cast<std::uint32_t>(now)};
+auto packetQueueMutex = new pthread_mutex_t;
 
 void HandlePubPacket(const boost::system::error_code&)
 {
@@ -87,7 +88,9 @@ void HandlePubPacket(const boost::system::error_code&)
 		if (++number_placed_packets % 10000 == 0)
 			std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
 		//std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
+		pthread_mutex_lock(packetQueueMutex);
 		packetQueue.push_back(new PubPkt(*allPackets.at(gen()%allPackets.size())));
+		pthread_mutex_unlock(packetQueueMutex);
 	} else {
 		++number_dropped_packets;
 		if (number_dropped_packets % 10000 == 0)
@@ -103,7 +106,9 @@ void PublishPackets()
 	while (true) {
 		if (packetQueue.size() > 0) {
 			std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
+			pthread_mutex_lock(packetQueueMutex);
 			PubPkt *pkt = packetQueue.front();
+			pthread_mutex_unlock(packetQueueMutex);
 			traceEvent(1, 0, true);
 			if (++pktsPublished % 2000 == 0) {
 				auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
