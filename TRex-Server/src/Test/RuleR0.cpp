@@ -40,7 +40,7 @@ RulePkt* RuleR0::buildRule(){
 
 	// Temp root predicate
 	Constraint tempConstr[number_constraints];
-	strcpy(tempConstr[0].name, ATTR_TEMPVALUE);
+	strcpy(tempConstr[0].name, "ic1");
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
 	tempConstr[0].intVal= 45;
@@ -54,7 +54,7 @@ RulePkt* RuleR0::buildRule(){
   tempConstr[2].op= GT;
   tempConstr[2].intVal= 22;
 
-	strcpy(tempConstr[3].name, "area");
+	strcpy(tempConstr[3].name, "sc1");
 	tempConstr[3].type = STRING;
 	tempConstr[3].op = EQ;
 	strcpy(tempConstr[3].stringVal, "office");
@@ -95,7 +95,7 @@ std::vector<PubPkt*> RuleR0::buildPublication(){
 	int number_attributes = 5;
 	Attribute attr[number_attributes];
 	// Value attribute
-	strcpy(attr[0].name, ATTR_TEMPVALUE);
+	strcpy(attr[0].name, "ic1");
 	attr[0].type= INT;
 	attr[0].intVal= 50;
 
@@ -108,9 +108,9 @@ std::vector<PubPkt*> RuleR0::buildPublication(){
   attr[2].intVal=88;
 
 	// Area attribute
-	strcpy(attr[3].name, ATTR_AREA);
+	strcpy(attr[3].name, "sc1");
 	attr[3].type= STRING;
-	strcpy(attr[3].stringVal, AREA_OFFICE);
+	strcpy(attr[3].stringVal, "sc2");
 
 	strcpy(attr[4].name, "sc2");
 	attr[4].type = STRING;
