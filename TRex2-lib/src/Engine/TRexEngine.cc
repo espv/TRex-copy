@@ -235,15 +235,22 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
 
   // Collects results
   for (int i = 0; i < numProc; i++) {
+    traceEvent(112);
     for (auto resPkt : shared[i].result) {
-      traceEvent(112);
+      traceEvent(113);
       result.insert(resPkt);
+    }
+    if (!shared[i].result.empty()) {
+      traceEvent(113);
     }
     shared[i].result.clear();
 #if MP_MODE == MP_COPY
     if (shared[i].pkt->decRefCount())
       delete shared[i].pkt;
 #endif
+  }
+  if (numProc > 0) {
+    traceEvent(112);
   }
   // Deletes used packet
   if (pkt->decRefCount())
