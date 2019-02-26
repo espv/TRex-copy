@@ -236,6 +236,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   // Collects results
   for (int i = 0; i < numProc; i++) {
     for (auto resPkt : shared[i].result) {
+      traceEvent(112);
       result.insert(resPkt);
     }
     shared[i].result.clear();
