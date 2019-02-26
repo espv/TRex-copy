@@ -42,7 +42,7 @@ void* processor(void* parShared) {
     // At this point, s->processMutex is locked by this thread, and s->lowerBound and s->upperBound will not be changed by TRexEngine::processRulePkt
     int lowerBound = s->lowerBound;
     int upperBound = s->upperBound;
-    traceEvent(6, 1);
+    traceEvent(6);
     // End processing
     if (s->finish) {
       pthread_mutex_unlock(s->processMutex);
@@ -231,7 +231,7 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   pthread_mutex_unlock(shared[0].resultMutex);
   *(shared[0].stillProcessing) = numProc;
   for (int i = 0; i < numProc; i++)  // Part of tracing only to connect trace event 8 with 111 for all processes
-    traceEvent(111, 1);
+    traceEvent(111);
 
   // Collects results
   for (int i = 0; i < numProc; i++) {

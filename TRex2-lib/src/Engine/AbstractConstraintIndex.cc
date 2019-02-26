@@ -18,6 +18,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 //
 
+#include "../Common/trace-framework.hpp"
 #include "AbstractConstraintIndex.h"
 
 using namespace std;
@@ -25,6 +26,7 @@ using namespace std;
 void AbstractConstraintIndex::addToMatchingHandler(MatchingHandler& mh,
                                                    TablePred* tp) {
   // Predicate refers to states
+  traceEvent(36);
   if (tp->stateType == STATE) {
     auto it = mh.matchingStates.find(tp->ruleId);
     if (it == mh.matchingStates.end()) {

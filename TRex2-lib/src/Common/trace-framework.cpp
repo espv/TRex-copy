@@ -37,7 +37,7 @@ int tracedEvents = 0;
 TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
-void traceEvent(int traceId, int eventType, bool reset)
+void traceEvent(int traceId, bool reset)
 {
   if (!doTrace)// || (traceId != 1 && traceId != 100 && traceId != 10 && traceId != 50 && traceId != 51 && traceId != 155 && traceId != 501 && traceId != 502 && traceId != 503 && traceId != 504 && traceId != 505  && traceId != 5 && traceId != 6 && traceId != 7 && traceId != 12 && traceId != 57 && traceId != 58 && traceId != 59 && traceId != 110 && traceId != 111 && traceId != 230))
     return;
@@ -52,7 +52,6 @@ void traceEvent(int traceId, int eventType, bool reset)
     events[tracedEvents].cpuId = sched_getcpu();
     events[tracedEvents].threadId = pid;
     events[tracedEvents].timestamp = current_time;
-    events[tracedEvents].type = eventType;
     ++tracedEvents;
   } else {
     if (first_time == 0)
@@ -84,7 +83,7 @@ void writeBufferToFile()
   for (int i = 0; i < tracedEvents; ++i)
   {
     TraceEvent *event = &events[i];
-    myfile << event->locationId << "\t" << event->type << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
+    myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
   }
   std::cout << "Finished writing" << std::endl;
   myfile.close();

@@ -10,12 +10,11 @@ public:
     int locationId;
     int cpuId;
     int threadId;
-    int type;
     long long timestamp;
     long long rdtsc;
 };
 
-void traceEvent(int traceId, int eventType=0, bool reset=false);
+void traceEvent(int traceId, bool reset=false);
 
 void writeBufferToFile();
 

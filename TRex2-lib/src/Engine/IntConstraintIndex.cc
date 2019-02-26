@@ -155,7 +155,7 @@ inline void IntConstraintIndex::processConstraint(
     IntTableConstraint* c, MatchingHandler& mh,
     map<TablePred*, int>& predCount) {
   for (auto it : c->connectedPredicates) {
-    //traceEvent(36);
+    traceEvent(35);
     // If satisfied for the first time, sets count to 1
     if (predCount.find(it) == predCount.end())
       predCount.insert(make_pair(it, 1));
