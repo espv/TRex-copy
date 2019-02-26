@@ -33,11 +33,12 @@ TestResultListener::~TestResultListener(){
 
 void TestResultListener::handleResult(set<PubPkt *> &genPkts, double procTime){
 	for (set<PubPkt*>::iterator i= genPkts.begin(); i != genPkts.end(); i++){
+	  traceEvent(601);
 		PubPkt* pubPkt= *i;
-		static int cnt = 0;
+		//static int cnt = 0;
 		//if (++cnt % 100 == 0) {
-			printMessage("New complex event created:");
-			printMessage(toString(pubPkt));
+			//printMessage("New complex event created:");
+			//printMessage(toString(pubPkt));
 		//}
 		if (matches(subscription, pubPkt)){
 			//printMessage("My subscription is matched");
