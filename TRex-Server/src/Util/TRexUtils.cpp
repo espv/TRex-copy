@@ -17,6 +17,7 @@
  */
 
 #include "TRexUtils.hpp"
+#include "../../../TRex2-lib/src/Common/trace-framework.hpp"
 
 using namespace concept;
 using namespace std;
@@ -25,6 +26,7 @@ bool util::matches(SubPkt* sub, PubPkt* pub){
 	if (pub->getEventType()!=sub->getEventType()) return false;
 
 	for (int i=0; i<sub->getConstraintsNum(); i++){
+		traceEvent(602);
 		Constraint constr= sub->getConstraint(i);
 		int attrIndex;
 		ValType valType;

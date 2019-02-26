@@ -148,6 +148,7 @@ void StacksRule::addToNegationStack(PubPkt* pkt, int index) {
 void StacksRule::startComputation(PubPkt* pkt, set<PubPkt*>& results) {
   // Adds the terminator to the last stack
   //std::cout << "StacksRule.cc >> StacksRule::startComputation" << std::endl;
+  traceEvent(700);
   pkt->incRefCount();
   receivedPkts[0].push_back(pkt);
   stacksSize[0] = 1;
@@ -168,6 +169,7 @@ void StacksRule::startComputation(PubPkt* pkt, set<PubPkt*>& results) {
   if (pkt->decRefCount())
     delete pkt;
   stacksSize[0] = 0;
+  traceEvent(710);
 }
 
 void StacksRule::parametricAddToStack(PubPkt* pkt, int& parStacksSize,

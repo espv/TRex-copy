@@ -20,6 +20,7 @@
 
 #include "CompositeEventGenerator.h"
 #include <limits>
+#include "../Common/trace-framework.hpp"
 
 using namespace std;
 
@@ -40,28 +41,37 @@ PubPkt* CompositeEventGenerator::generateCompositeEvent(
   int staticAttributesNum = ceTemplate->getStaticAttributesNum();
   Attribute attributes[attributesNum + staticAttributesNum];
   for (int i = 0; i < attributesNum; i++) {
+    traceEvent(701);
     ceTemplate->getAttributeName(attributes[i].name, i);
     ValType valType = ceTemplate->getAttributeTree(i)->getValType();
     attributes[i].type = valType;
-    if (valType == INT)
+    if (valType == INT) {
+      traceEvent(702);
       attributes[i].intVal = computeIntValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-          aggregateParameters, ceTemplate->getAttributeTree(i));
-    else if (valType == FLOAT)
+              partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
+              aggregateParameters, ceTemplate->getAttributeTree(i));
+    } else if (valType == FLOAT) {
+      traceEvent(703);
       attributes[i].floatVal = computeFloatValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-          aggregateParameters, ceTemplate->getAttributeTree(i));
-    else if (valType == BOOL)
+              partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
+              aggregateParameters, ceTemplate->getAttributeTree(i));
+    } else if (valType == BOOL) {
+      traceEvent(704);
       attributes[i].boolVal = computeBoolValue(
-          partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
-          aggregateParameters, ceTemplate->getAttributeTree(i));
-    else if (valType == STRING)
+              partialEvent, aggregates, aggsSize, receivedPkts, receivedAggs,
+              aggregateParameters, ceTemplate->getAttributeTree(i));
+    } else if (valType == STRING) {
+      traceEvent(705);
       computeStringValue(partialEvent, aggregates, aggsSize, receivedPkts,
                          receivedAggs, aggregateParameters,
                          ceTemplate->getAttributeTree(i),
                          attributes[i].stringVal);
+    }
   }
+  if (attributesNum > 0)
+    traceEvent(701);
   for (int i = 0; i < staticAttributesNum; i++) {
+    traceEvent(706);
     ceTemplate->getStaticAttribute(attributes[i + attributesNum], i);
   }
   PubPkt* result = new PubPkt(eventType, attributes, attributesNum + staticAttributesNum);

@@ -56,12 +56,14 @@ void* processor(void* parShared) {
       auto negsIt = mh->matchingNegations.find(i);
       if (negsIt != mh->matchingNegations.end()) {
         for (auto index : negsIt->second) {
+          traceEvent(803);
           s->stacksRule->find(i)->second->addToNegationStack(s->pkt, index);
         }
       }
       auto aggsIt = mh->matchingAggregates.find(i);
       if (aggsIt != mh->matchingAggregates.end()) {
         for (auto index : aggsIt->second) {
+          traceEvent(804);
           s->stacksRule->find(i)->second->addToAggregateStack(s->pkt, index);
         }
       }
@@ -71,7 +73,9 @@ void* processor(void* parShared) {
         // Last state (if found) is processed last
         bool lastState = false;
         for (auto index : statesIt->second) {
+          traceEvent(800);
           if (index != 0) {
+            traceEvent(801);
             s->stacksRule->find(i)->second->addToStack(s->pkt, index);
           } else {
             lastState = true;
