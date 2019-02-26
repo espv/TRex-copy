@@ -43,16 +43,16 @@ RulePkt* RuleR0::buildRule(){
 	strcpy(tempConstr[0].name, "ic1");
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
-	tempConstr[0].intVal= 45;
+	tempConstr[0].intVal= 0;
 	strcpy(tempConstr[1].name, "ic2");
 	tempConstr[1].type= INT;
 	tempConstr[1].op= GT;
-	tempConstr[1].intVal= 1;
+	tempConstr[1].intVal= 0;
 
   strcpy(tempConstr[2].name, "ic3");
   tempConstr[2].type= INT;
-  tempConstr[2].op= EQ;
-  tempConstr[2].intVal= 22;
+  tempConstr[2].op= GT;
+  tempConstr[2].intVal= 0;
 
 	strcpy(tempConstr[3].name, "sc1");
 	tempConstr[3].type = STRING;
@@ -97,11 +97,11 @@ std::vector<PubPkt*> RuleR0::buildPublication(){
 	// Value attribute
 	strcpy(attr[0].name, "ic1");
 	attr[0].type= INT;
-	attr[0].intVal= 50;
+	attr[0].intVal= 22;
 
 	strcpy(attr[1].name, "ic2");
 	attr[1].type = INT;
-	attr[1].intVal=88;
+	attr[1].intVal=22;
 
   strcpy(attr[2].name, "ic3");
   attr[2].type = INT;
