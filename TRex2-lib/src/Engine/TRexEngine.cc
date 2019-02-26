@@ -255,6 +255,8 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
     traceEvent(10);
     listener->handleResult(result, duration);
   }
+  if (!resultListeners.empty())
+    traceEvent(10);
   //traceEvent(11);
 
   for (auto pkt : result) {
