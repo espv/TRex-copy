@@ -113,7 +113,7 @@ void PublishPackets()
 		if (!packetQueueEmpty) {
 			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
 			PubPkt *pkt = packetQueue.front();
-			traceEvent(1, 0, true);
+			traceEvent(1, true);
 			/*if (++pktsPublished % 2000 == 0) {
 				auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
 				std::cout << pktsPublished << " - " << current_time - prev_time_published << std::endl;
@@ -124,7 +124,7 @@ void PublishPackets()
 			//std::cout << "before processPubPkt" << std::endl;
 			this_engine->processPubPkt(pkt);
 			//std::cout << "after processPubPkt" << std::endl;
-			traceEvent(100, false);
+			traceEvent(100);
 			pthread_mutex_lock(packetQueueMutex);
 			packetQueue.erase(packetQueue.begin());
 			pthread_mutex_unlock(packetQueueMutex);
