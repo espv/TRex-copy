@@ -122,7 +122,8 @@ void PublishPackets()
 
 			pkt->timeStamp = std::chrono::system_clock::now().time_since_epoch().count();
 			//std::cout << "before processPubPkt" << std::endl;
-			this_engine->processPubPkt(pkt);
+			auto pkt_copy = new PubPkt(*pkt);
+			this_engine->processPubPkt(pkt_copy);
 			//std::cout << "after processPubPkt" << std::endl;
 			traceEvent(100);
 			pthread_mutex_lock(packetQueueMutex);
