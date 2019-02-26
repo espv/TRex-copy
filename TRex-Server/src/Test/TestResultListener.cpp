@@ -16,7 +16,7 @@
  *
  */
 
-#include <TRex2-lib/src/Common/trace-framework.hpp>
+#include "../../../TRex2-lib/src/Common/trace-framework.hpp"
 #include "TestResultListener.hpp"
 
 using namespace concept::test;
