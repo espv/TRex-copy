@@ -33,7 +33,7 @@ long long first_time = 0;
 
 int tracedEvents = 0;
 
-#define MAX_NUMBER_EVENTS 50000
+#define MAX_NUMBER_EVENTS 250000
 TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;

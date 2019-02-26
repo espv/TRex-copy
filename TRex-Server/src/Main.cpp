@@ -133,7 +133,7 @@ void PublishPackets()
 }
 
 //#define SINGLE_RULE 1
-#define REGULAR_R1 1
+//#define REGULAR_R1 1
 void testEngine(){
 	pthread_mutex_init(packetQueueMutex, NULL);
   std::cout << "testEngine" << std::endl;
