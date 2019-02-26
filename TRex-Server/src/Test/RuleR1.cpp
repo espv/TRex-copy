@@ -31,14 +31,14 @@ RulePkt* RuleR1::buildRule(int event_temp, int event_humidity, int event_fire, i
   int indexRootPredicate= 0;
 	int indexSecondPredicate= 1;
 
-	TimeMs fiftenSeconds(15*1000);
+	TimeMs fiftenSeconds(15*1000*1000*1000);
 
 	// Temp predicate
 	// Constraint: Temp.value > 45
 	Constraint tempConstr[1];
 	strcpy(tempConstr[0].name, RuleR0::ATTR_TEMPVALUE);
 	tempConstr[0].type= INT;
-	tempConstr[0].op= EQ;
+	tempConstr[0].op= GT;
 	tempConstr[0].intVal= temperature;
 
   // Humidity predicate

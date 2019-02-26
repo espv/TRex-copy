@@ -73,7 +73,7 @@ std::vector<PubPkt*> packetQueue;
 
 long long pktsPublished = 0;
 std::vector<PubPkt*> allPackets;
-auto prev_time_published = std::chrono::system_clock::now().time_since_epoch().count();
+//auto prev_time_published = std::chrono::system_clock::now().time_since_epoch().count();
 TRexEngine *this_engine;
 boost::posix_time::microsec interval(20000);
 boost::asio::io_service io;
@@ -90,7 +90,7 @@ void HandlePubPacket(const boost::system::error_code&)
 		if (++number_placed_packets % 10000 == 0)
 			std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
 		pthread_mutex_lock(packetQueueMutex);
-		packetQueue.push_back(new PubPkt(*allPackets.at(gen()%allPackets.size())));
+		packetQueue.push_back(new PubPkt(*allPackets.at(/*gen()*/pktsPublished++%allPackets.size())));
 		pthread_mutex_unlock(packetQueueMutex);
 		//std::cout << "Inserted packet #" << number_placed_packets << " into queue. Size of packetQueue: " << packetQueue.size() << std::endl;
 	} else {
@@ -120,7 +120,7 @@ void PublishPackets()
                 prev_time_published = current_time;
 			}*/
 
-			pkt->timeStamp = clock();
+			pkt->timeStamp = std::chrono::system_clock::now().time_since_epoch().count();
 			//std::cout << "before processPubPkt" << std::endl;
 			this_engine->processPubPkt(pkt);
 			//std::cout << "after processPubPkt" << std::endl;
@@ -132,14 +132,15 @@ void PublishPackets()
 	}
 }
 
-#define SINGLE_RULE
+//#define SINGLE_RULE 1
+#define REGULAR_R1 1
 void testEngine(){
 	pthread_mutex_init(packetQueueMutex, NULL);
   std::cout << "testEngine" << std::endl;
 	this_engine = new TRexEngine(number_threads);
 	this_engine->finalize();
 
-#ifdef SINGLE_RULE
+#if SINGLE_RULE
   std::cout << "SINGLE_RULE" << std::endl;
   RuleR0 testRule;
 	this_engine->processRulePkt(testRule.buildRule());
@@ -147,6 +148,12 @@ void testEngine(){
   allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
   ResultListener* listener= new TestResultListener(testRule.buildSubscription());
   this_engine->addResultListener(listener);
+#elif REGULAR_R1
+	RuleR1 testRule;
+	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+	ResultListener* listener= new TestResultListener(testRule.buildSubscription(12));
+	this_engine->addResultListener(listener);
+	allPackets = testRule.buildPublication(10, 11, 50);
 #else
   RuleR1 testRule;
 	for (int i = 0; i < 20; i+=2) {
@@ -161,7 +168,9 @@ void testEngine(){
 	}
 #endif
 
-	boost::thread th{PublishPackets};
+	for (int i = 0; i < number_threads; i++) {
+		boost::thread th{PublishPackets};
+	}
 	t.async_wait(&HandlePubPacket);
 	io.run();
 
