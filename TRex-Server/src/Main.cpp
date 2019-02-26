@@ -112,7 +112,10 @@ void PublishPackets()
     pthread_mutex_unlock(packetQueueMutex);
 		if (!packetQueueEmpty) {
 			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
-			PubPkt *pkt = packetQueue.front();
+      pthread_mutex_lock(packetQueueMutex);
+      auto pkt = new PubPkt(*packetQueue.front());
+      packetQueue.erase(packetQueue.begin());
+      pthread_mutex_unlock(packetQueueMutex);
 			traceEvent(1, true);
 			/*if (++pktsPublished % 2000 == 0) {
 				auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
@@ -122,18 +125,15 @@ void PublishPackets()
 
 			pkt->timeStamp = std::chrono::system_clock::now().time_since_epoch().count();
 			//std::cout << "before processPubPkt" << std::endl;
-			auto pkt_copy = new PubPkt(*pkt);
-			this_engine->processPubPkt(pkt_copy);
+			this_engine->processPubPkt(pkt);
 			//std::cout << "after processPubPkt" << std::endl;
 			traceEvent(100);
-			pthread_mutex_lock(packetQueueMutex);
-			packetQueue.erase(packetQueue.begin());
-			pthread_mutex_unlock(packetQueueMutex);
 		}
 	}
 }
 
 //#define SINGLE_RULE 1
+#define SINGLE_MANY_RULES 1
 //#define REGULAR_R1 1
 void testEngine(){
 	pthread_mutex_init(packetQueueMutex, NULL);
@@ -145,6 +145,16 @@ void testEngine(){
   std::cout << "SINGLE_RULE" << std::endl;
   RuleR0 testRule;
 	this_engine->processRulePkt(testRule.buildRule());
+  auto testPackets = testRule.buildPublication();
+  allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
+  ResultListener* listener= new TestResultListener(testRule.buildSubscription());
+  this_engine->addResultListener(listener);
+#elif SINGLE_MANY_RULES
+  std::cout << "SINGLE_MANY_RULES" << std::endl;
+  RuleR0 testRule;
+  for (int i = 0; i < 100; i++) {
+    this_engine->processRulePkt(testRule.buildRule());
+  }
   auto testPackets = testRule.buildPublication();
   allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
   ResultListener* listener= new TestResultListener(testRule.buildSubscription());
