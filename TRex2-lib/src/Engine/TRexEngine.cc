@@ -210,7 +210,6 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
   traceEvent(110);
   // Installs information in shared memory
   for (int i = 0; i < numProc; i++) {
-    traceEvent(5);
     pthread_mutex_lock(shared[i].processMutex);
     shared[i].mh = mh;
 #if MP_MODE == MP_COPY
@@ -230,8 +229,8 @@ void TRexEngine::processPubPkt(PubPkt* pkt, bool recursion) {
     pthread_cond_wait(shared[0].resultCond, shared[0].resultMutex);
   pthread_mutex_unlock(shared[0].resultMutex);
   *(shared[0].stillProcessing) = numProc;
-  for (int i = 0; i < numProc; i++)  // Part of tracing only to connect trace event 8 with 111 for all processes
-    traceEvent(111);
+  //for (int i = 0; i < numProc; i++)  // Part of tracing only to connect trace event 8 with 111 for all processes
+  traceEvent(111);
 
   // Collects results
   for (int i = 0; i < numProc; i++) {

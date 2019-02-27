@@ -153,7 +153,7 @@ void testEngine(){
 #elif SINGLE_MANY_RULES
   std::cout << "SINGLE_MANY_RULES" << std::endl;
   RuleR0 testRule;
-  for (int i = 0; i < 100; i++) {
+  for (int i = 0; i < 8; i++) {
     this_engine->processRulePkt(testRule.buildRule());
   }
   auto testPackets = testRule.buildPublication();
