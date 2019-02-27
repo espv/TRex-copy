@@ -51,7 +51,7 @@ void traceEvent(int traceId, bool reset)
     events[tracedEvents].locationId = traceId;
     events[tracedEvents].cpuId = sched_getcpu();
     events[tracedEvents].threadId = pid;
-    events[tracedEvents].timestamp = current_time;
+    events[tracedEvents].timestamp = (((float)clock())/CLOCKS_PER_SEC) * 1000000000; //current_time;
     ++tracedEvents;
   } else {
     if (first_time == 0)
