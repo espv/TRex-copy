@@ -37,6 +37,7 @@
 #include <boost/thread.hpp>
 #include <cstring>
 #include <ctime>
+#include <queue>
 
 using concept::server::SOEPServer;
 using namespace concept::test;
@@ -69,7 +70,7 @@ void runServer(bool useGPU){
 int number_dropped_packets = 0;
 int number_placed_packets = 0;
 #define PACKET_CAPACITY 10
-std::vector<PubPkt*> packetQueue;
+std::queue<PubPkt*> packetQueue;
 
 long long pktsPublished = 0;
 std::vector<PubPkt*> allPackets;
@@ -90,7 +91,7 @@ void HandlePubPacket(const boost::system::error_code&)
 		if (++number_placed_packets % 10000 == 0)
 			std::cout << "Inserted packet #" << number_placed_packets << " into queue" << std::endl;
 		pthread_mutex_lock(packetQueueMutex);
-		packetQueue.push_back(new PubPkt(*allPackets.at(/*gen()*/pktsPublished++%allPackets.size())));
+		packetQueue.push(new PubPkt(*allPackets.at(/*gen()*/pktsPublished++%allPackets.size())));
 		pthread_mutex_unlock(packetQueueMutex);
 		//std::cout << "Inserted packet #" << number_placed_packets << " into queue. Size of packetQueue: " << packetQueue.size() << std::endl;
 	} else {
@@ -108,13 +109,11 @@ void PublishPackets()
 	while (continue_publishing) {
 		//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
     pthread_mutex_lock(packetQueueMutex);
-    auto packetQueueEmpty = packetQueue.empty();
-    pthread_mutex_unlock(packetQueueMutex);
-		if (!packetQueueEmpty) {
+		if (!packetQueue.empty()) {
 			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
-      pthread_mutex_lock(packetQueueMutex);
       auto pkt = new PubPkt(*packetQueue.front());
-      packetQueue.erase(packetQueue.begin());
+      packetQueue.pop();
+      //packetQueue.erase(packetQueue.begin());
       pthread_mutex_unlock(packetQueueMutex);
 			traceEvent(1, true);
 			/*if (++pktsPublished % 2000 == 0) {
@@ -128,6 +127,8 @@ void PublishPackets()
 			this_engine->processPubPkt(pkt);
 			//std::cout << "after processPubPkt" << std::endl;
 			traceEvent(100);
+		} else {
+      pthread_mutex_unlock(packetQueueMutex);
 		}
 	}
 }
