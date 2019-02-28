@@ -50,6 +50,7 @@ using namespace std;
 //#define SINGLE_MANY_RULES 1
 //#define REGULAR_R1 1
 
+std::string trace_name = "";
 bool continue_publishing = true;
 void my_handler(int s){
 	continue_publishing = false;
