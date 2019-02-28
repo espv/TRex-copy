@@ -36,24 +36,24 @@ RulePkt* RuleR0::buildRule(){
 
 	int indexPredTemp= 0;
 
-	int number_constraints = 3;
+	int number_constraints = 1;
 
 	// Temp root predicate
 	Constraint tempConstr[number_constraints];
-	strcpy(tempConstr[0].name, "ic1");
+	/*strcpy(tempConstr[0].name, "ic1");
+	tempConstr[0].type= INT;
+	tempConstr[0].op= GT;
+	tempConstr[0].intVal= 0;*/
+
+	strcpy(tempConstr[0].name, "ic2");
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
 	tempConstr[0].intVal= 0;
 
-	strcpy(tempConstr[1].name, "ic2");
-	tempConstr[1].type= INT;
-	tempConstr[1].op= GT;
-	tempConstr[1].intVal= 0;
-
-  strcpy(tempConstr[2].name, "ic3");
+  /*strcpy(tempConstr[2].name, "ic3");
   tempConstr[2].type= INT;
   tempConstr[2].op= GT;
-  tempConstr[2].intVal= 0;
+  tempConstr[2].intVal= 0;*/
 
 	/*strcpy(tempConstr[3].name, "sc1");
 	tempConstr[3].type = STRING;
@@ -93,23 +93,23 @@ SubPkt* RuleR0::buildSubscription() {
 }
 
 std::vector<PubPkt*> RuleR0::buildPublication(){
-	int number_attributes = 3;
+	int number_attributes = 1;
 	Attribute attr[number_attributes];
 	// Value attribute
-	strcpy(attr[0].name, "ic1");
+	/*strcpy(attr[0].name, "ic1");
 	attr[0].type= INT;
-	attr[0].intVal= 22;
+	attr[0].intVal= 22;*/
 
-	strcpy(attr[1].name, "ic2");
-	attr[1].type = INT;
-	attr[1].intVal=22;
+	strcpy(attr[0].name, "ic2");
+	attr[0].type = INT;
+	attr[0].intVal=22;
 
-  strcpy(attr[2].name, "ic3");
+  /*strcpy(attr[2].name, "ic3");
   attr[2].type = INT;
   attr[2].intVal=22;
 
 	// Area attribute
-	/*strcpy(attr[3].name, "sc1");
+	strcpy(attr[3].name, "sc1");
 	attr[3].type= STRING;
 	strcpy(attr[3].stringVal, "sa1");
 
