@@ -44,7 +44,7 @@ using namespace concept::test;
 using concept::util::Logging;
 using namespace std;
 
-//#define SEND_PACKETS_FOREVER
+#define SEND_PACKETS_FOREVER
 
 bool continue_publishing = true;
 void my_handler(int s){
