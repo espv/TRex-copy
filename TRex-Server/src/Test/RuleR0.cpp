@@ -36,7 +36,7 @@ RulePkt* RuleR0::buildRule(){
 
 	int indexPredTemp= 0;
 
-	int number_constraints = 5;
+	int number_constraints = 1;
 
 	// Temp root predicate
 	Constraint tempConstr[number_constraints];
@@ -92,7 +92,7 @@ SubPkt* RuleR0::buildSubscription() {
 }
 
 std::vector<PubPkt*> RuleR0::buildPublication(){
-	int number_attributes = 5;
+	int number_attributes = 1;
 	Attribute attr[number_attributes];
 	// Value attribute
 	strcpy(attr[0].name, "ic1");
