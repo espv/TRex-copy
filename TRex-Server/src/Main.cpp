@@ -117,7 +117,7 @@ void PublishPackets()
     pthread_mutex_lock(packetQueueMutex);
 #ifdef SEND_PACKETS_FOREVER
     packetQueue.push(new PubPkt(*allPackets.at(pktsPublished++%allPackets.size())));
-    usleep(1000);
+    //usleep(1000);
 #endif
 		if (!packetQueue.empty()) {
 			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
