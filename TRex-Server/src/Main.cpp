@@ -185,13 +185,15 @@ void testEngine(){
 	}
 #endif
 
+  boost::thread_group tg;
 	for (int i = 0; i < number_threads; i++) {
-		boost::thread th{PublishPackets};
+    tg.create_thread(PublishPackets);
 	}
 #ifndef SEND_PACKETS_FOREVER
 	t.async_wait(&HandlePubPacket);
 	io.run();
 #endif
+	tg.join_all();
 
 	/* Expected output: complex event should be created by T-Rex and published
 	 * to the TestResultListener, which should print it to screen.
