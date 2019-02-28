@@ -44,12 +44,13 @@ RulePkt* RuleR0::buildRule(){
 	tempConstr[0].type= INT;
 	tempConstr[0].op= GT;
 	tempConstr[0].intVal= 0;
-	strcpy(tempConstr[1].name, "ic2");
+
+	/*strcpy(tempConstr[1].name, "ic2");
 	tempConstr[1].type= INT;
 	tempConstr[1].op= GT;
 	tempConstr[1].intVal= 0;
 
-  /*strcpy(tempConstr[2].name, "ic3");
+  strcpy(tempConstr[2].name, "ic3");
   tempConstr[2].type= INT;
   tempConstr[2].op= GT;
   tempConstr[2].intVal= 0;
