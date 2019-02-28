@@ -81,7 +81,7 @@ long long pktsPublished = 0;
 std::vector<PubPkt*> allPackets;
 //auto prev_time_published = std::chrono::system_clock::now().time_since_epoch().count();
 TRexEngine *this_engine;
-boost::posix_time::microsec interval(20000);
+boost::posix_time::microsec interval(100000);
 boost::asio::io_service io;
 boost::asio::deadline_timer t(io, interval);
 
@@ -149,6 +149,7 @@ void testEngine(){
 	this_engine->finalize();
 
 #if SINGLE_RULE
+	trace_name += "-single-rule";
   std::cout << "SINGLE_RULE" << std::endl;
   RuleR0 testRule;
 	this_engine->processRulePkt(testRule.buildRule());
@@ -157,6 +158,7 @@ void testEngine(){
   ResultListener* listener= new TestResultListener(testRule.buildSubscription());
   this_engine->addResultListener(listener);
 #elif SINGLE_MANY_RULES
+	trace_name += "-single-many-rules";
   std::cout << "SINGLE_MANY_RULES" << std::endl;
   RuleR0 testRule;
   for (int i = 0; i < 8; i++) {
@@ -167,12 +169,14 @@ void testEngine(){
   ResultListener* listener= new TestResultListener(testRule.buildSubscription());
   this_engine->addResultListener(listener);
 #elif REGULAR_R1
+  trace_name += "-regular-r1";
 	RuleR1 testRule;
 	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
 	ResultListener* listener= new TestResultListener(testRule.buildSubscription(12));
 	this_engine->addResultListener(listener);
 	allPackets = testRule.buildPublication(10, 11, 50);
 #else
+	trace_name += "-many-complex-rules";
   RuleR1 testRule;
 	for (int i = 0; i < 20; i+=2) {
 	    for (int j = 0; j < 100; j++) {
@@ -201,7 +205,6 @@ void testEngine(){
 	 */
 }
 
-extern std::string trace_name = "";
 extern bool doTrace;
 int main(int argc, char* argv[]){
 	bool test = false;
