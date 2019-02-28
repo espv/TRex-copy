@@ -61,14 +61,8 @@ void my_handler(int s){
 
 int number_threads = boost::thread::hardware_concurrency();
 void runServer(bool useGPU){
-	// Create server with default port and #threads = #CPUs
-#ifdef USE_SINGLE_CORE
-    std::cout << "Using 2 thread" << std::endl;
-	SOEPServer server(SOEPServer::DEFAULT_PORT, 5, false, useGPU);
-# else
 	std::cout << "Using " << number_threads << " threads" << std::endl;
 	SOEPServer server(SOEPServer::DEFAULT_PORT, number_threads, false, useGPU);
-#endif
 
 	server.run();
 }
