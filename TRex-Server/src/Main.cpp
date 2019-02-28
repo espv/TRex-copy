@@ -44,6 +44,8 @@ using namespace concept::test;
 using concept::util::Logging;
 using namespace std;
 
+#define SEND_PACKETS_FOREVER
+
 bool continue_publishing = true;
 void my_handler(int s){
 	continue_publishing = false;
@@ -109,6 +111,9 @@ void PublishPackets()
 	while (continue_publishing) {
 		//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
     pthread_mutex_lock(packetQueueMutex);
+#ifdef SEND_PACKETS_FOREVER
+    packetQueue.push(new PubPkt(*allPackets.at(pktsPublished++%allPackets.size())));
+#endif
 		if (!packetQueue.empty()) {
 			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
       auto pkt = new PubPkt(*packetQueue.front());
@@ -134,7 +139,7 @@ void PublishPackets()
 }
 
 //#define SINGLE_RULE 1
-#define SINGLE_MANY_RULES 1
+//#define SINGLE_MANY_RULES 1
 //#define REGULAR_R1 1
 void testEngine(){
 	pthread_mutex_init(packetQueueMutex, NULL);
@@ -183,8 +188,10 @@ void testEngine(){
 	for (int i = 0; i < number_threads; i++) {
 		boost::thread th{PublishPackets};
 	}
+#ifndef SEND_PACKETS_FOREVER
 	t.async_wait(&HandlePubPacket);
 	io.run();
+#endif
 
 	/* Expected output: complex event should be created by T-Rex and published
 	 * to the TestResultListener, which should print it to screen.
