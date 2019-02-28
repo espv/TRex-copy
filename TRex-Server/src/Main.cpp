@@ -44,7 +44,11 @@ using namespace concept::test;
 using concept::util::Logging;
 using namespace std;
 
-//#define SEND_PACKETS_FOREVER
+#define SEND_PACKETS_FOREVER
+#define PACKET_CAPACITY 10
+#define SINGLE_RULE 1
+//#define SINGLE_MANY_RULES 1
+//#define REGULAR_R1 1
 
 bool continue_publishing = true;
 void my_handler(int s){
@@ -71,7 +75,6 @@ void runServer(bool useGPU){
 
 int number_dropped_packets = 0;
 int number_placed_packets = 0;
-#define PACKET_CAPACITY 10
 std::queue<PubPkt*> packetQueue;
 
 long long pktsPublished = 0;
@@ -113,6 +116,7 @@ void PublishPackets()
     pthread_mutex_lock(packetQueueMutex);
 #ifdef SEND_PACKETS_FOREVER
     packetQueue.push(new PubPkt(*allPackets.at(pktsPublished++%allPackets.size())));
+    usleep(100);
 #endif
 		if (!packetQueue.empty()) {
 			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
@@ -138,9 +142,6 @@ void PublishPackets()
 	}
 }
 
-//#define SINGLE_RULE 1
-//#define SINGLE_MANY_RULES 1
-//#define REGULAR_R1 1
 void testEngine(){
 	pthread_mutex_init(packetQueueMutex, NULL);
   std::cout << "testEngine" << std::endl;
