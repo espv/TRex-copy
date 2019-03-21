@@ -48,7 +48,8 @@ using namespace std;
 #define PACKET_CAPACITY 10
 //#define SINGLE_RULE 1
 //#define SINGLE_MANY_RULES 1
-#define REGULAR_R1 1
+//#define REGULAR_R1 1
+#define FIVE_R1 1
 
 std::string trace_name = "";
 bool continue_publishing = true;
@@ -166,6 +167,17 @@ void testEngine(){
 #elif REGULAR_R1
   trace_name += "-regular-r1";
 	RuleR1 testRule;
+	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+	ResultListener* listener= new TestResultListener(testRule.buildSubscription(12));
+	this_engine->addResultListener(listener);
+	allPackets = testRule.buildPublication(10, 11, 50);
+#elif FIVE_R1
+	trace_name += "-regular-r1";
+	RuleR1 testRule;
+	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
 	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
 	ResultListener* listener= new TestResultListener(testRule.buildSubscription(12));
 	this_engine->addResultListener(listener);
