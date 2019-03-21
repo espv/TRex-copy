@@ -46,9 +46,9 @@ using namespace std;
 
 #define SEND_PACKETS_FOREVER
 #define PACKET_CAPACITY 10
-#define SINGLE_RULE 1
+//#define SINGLE_RULE 1
 //#define SINGLE_MANY_RULES 1
-//#define REGULAR_R1 1
+#define REGULAR_R1 1
 
 std::string trace_name = "";
 bool continue_publishing = true;
