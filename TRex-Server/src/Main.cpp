@@ -71,6 +71,7 @@ void runServer(bool useGPU){
 
 int number_dropped_packets = 0;
 int number_placed_packets = 0;
+int test_mode = 0;
 std::queue<PubPkt*> packetQueue;
 
 long long pktsPublished = 0;
@@ -144,58 +145,60 @@ void testEngine(){
 	this_engine = new TRexEngine(number_threads);
 	this_engine->finalize();
 
-#if SINGLE_RULE
-	trace_name += "-single-rule";
-  std::cout << "SINGLE_RULE" << std::endl;
-  RuleR0 testRule;
-	this_engine->processRulePkt(testRule.buildRule());
-  auto testPackets = testRule.buildPublication();
-  allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
-  ResultListener* listener= new TestResultListener(testRule.buildSubscription());
-  this_engine->addResultListener(listener);
-#elif SINGLE_MANY_RULES
-	trace_name += "-single-many-rules";
-  std::cout << "SINGLE_MANY_RULES" << std::endl;
-  RuleR0 testRule;
-  for (int i = 0; i < 8; i++) {
+  if (test_mode == 0) {
+    trace_name += "-single-rule";
+    std::cout << "SINGLE_RULE" << std::endl;
+    RuleR0 testRule;
     this_engine->processRulePkt(testRule.buildRule());
+    auto testPackets = testRule.buildPublication();
+    allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
+    ResultListener *listener = new TestResultListener(testRule.buildSubscription());
+    this_engine->addResultListener(listener);
+  } else if (test_mode == 1) {
+    trace_name += "-single-many-rules";
+    std::cout << "SINGLE_MANY_RULES" << std::endl;
+    RuleR0 testRule;
+    for (int i = 0; i < 8; i++) {
+      this_engine->processRulePkt(testRule.buildRule());
+    }
+    auto testPackets = testRule.buildPublication();
+    allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
+    ResultListener *listener = new TestResultListener(testRule.buildSubscription());
+    this_engine->addResultListener(listener);
+  } else if (test_mode == 2) {
+    trace_name += "-regular-r1";
+    RuleR1 testRule;
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    ResultListener *listener = new TestResultListener(testRule.buildSubscription(12));
+    this_engine->addResultListener(listener);
+    allPackets = testRule.buildPublication(10, 11, 50);
+  } else if (test_mode == 3) {
+    trace_name += "-regular-r1";
+    RuleR1 testRule;
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    ResultListener *listener = new TestResultListener(testRule.buildSubscription(12));
+    this_engine->addResultListener(listener);
+    allPackets = testRule.buildPublication(10, 11, 50);
+  } else if (test_mode == 4) {
+    trace_name += "-many-complex-rules";
+    RuleR1 testRule;
+    for (int i = 0; i < 20; i += 2) {
+      for (int j = 0; j < 100; j++) {
+        int fire_event = ((i + 1) * (j + 1)) + 101;
+        this_engine->processRulePkt(testRule.buildRule(i, i + 1, fire_event, j % 10));
+        auto testPackets = testRule.buildPublication(i, i + 1, j % 10);
+        allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
+        ResultListener *listener = new TestResultListener(testRule.buildSubscription(fire_event));
+        this_engine->addResultListener(listener);
+      }
+    }
+  } else {
+    std::cout << "Invalid test mode" << std::endl;
   }
-  auto testPackets = testRule.buildPublication();
-  allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
-  ResultListener* listener= new TestResultListener(testRule.buildSubscription());
-  this_engine->addResultListener(listener);
-#elif REGULAR_R1
-  trace_name += "-regular-r1";
-	RuleR1 testRule;
-	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
-	ResultListener* listener= new TestResultListener(testRule.buildSubscription(12));
-	this_engine->addResultListener(listener);
-	allPackets = testRule.buildPublication(10, 11, 50);
-#elif FIVE_R1
-	trace_name += "-regular-r1";
-	RuleR1 testRule;
-	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
-	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
-	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
-	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
-	this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
-	ResultListener* listener= new TestResultListener(testRule.buildSubscription(12));
-	this_engine->addResultListener(listener);
-	allPackets = testRule.buildPublication(10, 11, 50);
-#else
-	trace_name += "-many-complex-rules";
-  RuleR1 testRule;
-	for (int i = 0; i < 20; i+=2) {
-	    for (int j = 0; j < 100; j++) {
-	        int fire_event = ((i+1)*(j+1))+101;
-            this_engine->processRulePkt(testRule.buildRule(i, i + 1, fire_event, j%10));
-            auto testPackets = testRule.buildPublication(i, i + 1, j%10);
-            allPackets.insert(allPackets.end(), testPackets.begin(), testPackets.end());
-            ResultListener* listener= new TestResultListener(testRule.buildSubscription(fire_event));
-            this_engine->addResultListener(listener);
-        }
-	}
-#endif
 
   boost::thread_group tg;
 	for (int i = 0; i < number_threads; i++) {
@@ -222,7 +225,9 @@ int main(int argc, char* argv[]){
       ++i;
       number_threads = std::atoi(argv[i]);
     } else if (!strcmp(argv[i], "-test")) {
+		  ++i;
       test = true;
+      test_mode = std::atoi(argv[i]);
     } else if (!strcmp(argv[i], "-trace-name")) {
 		  ++i;
 		  trace_name = argv[i];
