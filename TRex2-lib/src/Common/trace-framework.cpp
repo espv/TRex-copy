@@ -44,14 +44,18 @@ void traceEvent(int traceId, bool reset)
   int pid = syscall(SYS_gettid);
   pthread_mutex_lock(traceMutex);
   //std::cout << "tracing " << traceId << std::endl;
+  if (tracedEvents < MAX_NUMBER_EVENTS) {
+    ++tracedEvents;
+    return;
+  }
   auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
   if (writeTraceToFile) {
-    if (tracedEvents >= MAX_NUMBER_EVENTS -1)
+    if (tracedEvents >= MAX_NUMBER_EVENTS*2 - 1)
       writeBufferToFile();
-    events[tracedEvents].locationId = traceId;
-    events[tracedEvents].cpuId = sched_getcpu();
-    events[tracedEvents].threadId = pid;
-    events[tracedEvents].timestamp = current_time;
+    events[tracedEvents-MAX_NUMBER_EVENTS].locationId = traceId;
+    events[tracedEvents-MAX_NUMBER_EVENTS].cpuId = sched_getcpu();
+    events[tracedEvents-MAX_NUMBER_EVENTS].threadId = pid;
+    events[tracedEvents-MAX_NUMBER_EVENTS].timestamp = current_time;
     ++tracedEvents;
   } else {
     if (first_time == 0)
