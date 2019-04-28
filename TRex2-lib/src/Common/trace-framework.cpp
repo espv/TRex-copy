@@ -41,13 +41,13 @@ void traceEvent(int traceId, bool reset)
 {
   if (!doTrace || (traceId != 1 && traceId != 100)) ///*&& traceId != 230*//* && traceId != 110 && traceId != 111 && traceId != 4343 && traceId != 801 && traceId != 7 && traceId != 8)*/)  // && traceId != 10 && traceId != 50 && traceId != 51 && traceId != 155 && traceId != 501 && traceId != 502 && traceId != 503 && traceId != 504 && traceId != 505  && traceId != 5 && traceId != 6 && traceId != 7 && traceId != 12 && traceId != 57 && traceId != 58 && traceId != 59 && traceId != 110 && traceId != 111 && traceId != 112))
     return;
-  int pid = syscall(SYS_gettid);
-  pthread_mutex_lock(traceMutex);
-  //std::cout << "tracing " << traceId << std::endl;
   if (tracedEvents < MAX_NUMBER_EVENTS) {
     ++tracedEvents;
     return;
   }
+  int pid = syscall(SYS_gettid);
+  pthread_mutex_lock(traceMutex);
+  //std::cout << "tracing " << traceId << std::endl;
   auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
   if (writeTraceToFile) {
     if (tracedEvents >= MAX_NUMBER_EVENTS*2 - 1)
