@@ -77,6 +77,7 @@ void* processor(void* parShared) {
           if (index != 0) {
             traceEvent(801);
             s->stacksRule->find(i)->second->addToStack(s->pkt, index);
+            traceEvent(4343);
           } else {
             lastState = true;
           }
@@ -85,6 +86,7 @@ void* processor(void* parShared) {
           s->stacksRule->find(i)->second->startComputation(s->pkt, s->result);
         }
       }
+      traceEvent(8);
     }
     traceEvent(59);
     pthread_mutex_lock(s->processMutex);
