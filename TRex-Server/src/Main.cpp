@@ -178,12 +178,21 @@ void testEngine(){
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    ResultListener *listener = new TestResultListener(testRule.buildSubscription(12));
+    this_engine->addResultListener(listener);
+    allPackets = testRule.buildPublication(10, 11, 50);
+  } else if (test_mode == 4) {
+    trace_name += "-regular-r1";
+    RuleR1 testRule;
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     ResultListener *listener = new TestResultListener(testRule.buildSubscription(12));
     this_engine->addResultListener(listener);
     allPackets = testRule.buildPublication(10, 11, 50);
-  } else if (test_mode == 4) {
+  } else if (test_mode == 5) {
     trace_name += "-many-complex-rules";
     RuleR1 testRule;
     for (int i = 0; i < 20; i += 2) {
