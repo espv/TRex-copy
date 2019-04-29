@@ -177,11 +177,29 @@ void testEngine(){
     RuleR1 testRule;
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
-    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     ResultListener *listener = new TestResultListener(testRule.buildSubscription(12));
     this_engine->addResultListener(listener);
     allPackets = testRule.buildPublication(10, 11, 50);
   } else if (test_mode == 4) {
+    trace_name += "-regular-r1";
+    RuleR1 testRule;
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    ResultListener *listener = new TestResultListener(testRule.buildSubscription(12));
+    this_engine->addResultListener(listener);
+    allPackets = testRule.buildPublication(10, 11, 50);
+  } else if (test_mode == 5) {
+    trace_name += "-regular-r1";
+    RuleR1 testRule;
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
+    ResultListener *listener = new TestResultListener(testRule.buildSubscription(12));
+    this_engine->addResultListener(listener);
+    allPackets = testRule.buildPublication(10, 11, 50);
+  } else if (test_mode == 6) {
     trace_name += "-regular-r1";
     RuleR1 testRule;
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
