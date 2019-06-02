@@ -33,7 +33,7 @@ long long first_time = 0;
 
 int tracedEvents = 0;
 
-#define MAX_NUMBER_EVENTS 2000000
+#define MAX_NUMBER_EVENTS 20000
 TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
@@ -41,21 +41,26 @@ void traceEvent(int traceId, bool reset)
 {
   if (!doTrace || (traceId != 1 && traceId != 100)) ///*&& traceId != 230*//* && traceId != 110 && traceId != 111 && traceId != 4343 && traceId != 801 && traceId != 7 && traceId != 8)*/)  // && traceId != 10 && traceId != 50 && traceId != 51 && traceId != 155 && traceId != 501 && traceId != 502 && traceId != 503 && traceId != 504 && traceId != 505  && traceId != 5 && traceId != 6 && traceId != 7 && traceId != 12 && traceId != 57 && traceId != 58 && traceId != 59 && traceId != 110 && traceId != 111 && traceId != 112))
     return;
-  if (tracedEvents < MAX_NUMBER_EVENTS) {
+  /*if (tracedEvents < MAX_NUMBER_EVENTS) {
     ++tracedEvents;
     return;
-  }
+  }*/
   int pid = syscall(SYS_gettid);
   pthread_mutex_lock(traceMutex);
-  //std::cout << "tracing " << traceId << std::endl;
   auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
+  //std::cout << "tracing " << traceId << std::endl;
+  /*auto start = std::chrono::high_resolution_clock::now();
+  //auto current_time2 = std::chrono::system_clock::now().time_since_epoch().count();
+  auto finish = std::chrono::high_resolution_clock::now();
+  auto diff = std::chrono::duration_cast<std::chrono::nanoseconds>(finish-start).count();*/
+
   if (writeTraceToFile) {
-    if (tracedEvents >= MAX_NUMBER_EVENTS*2 - 1)
+    if (tracedEvents >= MAX_NUMBER_EVENTS - 1)
       writeBufferToFile();
-    events[tracedEvents-MAX_NUMBER_EVENTS].locationId = traceId;
-    events[tracedEvents-MAX_NUMBER_EVENTS].cpuId = sched_getcpu();
-    events[tracedEvents-MAX_NUMBER_EVENTS].threadId = pid;
-    events[tracedEvents-MAX_NUMBER_EVENTS].timestamp = current_time;
+    events[tracedEvents].locationId = traceId;
+    events[tracedEvents].cpuId = sched_getcpu();
+    events[tracedEvents].threadId = pid;
+    events[tracedEvents].timestamp = current_time;
     ++tracedEvents;
   } else {
     if (first_time == 0)

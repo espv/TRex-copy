@@ -109,29 +109,17 @@ void HandlePubPacket(const boost::system::error_code&)
 void PublishPackets()
 {
 	while (continue_publishing) {
-		//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
     pthread_mutex_lock(packetQueueMutex);
 #ifdef SEND_PACKETS_FOREVER
     packetQueue.push(new PubPkt(*allPackets.at(pktsPublished++%allPackets.size())));
-    //usleep(1000);
 #endif
 		if (!packetQueue.empty()) {
-			//std::cout << "PublishPackets, size of packetQueue: " << packetQueue.size() << std::endl;
       auto pkt = new PubPkt(*packetQueue.front());
       packetQueue.pop();
-      //packetQueue.erase(packetQueue.begin());
       pthread_mutex_unlock(packetQueueMutex);
+      pkt->timeStamp = std::chrono::system_clock::now().time_since_epoch().count();
 			traceEvent(1, true);
-			/*if (++pktsPublished % 2000 == 0) {
-				auto current_time = std::chrono::system_clock::now().time_since_epoch().count();
-				std::cout << pktsPublished << " - " << current_time - prev_time_published << std::endl;
-                prev_time_published = current_time;
-			}*/
-
-			pkt->timeStamp = std::chrono::system_clock::now().time_since_epoch().count();
-			//std::cout << "before processPubPkt" << std::endl;
 			this_engine->processPubPkt(pkt);
-			//std::cout << "after processPubPkt" << std::endl;
 			traceEvent(100);
 		} else {
       pthread_mutex_unlock(packetQueueMutex);
