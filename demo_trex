@@ -1,0 +1,1 @@
+TRexServer -test 2 -trace -number-threads 1 -trace-name rpi_demo && cd ../analysis/traces && mv *rpi*.trace rpi/ && git add rpi/*rpi_demo* && git commit rpi/*rpi_demo*.trace -m "demo trace" && git push origin demo/debs-2019
