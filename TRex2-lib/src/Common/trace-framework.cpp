@@ -80,6 +80,7 @@ void traceEvent(int traceId, bool reset)
 int trace_index = 0;
 void writeBufferToFile()
 {
+  exit(0);
   std::cout << "Writing trace to file" << std::endl;
   ofstream myfile;
   std::ostringstream oss;
@@ -95,10 +96,10 @@ void writeBufferToFile()
     myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
   }
   std::cout << "Finished writing" << std::endl;
-  //myfile.close();
+  myfile.close();
 
   tracedEvents = 0;
-  //memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
+  memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
   std::cout << "trace-framework.cpp, ready to exit" << std::endl;
   exit(0);
 }
