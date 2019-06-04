@@ -5,6 +5,8 @@
 #ifndef TREXSERVER_TRACE_FRAMEWORK_H
 #define TREXSERVER_TRACE_FRAMEWORK_H
 
+#include <iostream>
+
 class TraceEvent {
 public:
     int locationId;
@@ -17,5 +19,7 @@ public:
 void traceEvent(int traceId, bool reset=false);
 
 void writeBufferToFile();
+
+void setTraceName(std::string tn);
 
 #endif //TREXSERVER_TRACE_FRAMEWORK_H

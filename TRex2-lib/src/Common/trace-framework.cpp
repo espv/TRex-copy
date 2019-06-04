@@ -33,7 +33,7 @@ long long first_time = 0;
 
 int tracedEvents = 0;
 
-#define MAX_NUMBER_EVENTS 20000
+#define MAX_NUMBER_EVENTS 2000
 TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
@@ -80,7 +80,6 @@ void traceEvent(int traceId, bool reset)
 int trace_index = 0;
 void writeBufferToFile()
 {
-  exit(0);
   std::cout << "Writing trace to file" << std::endl;
   ofstream myfile;
   std::ostringstream oss;
@@ -102,4 +101,8 @@ void writeBufferToFile()
   memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
   std::cout << "trace-framework.cpp, ready to exit" << std::endl;
   exit(0);
+}
+
+void setTraceName(std::string tn) {
+  trace_name = tn;
 }

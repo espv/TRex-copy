@@ -51,7 +51,7 @@ using namespace std;
 //#define REGULAR_R1 1
 #define FIVE_R1 1
 
-std::string trace_name = "";
+std::string tn = "";
 bool continue_publishing = true;
 void my_handler(int s){
 	continue_publishing = false;
@@ -134,7 +134,7 @@ void testEngine(){
 	this_engine->finalize();
 
   if (test_mode == 0) {
-    trace_name += "-single-rule";
+    tn += "-single-rule";
     std::cout << "SINGLE_RULE" << std::endl;
     RuleR0 testRule;
     this_engine->processRulePkt(testRule.buildRule());
@@ -143,7 +143,7 @@ void testEngine(){
     ResultListener *listener = new TestResultListener(testRule.buildSubscription());
     this_engine->addResultListener(listener);
   } else if (test_mode == 1) {
-    trace_name += "-single-many-rules";
+    tn += "-single-many-rules";
     std::cout << "SINGLE_MANY_RULES" << std::endl;
     RuleR0 testRule;
     for (int i = 0; i < 8; i++) {
@@ -154,14 +154,14 @@ void testEngine(){
     ResultListener *listener = new TestResultListener(testRule.buildSubscription());
     this_engine->addResultListener(listener);
   } else if (test_mode == 2) {
-    trace_name += "-regular-r1";
+    tn += "-regular-r1";
     RuleR1 testRule;
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     ResultListener *listener = new TestResultListener(testRule.buildSubscription(12));
     this_engine->addResultListener(listener);
     allPackets = testRule.buildPublication(10, 11, 50);
   } else if (test_mode == 3) {
-    trace_name += "-regular-r1";
+    tn += "-regular-r1";
     RuleR1 testRule;
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
@@ -169,7 +169,7 @@ void testEngine(){
     this_engine->addResultListener(listener);
     allPackets = testRule.buildPublication(10, 11, 50);
   } else if (test_mode == 4) {
-    trace_name += "-regular-r1";
+    tn += "-regular-r1";
     RuleR1 testRule;
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
@@ -178,7 +178,7 @@ void testEngine(){
     this_engine->addResultListener(listener);
     allPackets = testRule.buildPublication(10, 11, 50);
   } else if (test_mode == 5) {
-    trace_name += "-regular-r1";
+    tn += "-regular-r1";
     RuleR1 testRule;
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
@@ -188,7 +188,7 @@ void testEngine(){
     this_engine->addResultListener(listener);
     allPackets = testRule.buildPublication(10, 11, 50);
   } else if (test_mode == 6) {
-    trace_name += "-regular-r1";
+    tn += "-regular-r1";
     RuleR1 testRule;
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
     this_engine->processRulePkt(testRule.buildRule(10, 11, 12, 45));
@@ -199,7 +199,7 @@ void testEngine(){
     this_engine->addResultListener(listener);
     allPackets = testRule.buildPublication(10, 11, 50);
   } else if (test_mode == 5) {
-    trace_name += "-many-complex-rules";
+    tn += "-many-complex-rules";
     RuleR1 testRule;
     for (int i = 0; i < 20; i += 2) {
       for (int j = 0; j < 100; j++) {
@@ -215,6 +215,7 @@ void testEngine(){
     std::cout << "Invalid test mode" << std::endl;
   }
 
+  setTraceName(tn);
   boost::thread_group tg;
 	for (int i = 0; i < number_threads; i++) {
     tg.create_thread(PublishPackets);
@@ -245,7 +246,7 @@ int main(int argc, char* argv[]){
       test_mode = std::atoi(argv[i]);
     } else if (!strcmp(argv[i], "-trace-name")) {
 		  ++i;
-		  trace_name = argv[i];
+		  tn = argv[i];
 		}
 	}
 
