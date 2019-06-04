@@ -99,5 +99,6 @@ void writeBufferToFile()
 
   tracedEvents = 0;
   memset(events, 0, sizeof(TraceEvent)*MAX_NUMBER_EVENTS);
+  std::cout << "trace-framework.cpp, ready to exit" << std::endl;
   exit(0);
 }
