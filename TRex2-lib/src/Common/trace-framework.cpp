@@ -33,7 +33,7 @@ long long first_time = 0;
 
 int tracedEvents = 0;
 
-#define MAX_NUMBER_EVENTS 2000
+#define MAX_NUMBER_EVENTS 200000
 TraceEvent events[MAX_NUMBER_EVENTS];
 
 bool writeTraceToFile = true;
@@ -89,7 +89,7 @@ void writeBufferToFile()
   std::string fn = oss.str();
   myfile.open (fn);
   std::cout << "About to write to file" << std::endl;
-  for (int i = 0; i < tracedEvents; ++i)
+  for (int i = tracedEvents/2; i < tracedEvents; ++i)
   {
     TraceEvent *event = &events[i];
     myfile << event->locationId << "\t" << event->cpuId << "\t" << event->threadId << "\t" << event->timestamp << "\n";
