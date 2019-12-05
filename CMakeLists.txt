@@ -25,16 +25,16 @@ include_directories(TRex2-lib/src/Packets)
 # it will always rebuild the link with TRex2-lib when the library has been changed, i.e., make install is executed in
 # TRex2-lib. To prevent this, we will only run make install in TRex2-lib if a source file has changed in TRex2-lib,
 # or, the output from running "make" is not "Nothing to be done for 'all'.
-add_custom_target(TRexServer COMMAND ${PROJECT_SOURCE_DIR}/TRex-Server/custom_setup.sh
+add_custom_target(TRexServer
         CLION_EXE_DIR=${PROJECT_SOURCE_DIR}/TRex-Server/src)
 
 add_custom_target(JustRunTRexServer
         CLION_EXE_DIR=${PROJECT_SOURCE_DIR}/TRex-Server/src)
 
-add_custom_target(ConfigureDebugTRex COMMAND ${PROJECT_SOURCE_DIR}/TRex2-lib/run_debug_configure && ${PROJECT_SOURCE_DIR}/TRex-Server/run_debug_configure
+add_custom_target(ConfigureDebugTRex
         CLION_EXE_DIR=${PROJECT_SOURCE_DIR}/TRex2-Server/src)
 
-add_custom_target(ConfigureProdTRex COMMAND ${PROJECT_SOURCE_DIR}/TRex2-lib/run_production_configure && ${PROJECT_SOURCE_DIR}/TRex-Server/run_production_configure
+add_custom_target(ConfigureProdTRex
         CLION_EXE_DIR=${PROJECT_SOURCE_DIR}/TRex-Server/src)
 
 set_target_properties(TRexServer PROPERTIES LINKER_LANGUAGE CXX)
@@ -83,7 +83,6 @@ add_executable(T-Rex
         TRex2-lib/src/Engine/IntConstraintIndex.h
         TRex2-lib/src/Engine/Engine.h
         TRex2-lib/src/Engine/TRexEngine.h
-        TRex-Server/config.h
         TRex2-lib/src/Common/trace-framework.hpp
         TRex-Server/src/util.hpp
         TRex-Server/src/Util/Logging.hpp
